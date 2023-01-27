@@ -1,9 +1,0 @@
-version: '3.8'
-services:
-  kp-app:
-    container_name: web
-    build:
-      context: /KnowlodgeShare
-      dockerfile: ./KnowlodgeShare/Dockerfile
-    ports:
-    - '44339:80'

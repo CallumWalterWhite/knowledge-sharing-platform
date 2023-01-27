@@ -15,7 +15,16 @@ builder.Services.AddAuthorization(options =>
 {
     // By default, all incoming requests will be authorized according to the default policy.
     options.FallbackPolicy = options.DefaultPolicy;
+}).AddCookie(options =>
+{
+    // add an instance of the patched manager to the options:
+    options.CookieManager = new ChunkingCookieManager();
+
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SameSite = SameSiteMode.None;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
 });
+
 builder.Services.AddRazorPages()
     .AddMicrosoftIdentityUI();
 

@@ -1,0 +1,9 @@
+version: '3.8'
+services:
+  kp-app:
+    container_name: swag_tab
+    build:
+      context: /src/KnowlodgeShare
+      dockerfile: ./KnowlodgeShare/Dockerfile
+    ports:
+    - '44339:80'
