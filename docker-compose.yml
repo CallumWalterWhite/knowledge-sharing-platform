@@ -7,3 +7,4 @@ services:
       dockerfile: ./KnowlodgeShare/Dockerfile
     ports:
     - '44339:80'
+    - '45339:443'

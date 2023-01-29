@@ -1,15 +1,15 @@
 {
   "dependencies": {
-    "identityapp1": {
-      "secretStore": null,
-      "resourceId": null,
-      "type": "identityapp.default",
-      "connectionId": null
-    },
     "secrets1": {
       "secretStore": null,
       "resourceId": null,
       "type": "secrets.user",
+      "connectionId": null
+    },
+    "identityapp1": {
+      "secretStore": null,
+      "resourceId": null,
+      "type": "identityapp.default",
       "connectionId": null
     }
   }

@@ -1,11 +1,11 @@
 {
   "dependencies": {
-    "identityapp1": {
-      "type": "identityapp",
-      "connectionId": null
-    },
     "secrets1": {
       "type": "secrets",
+      "connectionId": null
+    },
+    "identityapp1": {
+      "type": "identityapp",
       "connectionId": null
     }
   }
