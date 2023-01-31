@@ -1,10 +1,8 @@
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+using KnowledgeShare.Core.Repository;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
+using Neo4j.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +18,28 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddRazorPages()
     .AddMicrosoftIdentityUI();
+
+builder.Services.AddSingleton<IDriver>(
+        (serviceProvider) =>
+        {
+            IConfiguration configuration = serviceProvider.GetService<IConfiguration>();
+            IConfigurationSection neoConfig = configuration.GetSection("Neo4j");
+            IConfigurationSection neoConfigUri = neoConfig.GetSection("uri");
+            IConfigurationSection neoConfigUser = neoConfig.GetSection("user");
+            IConfigurationSection neoConfigPassword = neoConfig.GetSection("password");
+            return GraphDatabase.Driver(neoConfigUri.Value, AuthTokens.Basic(neoConfigUser.Value, neoConfigPassword.Value));
+        }
+    );
+
+builder.Services.AddScoped<IAsyncSession>(
+    (serviceProvider) =>
+    {
+        IDriver driver = serviceProvider.GetService<IDriver>();
+        return driver.AsyncSession();
+    }
+);
+
+builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 var app = builder.Build();
 
