@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+﻿using KnowledgeShare.Core.Enitites.Tags;
+using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace KnowlodgeShare.Pages
 {
@@ -8,10 +9,14 @@ namespace KnowlodgeShare.Pages
 
         private readonly ILogger<IndexModel> _logger;
 
+        private readonly ITagContext _tagContext;
+
         public IndexModel(
-            ILogger<IndexModel> logger)
+            ILogger<IndexModel> logger,
+            ITagContext tagContext)
         {
             _logger = logger;
+            _tagContext = tagContext;
         }
 
         public async void OnGet()

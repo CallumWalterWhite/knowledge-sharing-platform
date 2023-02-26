@@ -7,11 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KnowlodgeShare", "Knowlodge
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{EC3E7EA4-AD1A-4598-8268-E2478ED02BFC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnowledgeShare.Core", "KnowledgeShare.Core\KnowledgeShare.Core.csproj", "{459F4178-C90B-429D-A0ED-C22CCBF6B84D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KnowledgeShare.Core", "KnowledgeShare.Core\KnowledgeShare.Core.csproj", "{459F4178-C90B-429D-A0ED-C22CCBF6B84D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnowledgeShare.Domain", "KnowledgeShare.Domain\KnowledgeShare.Domain.csproj", "{288CD456-115E-4FD8-98AD-381A0B69770A}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnowledgeShare.Persistence", "KnowledgeShare.Persistence\KnowledgeShare.Persistence.csproj", "{9B1439B4-7C32-4CDD-89E6-911BB7F653DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KnowledgeShare.Persistence", "KnowledgeShare.Persistence\KnowledgeShare.Persistence.csproj", "{9B1439B4-7C32-4CDD-89E6-911BB7F653DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,10 +25,6 @@ Global
 		{459F4178-C90B-429D-A0ED-C22CCBF6B84D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{459F4178-C90B-429D-A0ED-C22CCBF6B84D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{459F4178-C90B-429D-A0ED-C22CCBF6B84D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{288CD456-115E-4FD8-98AD-381A0B69770A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{288CD456-115E-4FD8-98AD-381A0B69770A}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{288CD456-115E-4FD8-98AD-381A0B69770A}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{288CD456-115E-4FD8-98AD-381A0B69770A}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9B1439B4-7C32-4CDD-89E6-911BB7F653DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9B1439B4-7C32-4CDD-89E6-911BB7F653DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9B1439B4-7C32-4CDD-89E6-911BB7F653DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -41,7 +35,6 @@ Global
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{459F4178-C90B-429D-A0ED-C22CCBF6B84D} = {EC3E7EA4-AD1A-4598-8268-E2478ED02BFC}
-		{288CD456-115E-4FD8-98AD-381A0B69770A} = {EC3E7EA4-AD1A-4598-8268-E2478ED02BFC}
 		{9B1439B4-7C32-4CDD-89E6-911BB7F653DA} = {EC3E7EA4-AD1A-4598-8268-E2478ED02BFC}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution

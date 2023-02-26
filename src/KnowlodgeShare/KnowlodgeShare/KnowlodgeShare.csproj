@@ -18,17 +18,16 @@
     <PackageReference Include="Microsoft.Identity.Web" Version="1.24.1" />
     <PackageReference Include="Microsoft.Identity.Web.UI" Version="1.16.0" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
-    <PackageReference Include="Neo4j.Driver" Version="5.4.0" />
+    <PackageReference Include="Neo4j.Driver" Version="5.5.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\KnowledgeShare.Core\KnowledgeShare.Core.csproj" />
-    <ProjectReference Include="..\KnowledgeShare.Domain\KnowledgeShare.Domain.csproj" />
     <ProjectReference Include="..\KnowledgeShare.Persistence\KnowledgeShare.Persistence.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\Shared\Content" />
+    <Folder Include="Pages\Shared\Content\" />
   </ItemGroup>
 
 </Project>

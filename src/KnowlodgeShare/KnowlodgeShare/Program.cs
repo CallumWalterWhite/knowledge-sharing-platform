@@ -1,4 +1,5 @@
-using KnowledgeShare.Core.Repository;
+using KnowledgeShare.Core.Enitites.Tags;
+using KnowledgeShare.Persistence.Tags;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
@@ -19,7 +20,7 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddRazorPages()
     .AddMicrosoftIdentityUI();
 
-builder.Services.AddSingleton<IDriver>(
+builder.Services.AddScoped<IDriver>(
         (serviceProvider) =>
         {
             IConfiguration configuration = serviceProvider.GetService<IConfiguration>();
@@ -39,7 +40,7 @@ builder.Services.AddScoped<IAsyncSession>(
     }
 );
 
-builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+builder.Services.AddScoped(typeof(ITagContext), typeof(TagContext));
 
 var app = builder.Build();
 
