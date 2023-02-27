@@ -1,7 +1,8 @@
-using KnowledgeShare.Core.Enitites.Tags;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
+using KnowledgeShare.Core.Context;
+using KnowledgeShare.Core.Entities.Content;
 
 namespace KnowledgeShare.Pages
 {
@@ -14,16 +15,25 @@ namespace KnowledgeShare.Pages
         [BindProperty]
         [Required]
         public string Body { get; set; }
+        
+        [BindProperty]
+        [Required]
+        public string Link { get; set; }
 
         [BindProperty]
         public List<TagViewModel> Tags { get; set; }
 
         private ITagContext _tagContext;
 
-        public CreatePostModel(ITagContext tagContext)
+        private IArticleSummaryContext _articleSummaryContext;
+
+        public CreatePostModel(
+            ITagContext tagContext,
+            IArticleSummaryContext articleSummaryContext)
         {
             Tags = new List<TagViewModel>();
             _tagContext = tagContext;
+            _articleSummaryContext = articleSummaryContext;
         }
 
         public async Task OnGetAsync()
@@ -45,7 +55,7 @@ namespace KnowledgeShare.Pages
                 return Page();
             }
             
-            await _tagContext.AddAsync(new Tag(Title));
+            await _articleSummaryContext.AddAsync(ArticleSummary.Create(Title, Body, Link));
             return Page();
         }
     }

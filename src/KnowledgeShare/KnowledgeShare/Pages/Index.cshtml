@@ -2,7 +2,7 @@
 @using KnowledgeShare.Pages.Shared.Feed
 @model IndexModel
 @{
-    ViewData["Title"] = this.Model.Test;
+    ViewData["Title"] = "Home";
 }
 
 <!--Main layout-->
@@ -13,27 +13,12 @@
         <h4 class="mb-5"><strong>Latest posts</strong></h4>
 
         <div class="row">
-          <div class="col-lg-4 col-md-12 mb-4">
-            @(await Html.RenderComponentAsync<FeedContentComponent>(RenderMode.Static))
-          </div>
-
-          <div class="col-lg-4 col-md-6 mb-4">
-            @(await Html.RenderComponentAsync<FeedContentComponent>(RenderMode.Static))
-          </div>
-
-          <div class="col-lg-4 col-md-6 mb-4">
-            @(await Html.RenderComponentAsync<FeedContentComponent>(RenderMode.Static))
-          </div>
-        </div>
-
-        <div class="row">
-          <div class="col-lg-4 col-md-12 mb-4">
-            @(await Html.RenderComponentAsync<FeedContentComponent>(RenderMode.Static))
-          </div>
-
-          <div class="col-lg-4 col-md-6 mb-4">
-            @(await Html.RenderComponentAsync<FeedContentComponent>(RenderMode.Static))
-          </div>
+          @foreach (var tag in Model.ArticleSummaryViewModels)
+          {
+            <div class="col-lg-4 col-md-12 mb-4">
+              @(await Html.RenderComponentAsync<FeedContentComponent>(RenderMode.Static, new { Title = tag.Title, Body = tag.Summary, Link = tag.Link }))
+            </div>
+          }
         </div>
       </section>
       <!--Section: Content-->

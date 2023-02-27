@@ -1,4 +1,14 @@
-﻿<div class="card">
+﻿@code {
+    [Parameter]
+    public string Title { get; set; }
+  
+    [Parameter]
+    public string Body { get; set; }
+  
+    [Parameter]
+    public string Link { get; set; }
+}
+<div class="card">
   <div class="bg-image hover-overlay ripple" data-mdb-ripple-color="light">
     <img src="https://mdbootstrap.com/img/new/standard/nature/184.jpg" class="img-fluid" />
     <a href="#!">
@@ -6,11 +16,11 @@
     </a>
   </div>
   <div class="card-body">
-    <h5 class="card-title">Post title</h5>
+    <h5 class="card-title">@Title</h5>
     <p class="card-text">
-      Some quick example text to build on the card title and make up the bulk of the
-      card's content.
+      @Body
     </p>
+    <h6 class="card-title">@Link</h6>
     <a href="#!" class="btn btn-primary">Read</a>
   </div>
 </div>

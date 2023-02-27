@@ -1,4 +1,5 @@
-using KnowledgeShare.Core.Enitites.Tags;
+using KnowledgeShare.Core.Context;
+using KnowledgeShare.Persistence.Content;
 using KnowledgeShare.Persistence.Tags;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Identity.Web;
@@ -41,6 +42,7 @@ builder.Services.AddScoped<IAsyncSession>(
 );
 
 builder.Services.AddScoped(typeof(ITagContext), typeof(TagContext));
+builder.Services.AddScoped(typeof(IArticleSummaryContext), typeof(ArticleSummaryContext));
 
 var app = builder.Build();
 
