@@ -37,7 +37,7 @@ jobs:
           push: true
           tags: mhrntuknowledgeshareuksacr.azurecr.io/mhr-ntu-knowledge-share-uks-aks:${{ github.sha }}
           file: ./Dockerfile
-          context: /src/KnowledgeShare
+          context: ./src/KnowledgeShare
 
 
   deploy:
