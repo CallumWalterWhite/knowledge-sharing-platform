@@ -3,8 +3,8 @@ services:
   ui:
     hostname: ui
     build:
-      context: /src/KnowlodgeShare
-      dockerfile: ./KnowlodgeShare/Dockerfile
+      context: /src/KnowledgeShare
+      dockerfile: ./KnowledgeShare/Dockerfile
     ports:
     - '54339:80'
     - '55339:443'
