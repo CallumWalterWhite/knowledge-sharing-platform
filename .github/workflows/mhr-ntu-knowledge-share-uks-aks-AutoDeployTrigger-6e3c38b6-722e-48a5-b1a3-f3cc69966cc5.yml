@@ -33,7 +33,7 @@ jobs:
           
       - name: Build and push container image to registry
         run: |
-          docker build "$GITHUB_WORKSPACE/src" -f "src/KnowledgeShare/Dockerfile" -t mhrntuknowledgeshareuksacr.azurecr.io/mhr-ntu-knowledge-share-uks-aks:${{ github.sha }}
+          docker build "$GITHUB_WORKSPACE/src/KnowledgeShare" -f "src/KnowledgeShare/Dockerfile" -t mhrntuknowledgeshareuksacr.azurecr.io/mhr-ntu-knowledge-share-uks-aks:${{ github.sha }}
           docker push mhrntuknowledgeshareuksacr.azurecr.io/mhr-ntu-knowledge-share-uks-aks:${{ github.sha }}
 
 
