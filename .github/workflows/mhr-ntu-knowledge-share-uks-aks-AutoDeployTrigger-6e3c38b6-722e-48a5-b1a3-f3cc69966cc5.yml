@@ -7,7 +7,7 @@ on:
     branches: 
       [ main ]
     paths:
-    - 'knowledge-sharing-platform/src/KnowledgeShare/KnowledgeShare/**'
+    - 'knowledge-sharing-platform/src/**'
     - '.github/workflows/mhr-ntu-knowledge-share-uks-aks-AutoDeployTrigger-6e3c38b6-722e-48a5-b1a3-f3cc69966cc5.yml'
 
   # Allow mannually trigger 
@@ -30,14 +30,11 @@ jobs:
           registry: mhrntuknowledgeshareuksacr.azurecr.io
           username: ${{ secrets.MHRNTUKNOWLEDGESHAREUKSAKS_REGISTRY_USERNAME }}
           password: ${{ secrets.MHRNTUKNOWLEDGESHAREUKSAKS_REGISTRY_PASSWORD }}
-
+          
       - name: Build and push container image to registry
-        uses: docker/build-push-action@v2
-        with:
-          push: true
-          tags: mhrntuknowledgeshareuksacr.azurecr.io/mhr-ntu-knowledge-share-uks-aks:${{ github.sha }}
-          context: ./src/KnowledgeShare/
-          file: ./Dockerfile
+        run: |
+          docker build "$GITHUB_WORKSPACE/src" -f "src/KnowledgeShare/Dockerfile" -t mhrntuknowledgeshareuksacr.azurecr.io/mhr-ntu-knowledge-share-uks-aks:${{ github.sha }}
+          docker push mhrntuknowledgeshareuksacr.azurecr.io/mhr-ntu-knowledge-share-uks-aks:${{ github.sha }}
 
 
   deploy:
