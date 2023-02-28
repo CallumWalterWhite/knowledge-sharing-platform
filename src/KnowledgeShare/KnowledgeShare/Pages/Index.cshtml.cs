@@ -13,23 +13,23 @@ namespace KnowledgeShare.Pages
         private readonly IArticleSummaryContext _articleSummaryContext;
 
         public IndexModel(
-            ILogger<IndexModel> logger, IArticleSummaryContext articleSummaryContext)
+            ILogger<IndexModel> logger)
         {
             _logger = logger;
-            _articleSummaryContext = articleSummaryContext;
         }
 
         public async Task OnGetAsync()
         {
-            IEnumerable<ArticleSummary> articleSummaries = await _articleSummaryContext.GetAllAsync();
-            ArticleSummaryViewModels = articleSummaries.Select(
-                x => new ArticleSummaryViewModel()
-                {
-                    Title = x.Title,
-                    Summary = x.Summary,
-                    Link = x.Link
-                }
-            ).ToList();
+            ArticleSummaryViewModels = new List<ArticleSummaryViewModel>();
+            //IEnumerable<ArticleSummary> articleSummaries = await _articleSummaryContext.GetAllAsync();
+            //ArticleSummaryViewModels = articleSummaries.Select(
+            //    x => new ArticleSummaryViewModel()
+            //    {
+            //        Title = x.Title,
+            //        Summary = x.Summary,
+            //        Link = x.Link
+            //    }
+            //).ToList();
         }
     }
     
