@@ -2,30 +2,17 @@
 using KnowledgeShare.Persistence.Content;
 using KnowledgeShare.Persistence.Tags;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 using Neo4j.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
-#if DEBUG
 // Add services to the container.
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
-#endif
-#if !DEBUG
-builder.Services.AddAuthentication() 
-     .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
-     {
-         options.Authority = $"https://{builder.Configuration["Auth0:Domain"]}";
-         options.TokenValidationParameters =
-           new Microsoft.IdentityModel.Tokens.TokenValidationParameters
-           {
-               ValidAudience = builder.Configuration["Auth0:Audience"],
-               ValidIssuer = $"{builder.Configuration["Auth0:Domain"]}"
-           };
-     });
-#endif
 
 builder.Services.AddAuthorization(options =>
 {
