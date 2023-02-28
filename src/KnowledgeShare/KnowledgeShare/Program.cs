@@ -1,3 +1,6 @@
+using Azure.Identity;
+using Azure.Security.KeyVault.Keys;
+using Azure.Security.KeyVault.Secrets;
 using KnowledgeShare.Core.Context;
 using KnowledgeShare.Persistence.Content;
 using KnowledgeShare.Persistence.Tags;
@@ -7,10 +10,20 @@ using Microsoft.Identity.Web.UI;
 using Neo4j.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
-
+#if DEBUG
 // Add services to the container.
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
+#endif
+#if !DEBUG
+// Add services to the container.
+string vaultName = "mhrknowledgeshareuksrg";
+string keyVaultUrl = $"https://{vaultName}.vault.azure.net";
+SecretClient client = new SecretClient(vaultUri: new Uri(keyVaultUrl), credential: new DefaultAzureCredential());
+
+builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
+#endif
 
 builder.Services.AddAuthorization(options =>
 {
