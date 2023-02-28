@@ -7,7 +7,7 @@ on:
     branches: 
       [ main ]
     paths:
-    - 'knowledge-sharing-platform/src/**'
+    - 'knowledge-sharing-platform/src/KnowledgeShare/**'
     - '.github/workflows/mhr-ntu-knowledge-share-uks-aks-AutoDeployTrigger.yml'
 
   # Allow mannually trigger 
