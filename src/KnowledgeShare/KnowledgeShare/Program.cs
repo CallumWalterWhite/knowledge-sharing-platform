@@ -11,9 +11,11 @@ using Neo4j.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
+#if DEBUG
 // Add services to the container.
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
+#endif
 
 builder.Services.AddAuthorization(options =>
 {
@@ -48,6 +50,14 @@ builder.Services.AddScoped(typeof(ITagContext), typeof(TagContext));
 builder.Services.AddScoped(typeof(IArticleSummaryContext), typeof(ArticleSummaryContext));
 
 var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler("/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
