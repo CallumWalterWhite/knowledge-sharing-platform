@@ -64,7 +64,9 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+#if DEBUG
 app.UseAuthentication();
+#endif
 app.UseAuthorization();
 
 app.MapRazorPages();
