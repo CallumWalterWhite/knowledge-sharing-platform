@@ -74,6 +74,8 @@ app.UseRouting();
 
 app.UseAuthentication();
 
+app.UseHsts();
+app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapRazorPages();
