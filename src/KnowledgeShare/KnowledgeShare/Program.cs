@@ -10,15 +10,14 @@ using Neo4j.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
+#if DEBUG
 // Add services to the container.
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
-
-builder.Services.AddAuthorization(options =>
-{
-    // By default, all incoming requests will be authorized according to the default policy.
-    options.FallbackPolicy = options.DefaultPolicy;
-});
+#endif
+#if !DEBUG
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme);
+#endif
 
 builder.Services.AddRazorPages()
     .AddMicrosoftIdentityUI();
@@ -61,7 +60,10 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+#if DEBUG
+// Add services to the container.
 app.UseAuthentication();
+#endif
 app.UseAuthorization();
 
 app.MapRazorPages();
