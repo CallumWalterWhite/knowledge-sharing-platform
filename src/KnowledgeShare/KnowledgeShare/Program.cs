@@ -10,20 +10,10 @@ using Microsoft.Identity.Web.UI;
 using Neo4j.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
-#if DEBUG
-// Add services to the container.
-builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
-#endif
-#if !DEBUG
-// Add services to the container.
-string vaultName = "mhrknowledgeshareuksrg";
-string keyVaultUrl = $"https://{vaultName}.vault.azure.net";
-SecretClient client = new SecretClient(vaultUri: new Uri(keyVaultUrl), credential: new DefaultAzureCredential());
 
+// Add services to the container.
 builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAd"));
-#endif
 
 builder.Services.AddAuthorization(options =>
 {
@@ -59,22 +49,12 @@ builder.Services.AddScoped(typeof(IArticleSummaryContext), typeof(ArticleSummary
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
-
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
 app.UseAuthentication();
-
-app.UseHsts();
 app.UseAuthorization();
 
 app.MapRazorPages();
