@@ -1,5 +1,6 @@
 ﻿using KnowledgeShare.Core.Context;
 using KnowledgeShare.Core.Entities.Content;
+using KnowledgeShare.Core.Entities.Tags;
 using Neo4j.Driver;
 
 namespace KnowledgeShare.Persistence.Content;
@@ -13,7 +14,7 @@ public class ArticleSummaryContext : IArticleSummaryContext
         _session = session;
     }
     
-    public async Task AddAsync(ArticleSummary articleSummary)
+    public async Task AddAsync(ArticleSummary articleSummary, List<Tag> tags)
     {
         Dictionary<string, object> statementParameters = new Dictionary<string, object>
         {
@@ -27,6 +28,27 @@ public class ArticleSummaryContext : IArticleSummaryContext
             await tx.RunAsync("CREATE (post:ArticleSummary {id: $id, title: $title, summary: $summary, link: $link}) ",
                 statementParameters);
         });
+        await AddTagAsync(articleSummary, tags);
+    }
+
+    public async Task AddTagAsync(ArticleSummary articleSummary, List<Tag> tags)
+    {
+        foreach(Tag tag in tags)
+        {
+            Dictionary<string, object> statementParameters = new Dictionary<string, object>
+            {
+                {"articleSummaryId", articleSummary.Id.ToString() },
+                {"tagId", articleSummary.Id.ToString() }
+            };
+
+            await _session.ExecuteWriteAsync(async tx =>
+            {
+                string query = "MATCH (a:ArticleSummary { id: $articleSummaryId }), (t:Tag { id: $tagId }) " +
+                       "MERGE (a)-[:HAS_TAG]->(t)";
+                await tx.RunAsync(query,
+                    statementParameters);
+            });
+        }
     }
 
     public async Task<IEnumerable<ArticleSummary>> GetAllAsync()
