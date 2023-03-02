@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Identity.Web;
 
 namespace KnowledgeShare.Web.Setup.Auth;
