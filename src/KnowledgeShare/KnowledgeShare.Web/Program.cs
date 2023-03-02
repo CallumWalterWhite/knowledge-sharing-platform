@@ -1,19 +1,13 @@
-using KnowledgeShare.Web.Data;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
-using Radzen;
+using KnowledgeShare.Web.Setup.Auth;
+using KnowledgeShare.Web.Setup.Ioc;
 
-var builder = WebApplication.CreateBuilder(args);
-
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
+AuthenticationInstaller.Install(builder);
+CoreInstaller.Install(builder.Services);
+GraphInstaller.Install(builder.Services);
 // Add services to the container.
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor();
-builder.Services.AddSingleton<WeatherForecastService>();
-
-builder.Services.AddScoped<DialogService>();
-builder.Services.AddScoped<NotificationService>();
-builder.Services.AddScoped<TooltipService>();
-builder.Services.AddScoped<ContextMenuService>();
 
 var app = builder.Build();
 

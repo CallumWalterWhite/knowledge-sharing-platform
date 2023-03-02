@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KnowledgeShare", "KnowledgeShare\KnowledgeShare.csproj", "{A552A531-F09E-4246-AA43-F8DCA86C37B5}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{EC3E7EA4-AD1A-4598-8268-E2478ED02BFC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KnowledgeShare.Core", "KnowledgeShare.Core\KnowledgeShare.Core.csproj", "{459F4178-C90B-429D-A0ED-C22CCBF6B84D}"
@@ -19,10 +17,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A552A531-F09E-4246-AA43-F8DCA86C37B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A552A531-F09E-4246-AA43-F8DCA86C37B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A552A531-F09E-4246-AA43-F8DCA86C37B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A552A531-F09E-4246-AA43-F8DCA86C37B5}.Release|Any CPU.Build.0 = Release|Any CPU
 		{459F4178-C90B-429D-A0ED-C22CCBF6B84D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{459F4178-C90B-429D-A0ED-C22CCBF6B84D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{459F4178-C90B-429D-A0ED-C22CCBF6B84D}.Release|Any CPU.ActiveCfg = Release|Any CPU
