@@ -8,16 +8,16 @@ namespace KnowledgeShare.Web.Setup.Ioc;
 
 public class CoreInstaller
 {
-    public static void Install(IServiceCollection service)
+    public static void Install(IServiceCollection services)
     {
-        service.AddScoped(typeof(ITagContext), typeof(TagContext));
-        service.AddScoped(typeof(IArticleSummaryContext), typeof(ArticleSummaryContext));
-        service.AddScoped<DialogService>();
-        service.AddScoped<NotificationService>();
-        service.AddScoped<TooltipService>();
-        service.AddScoped<ContextMenuService>();
+        services.AddScoped(typeof(ITagContext), typeof(TagContext));
+        services.AddScoped(typeof(IArticleSummaryContext), typeof(ArticleSummaryContext));
+        services.AddScoped<DialogService>();
+        services.AddScoped<NotificationService>();
+        services.AddScoped<TooltipService>();
+        services.AddScoped<ContextMenuService>();
         
         //TODO: REMOVE
-        service.AddSingleton<WeatherForecastService>();
+        services.AddSingleton<WeatherForecastService>();
     }
 }

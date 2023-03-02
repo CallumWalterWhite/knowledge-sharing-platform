@@ -4,9 +4,16 @@ namespace KnowledgeShare.Web.Setup.Ioc;
 
 public class GraphInstaller
 {
-    public static void Install(IServiceCollection service)
+    public static void Install(IServiceCollection services)
     {
-        service.AddScoped<IDriver>(
+        services.AddScoped<IAsyncSession>(
+            (serviceProvider) =>
+            {
+                IDriver driver = serviceProvider.GetService<IDriver>();
+                return driver.AsyncSession();
+            }
+        );
+        services.AddScoped<IDriver>(
             (serviceProvider) =>
             {
 #if DEBUG
