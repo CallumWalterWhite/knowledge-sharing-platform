@@ -1,3 +1,4 @@
+using System.Net;
 using KnowledgeShare.Web.Setup.Auth;
 using KnowledgeShare.Web.Setup.Ioc;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
@@ -25,6 +26,14 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor()
     .AddMicrosoftIdentityConsentHandler();
 
+if (!builder.Environment.IsDevelopment())
+{
+    builder.Services.AddHttpsRedirection(options =>
+    {
+        options.RedirectStatusCode = (int)HttpStatusCode.PermanentRedirect;
+        options.HttpsPort = 443;
+    });
+}
 var app = builder.Build();
 
 if (!app.Environment.IsProduction())
