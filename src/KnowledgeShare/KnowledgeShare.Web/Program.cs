@@ -1,6 +1,7 @@
 using KnowledgeShare.Web.Setup.Auth;
 using KnowledgeShare.Web.Setup.Ioc;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 
@@ -26,13 +27,18 @@ builder.Services.AddServerSideBlazor()
 
 var app = builder.Build();
 
-app.Use((context, next) =>
+if (!app.Environment.IsProduction())
 {
-    context.Request.Scheme = "https";
-    return next(context);
+    app.Use((context, next) =>
+    {
+        context.Request.Scheme = "https";
+        return next(context);
+    });
+}
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedProto
 });
-
-app.UseForwardedHeaders();
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
