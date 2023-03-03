@@ -1,8 +1,6 @@
-using System.Net;
 using KnowledgeShare.Web.Setup.Auth;
 using KnowledgeShare.Web.Setup.Ioc;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
 
@@ -26,28 +24,8 @@ builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor()
     .AddMicrosoftIdentityConsentHandler();
 
-if (!builder.Environment.IsDevelopment())
-{
-    builder.Services.AddHttpsRedirection(options =>
-    {
-        options.RedirectStatusCode = (int)HttpStatusCode.PermanentRedirect;
-        options.HttpsPort = 443;
-    });
-}
 var app = builder.Build();
 
-if (!app.Environment.IsProduction())
-{
-    app.Use((context, next) =>
-    {
-        context.Request.Scheme = "https";
-        return next(context);
-    });
-}
-app.UseForwardedHeaders(new ForwardedHeadersOptions
-{
-    ForwardedHeaders = ForwardedHeaders.XForwardedProto
-});
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
