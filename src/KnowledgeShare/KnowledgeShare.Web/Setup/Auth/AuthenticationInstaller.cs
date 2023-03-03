@@ -16,8 +16,5 @@ public class AuthenticationInstaller
             .AddMicrosoftGraph(builder.Configuration.GetSection("DownstreamApi"))
             .AddInMemoryTokenCaches();
 #endif
-#if !DEBUG
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme);
-#endif
     }
 }
