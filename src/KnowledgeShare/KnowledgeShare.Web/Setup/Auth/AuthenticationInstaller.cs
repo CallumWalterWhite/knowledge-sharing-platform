@@ -1,5 +1,8 @@
-﻿using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.Graph.ExternalConnectors;
 using Microsoft.Identity.Web;
+using Microsoft.IdentityModel.Tokens;
 
 namespace KnowledgeShare.Web.Setup.Auth;
 
@@ -17,7 +20,14 @@ public class AuthenticationInstaller
             .AddInMemoryTokenCaches();
 #endif
 #if !DEBUG
-builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme);
+builder.Services.AddAuthentication(options =>
+        {
+
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultSignInScheme = JwtBearerDefaults.AuthenticationScheme;
+
+        });
 #endif
     }
 }
