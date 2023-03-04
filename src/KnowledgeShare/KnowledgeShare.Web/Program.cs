@@ -1,9 +1,11 @@
 using KnowledgeShare.Web.Setup.Auth;
 using KnowledgeShare.Web.Setup.Ioc;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.TokenCacheProviders.InMemory;
+using Microsoft.IdentityModel.Tokens;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -15,12 +17,40 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddMicrosoftGraph(builder.Configuration.GetSection("DownstreamApi"))
     .AddInMemoryTokenCaches();
 #endif
+
+builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("ProdAzureAd"))
+    .EnableTokenAcquisitionToCallDownstreamApi(initialScopes)
+    .AddMicrosoftGraph(builder.Configuration.GetSection("DownstreamApi"))
+    .AddInMemoryTokenCaches();
 #if !DEBUG
-        builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-            .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("ProdAzureAd"))
-            .EnableTokenAcquisitionToCallDownstreamApi(initialScopes)
-            .AddMicrosoftGraph(builder.Configuration.GetSection("DownstreamApi"))
-            .AddInMemoryTokenCaches();
+        builder.Services.AddAuthentication(options =>
+        {
+            options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
+        })
+        .AddCookie(options =>
+        {
+            options.Cookie.Name = "MyAppCookie";
+        })
+        .AddOpenIdConnect(options =>
+        {
+            options.Authority = "https://login.microsoftonline.com/75b02e0d-90d1-43e5-b5db-20eaaddbfac6/v2.0";
+            options.ClientId = "5a2b94ee-071d-4330-8960-807e0221bafb";
+            options.ClientSecret = "ip_8Q~ZZcdgAoDtKEMWkvL.fr-OKEEcamInDCafb";
+            options.ResponseType = "code";
+            options.Scope.Add("openid");
+            options.Scope.Add("profile");
+            options.Scope.Add("email");
+            options.SaveTokens = true;
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = $"https://login.microsoftonline.com/75b02e0d-90d1-43e5-b5db-20eaaddbfac6/v2.0",
+                ValidateAudience = true,
+                ValidAudience = "5a2b94ee-071d-4330-8960-807e0221bafb"
+            };
+        });
 #endif
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
