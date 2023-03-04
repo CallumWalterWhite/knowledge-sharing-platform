@@ -2,6 +2,7 @@ using KnowledgeShare.Web.Setup.Auth;
 using KnowledgeShare.Web.Setup.Ioc;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.Identity.Web;
+using Microsoft.Identity.Web.TokenCacheProviders.InMemory;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
@@ -14,10 +15,8 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddInMemoryTokenCaches();
 #endif
 #if !DEBUG
-        builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-            .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("ProdAzureAd"))
-            .EnableTokenAcquisitionToCallDownstreamApi(initialScopes)
-            .AddMicrosoftGraph(builder.Configuration.GetSection("DownstreamApi"))
+        builder.Services
+            .AddMicrosoftGraph()
             .AddInMemoryTokenCaches();
 #endif
 builder.Services.AddAuthorization(options =>
