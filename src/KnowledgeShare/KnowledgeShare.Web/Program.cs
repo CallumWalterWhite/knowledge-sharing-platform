@@ -17,12 +17,6 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddMicrosoftGraph(builder.Configuration.GetSection("DownstreamApi"))
     .AddInMemoryTokenCaches();
 #endif
-
-builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-    .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("ProdAzureAd"))
-    .EnableTokenAcquisitionToCallDownstreamApi(initialScopes)
-    .AddMicrosoftGraph(builder.Configuration.GetSection("DownstreamApi"))
-    .AddInMemoryTokenCaches();
 #if !DEBUG
         builder.Services.AddAuthentication(options =>
         {
