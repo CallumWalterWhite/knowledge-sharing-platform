@@ -24,7 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services" />
+    <_ContentIncludedByDefault Remove="Pages\Posts\ArticlePostComponent.razor" />
   </ItemGroup>
 
 </Project>

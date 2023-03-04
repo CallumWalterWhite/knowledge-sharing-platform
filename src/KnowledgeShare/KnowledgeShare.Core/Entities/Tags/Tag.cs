@@ -1,9 +1,8 @@
 ﻿namespace KnowledgeShare.Core.Entities.Tags
 {
-    public class Tag : Entity
+    public class Tag
     {
-        private Tag(
-            Guid id,   
+        public Tag(
             string value)
         {
             Value = value;
@@ -13,7 +12,7 @@
 
         public static Tag Create(string value)
         {
-            return new Tag(Guid.NewGuid(), value);
+            return new Tag(value);
         }
     }
 }

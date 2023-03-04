@@ -1,0 +1,126 @@
+﻿@page "/create-post"
+@using KnowledgeShare.Core.Posts
+@using Microsoft.AspNetCore.Components
+@using KnowledgeShare.Core.Entities.Tags
+@using KnowledgeShare.Core.Tags
+@inject ICreatePostService CreatePostService;
+@inject IGetAllTagsService GetAllTagsService;
+
+<h1>Create Post</h1>
+
+<EditForm Model="@post" OnValidSubmit="@Create">
+    <ValidationSummary />
+
+    <div class="form-group">
+        <label for="postType">Post Type</label>
+        <select class="form-control" id="postType" @bind="@post.Discriminator">
+            <option value="@PostTypeDiscriminator.Article">Article</option>
+            <option value="@PostTypeDiscriminator.Book">Book</option>
+        </select>
+    </div>
+
+    @if (post.Discriminator == PostTypeDiscriminator.Article)
+    {
+        <div class="form-group">
+            <label for="title">Title</label>
+            <InputText class="form-control" id="title" @bind-Value="@(post.Title)" />
+            <ValidationMessage For="@(() => (post).Title)" />
+        </div>
+
+        <div class="form-group">
+            <label for="link">Link</label>
+            <InputText class="form-control" id="link" @bind-Value="@(post.Link)" />
+            <ValidationMessage For="@(() => (post).Link)" />
+        </div>
+
+        <div class="form-group">
+            <label for="summary">Summary</label>
+            <InputText class="form-control" id="summary" @bind-Value="@(post.Summary)" />
+            <ValidationMessage For="@(() => (post).Summary)" />
+        </div>
+    }
+
+    @if (post.Discriminator == PostTypeDiscriminator.Book)
+    {
+        <div class="form-group">
+            <label for="title">Title</label>
+            <InputText class="form-control" id="title" @bind-Value="@(post.Title)" />
+            <ValidationMessage For="@(() => (post).Title)" />
+        </div>
+
+        <div class="form-group">
+            <label for="summary">Summary</label>
+            <InputText class="form-control text-body" id="summary" @bind-Value="@(post.Summary)" />
+            <ValidationMessage For="@(() => (post).Summary)" />
+        </div>
+    }
+    <div class="form-group">
+        <label for="tagSearchInput">Search for a tag:</label>
+        <div class="input-group">
+            <input type="text" class="form-control" id="tagSearchInput" @bind-value="@searchQuery" @bind-value:event="oninput" placeholder="Enter a tag name..." />
+            <div class="input-group-append">
+                <button type="button" class="btn btn-primary" @onclick="AddTag">Add</button>
+            </div>
+        </div>
+    </div>
+    @if (Tags.Any())
+    {
+        <div class="form-group">
+            <label>Selected tags:</label>
+            <ul class="list-group">
+                @foreach (var tag in Tags)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>@tag</span>
+                        <button type="button" class="btn btn-danger btn-sm" @onclick="() => RemoveTag(tag)">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+    else
+    {
+        <p>No tags selected.</p>
+    }
+    
+
+    <button type="submit" class="btn btn-primary">Create Post</button>
+</EditForm>
+
+@code {
+    private CreatePostDto post = new CreatePostDto()
+    {
+        Discriminator = PostTypeDiscriminator.Article,
+        Tags = new List<string>()
+    };
+    private List<string> Tags { get; set; } = new List<string>();
+
+    private async Task Create()
+    {
+        post.Tags = Tags;
+        // Call your API to create the post with the data from the form
+        await CreatePostService.Create(post);
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+    }
+    
+    private string searchQuery;
+
+    private async Task AddTag()
+    {
+        if (!string.IsNullOrWhiteSpace(searchQuery) && !Tags.Contains(searchQuery))
+        {
+            Tags.Add(searchQuery);
+            searchQuery = string.Empty;
+        }
+    }
+
+    private async Task RemoveTag(string tag)
+    {
+        Tags.Remove(tag);
+    }
+}

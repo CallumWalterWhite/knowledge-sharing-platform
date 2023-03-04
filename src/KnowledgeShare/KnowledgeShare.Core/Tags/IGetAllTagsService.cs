@@ -1,0 +1,10 @@
+﻿using KnowledgeShare.Core.Entities.Tags;
+
+namespace KnowledgeShare.Core.Tags;
+
+public interface IGetAllTagsService
+{
+    Task<IEnumerable<Tag>> GetAllAsync();
+    
+    Task<IEnumerable<Tag>> GetAllAsyncByValue(string value);
+}

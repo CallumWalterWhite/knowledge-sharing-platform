@@ -6,8 +6,12 @@ namespace KnowledgeShare.Core.Context
     {
         Task AddAsync(Tag tag);
 
-        Task<IEnumerable<string>> GetAllTags();
+        Task<IEnumerable<Tag>> GetAllTags();
 
         Task<bool> MatchAsync(string value);
+
+        Task<Tag?> GetAsync(string value);
+        
+        Task<IEnumerable<Tag>> GetAllTagsByValue(string value);
     }
 }

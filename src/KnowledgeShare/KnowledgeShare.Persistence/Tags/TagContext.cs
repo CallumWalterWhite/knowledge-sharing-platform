@@ -17,12 +17,11 @@ namespace KnowledgeShare.Persistence.Tags
         {
             Dictionary<string, object> statementParameters = new Dictionary<string, object>
             {
-                {"value", tag.Value },
-                {"id", tag.Id }
+                {"value", tag.Value }
             };
             await _session.ExecuteWriteAsync(async tx =>
             {
-                await tx.RunAsync("CREATE (tag:Tag {id: $id, value: $value}) ",
+                await tx.RunAsync("CREATE (tag:Tag {value: $value}) ",
                     statementParameters);
             });
         }
@@ -34,26 +33,72 @@ namespace KnowledgeShare.Persistence.Tags
             {
                 {"value", value }
             };
-            IResultCursor cursor = await _session.RunAsync("MATCH (tag:Tag WHERE a.name = $value) RETURN tag");
+            IResultCursor cursor = await _session.RunAsync("MATCH (tag:Tag WHERE tag.value = $value) RETURN tag.value", statementParameters);
             while (await cursor.FetchAsync())
             {
-                object? tag = cursor.Current["tag"];
+                object? tag = cursor.Current["tag.value"];
                 matched = tag is not null;
             }
 
             return matched;
         }
 
-        public async Task<IEnumerable<string>> GetAllTags()
+        public async Task<Tag?> GetAsync(string tagValue)
         {
-            List<string> results = new List<string>();
-            IResultCursor cursor = await _session.RunAsync("MATCH (tag:Tag) RETURN tag.value");
+            Dictionary<string, object> statementParameters = new Dictionary<string, object>
+            {
+                {"value", tagValue }
+            };
+            Tag? tag = null;
+            IResultCursor cursor = await _session.RunAsync("MATCH (tag:Tag WHERE tag.value = $value) RETURN tag.value", statementParameters);
             while (await cursor.FetchAsync())
             {
-                object? result = cursor.Current["tag.value"];
-                if (result is not null)
+                object? value = cursor.Current["tag.value"];
+                if (value is not null)
                 {
-                    results.Add(result.ToString());
+                    tag = new Tag(value.ToString());
+                }
+            }
+
+            return tag;
+        }
+
+        public async Task<IEnumerable<Tag>> GetAllTagsByValue(string value)
+        {
+            List<Tag> results = new List<Tag>();
+            Dictionary<string, object> statementParameters = new Dictionary<string, object>
+            {
+                {"searchQuery", value },
+            };
+            IResultCursor cursor = await _session.RunAsync(
+                "MATCH (t:Tag)\nWHERE toLower(t.value) CONTAINS toLower($searchQuery)\nRETURN t.value, apoc.text.distance(t.value, $searchQuery, 2) AS distance\nORDER BY distance", statementParameters);
+            while (await cursor.FetchAsync())
+            {
+                object? tagValue = cursor.Current["tag.value"];
+                if (tagValue is not null)
+                {
+                    results.Add(new Tag(
+                        tagValue.ToString() ?? string.Empty
+                    ));   
+                }
+            }
+
+            return results;
+        }
+
+        public async Task<IEnumerable<Tag>> GetAllTags()
+        {
+            List<Tag> results = new List<Tag>();
+            IResultCursor cursor = await _session.RunAsync("MATCH (tag:Tag) RETURN tag.value, tag.id");
+            while (await cursor.FetchAsync())
+            {
+                object? value = cursor.Current["tag.value"];
+                object? id = cursor.Current["tag.id"];
+                if (value is not null)
+                {
+                    results.Add(new Tag(
+                        value.ToString() ?? string.Empty
+                    ));   
                 }
             }
 
