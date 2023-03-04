@@ -10,6 +10,7 @@ RUN dotnet restore
 # Build and publish a release
 RUN dotnet publish -c Release -o out
 
+ENV ASPNETCORE_FORWARDEDHEADERS_ENABLED=true
 # Build runtime image
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /app
