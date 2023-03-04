@@ -10,6 +10,8 @@ public class Post
         Id = id;
     }
     
+    public string Title { get; set; }
+    
     public Guid Id { get; set; }
     
     public IEnumerable<Tag> Tags { get; set; }

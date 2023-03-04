@@ -18,8 +18,6 @@ public class ArticlePost : Post
         Summary = summary;
     }
 
-    private string Title { get; set; }
-
     private string Link { get; set; }
 
     private string Summary { get; set; }

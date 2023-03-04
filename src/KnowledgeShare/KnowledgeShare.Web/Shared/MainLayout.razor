@@ -1,20 +1,39 @@
-﻿@inherits LayoutComponentBase
+﻿@using KnowledgeShare.Core.Posts
+@inherits LayoutComponentBase
+@inject ISearchPostService SearchPostService;
 
-<PageTitle>knowledge_share</PageTitle>
-
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
-
-    <main>
-        <div class="top-row px-4 auth">
+<PageTitle>MHR Knowledge sharing platform</PageTitle>
+<RadzenLayout Style="height: 300px; grid-template-columns: 1fr auto; grid-template-areas: 'rz-header rz-sidebar' 'rz-body rz-sidebar'">
+    <RadzenHeader>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" AlignItems="AlignItems.Center" style="background-color: #c73333;" Gap="1rem">
+            <div class="rz-p-12 rz-text-align-center">
+                <RadzenAutoComplete @bind-Value=@postTitle Data=@posts TextProperty="PostTitle" LoadData=@OnLoadData Style="width: 13rem" />
+                <RadzenText TextStyle="TextStyle.Body2">Start typing e.g. France
+                    @((MarkupString)(!string.IsNullOrEmpty(postTitle) ? $", Value is: <strong>{postTitle}</strong>" : ""))</RadzenText>
+            </div>
             <LoginDisplay />
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
-        </div>
-
-        <article class="content px-4">
+            <RadzenSidebarToggle Click="@(() => sidebar4Expanded = !sidebar4Expanded)" Class="rz-m-0" />
+        </RadzenStack>
+    </RadzenHeader>
+    <RadzenSidebar @bind-Expanded="@sidebar4Expanded">
+        <NavMenu />
+    </RadzenSidebar>
+    <RadzenBody>
+        <div class="rz-p-4">
             @Body
-        </article>
-    </main>
-</div>
+        </div>
+    </RadzenBody>
+</RadzenLayout>
+@code {
+    bool sidebar4Expanded = false;
+    string postTitle;
+
+    IEnumerable<Post> posts;
+
+    async Task OnLoadData(LoadDataArgs args)
+    {
+        posts = (await SearchPostService.SearchAsync(args.Filter))
+            .Where(c => c.Title.Contains(args.Filter))
+            .OrderBy(c => c.Title);
+    }
+}

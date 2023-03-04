@@ -15,8 +15,6 @@ public class BookPost : Post
         Title = title;
         Summary = summary;
     }
-
-    private string Title { get; set; }
     private string Summary { get; set; }
     
 

@@ -21,6 +21,7 @@ public class CoreInstaller
         services.AddScoped<ContextMenuService>();
         services.AddScoped(typeof(ICreatePostService), typeof(CreatePostService));
         services.AddScoped(typeof(IGetAllTagsService), typeof(GetAllTagsService));
+        services.AddScoped(typeof(ISearchPostService), typeof(SearchPostService));
         services.AddScoped(typeof(IPostContextProvider), typeof(PostContextProvider));
         services.AddScoped(typeof(IPostFactory), typeof(PostFactory));
         

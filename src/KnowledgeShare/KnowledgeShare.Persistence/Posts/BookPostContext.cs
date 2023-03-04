@@ -5,7 +5,7 @@ using Neo4j.Driver;
 
 namespace KnowledgeShare.Persistence.Posts;
 
-public class BookPostContext<TPost> : IPostContext<BookPost>, IBookPostContext
+public class BookPostContext<TPost> : IPostContext<BookPost>
 {
     private readonly IAsyncSession _session;
     
