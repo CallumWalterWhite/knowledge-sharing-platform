@@ -14,6 +14,13 @@ builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
     .AddMicrosoftGraph(builder.Configuration.GetSection("DownstreamApi"))
     .AddInMemoryTokenCaches();
 #endif
+#if !DEBUG
+        builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+            .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("ProdAzureAd"))
+            .EnableTokenAcquisitionToCallDownstreamApi(initialScopes)
+            .AddMicrosoftGraph(builder.Configuration.GetSection("DownstreamApi"))
+            .AddInMemoryTokenCaches();
+#endif
 builder.Services.AddAuthorization(options =>
 {
     // By default, all incoming requests will be authorized according to the default policy
