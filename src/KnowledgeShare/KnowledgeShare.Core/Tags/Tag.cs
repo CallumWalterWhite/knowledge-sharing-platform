@@ -2,11 +2,20 @@
 {
     public class Tag
     {
-        public Tag(
+        private Tag(
             string value)
         {
             Value = value;
         }
+        
+        public Tag(
+            Guid id,
+            string value)
+        {
+            Value = value;
+        }
+        
+        public Guid Id { get; }
 
         public string Value { get; }
 

@@ -3,6 +3,7 @@ using KnowledgeShare.Core.Persons;
 using KnowledgeShare.Core.Posts;
 using KnowledgeShare.Core.Posts.Types;
 using KnowledgeShare.Core.Tags;
+using KnowledgeShare.Persistence;
 using KnowledgeShare.Persistence.Persons;
 using KnowledgeShare.Persistence.Posts;
 using KnowledgeShare.Persistence.Tags;
@@ -29,7 +30,8 @@ public class CoreInstaller
         
         services.AddScoped(typeof(IPersonService), typeof(PersonService));
         services.AddScoped(typeof(IPersonRepository), typeof(PersonRepository));
-        
+        services.AddScoped(typeof(INeo4jDataAccess), typeof(Neo4jDataAccess));
+
         services.AddScoped(typeof(IPostRepositoryProvider), typeof(PostRepositoryProvider));
         services.AddScoped(typeof(IPostRepository<ArticlePost>), typeof(ArticlePostRepository<ArticlePost>));
         services.AddScoped(typeof(IPostRepository<BookPost>), typeof(BookPostRepository<BookPost>));

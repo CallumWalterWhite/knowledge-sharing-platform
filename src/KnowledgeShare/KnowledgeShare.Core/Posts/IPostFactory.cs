@@ -2,5 +2,5 @@
 
 public interface IPostFactory
 {
-    public Post Create(CreatePostDto createPostDto);
+    Task<Post> Create(CreatePostDto createPostDto);
 }

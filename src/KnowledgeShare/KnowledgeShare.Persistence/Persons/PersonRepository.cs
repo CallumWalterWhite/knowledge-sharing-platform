@@ -7,27 +7,27 @@ public class PersonRepository : IPersonRepository
 {
     private readonly IAsyncSession _session;
 
-    public PersonRepository(IAsyncSession session)
+    private readonly INeo4jDataAccess _neo4JDataAccess;
+
+    public PersonRepository(IAsyncSession session, INeo4jDataAccess neo4JDataAccess)
     {
         _session = session;
+        _neo4JDataAccess = neo4JDataAccess;
     }
 
     public async Task<Person?> GetPersonByUserIdAsync(string userId)
     {
-        Dictionary<string, object> statementParameters = new Dictionary<string, object>
-        {
-            {"userId", userId }
-        };
+        string query = @"MATCH (p:Person WHERE p.userId = $userId) RETURN p{ id: p.id, userId: p.userId, name: p.name }";
+
+        IDictionary<string, object> parameters = new Dictionary<string, object> { { "userId", userId } };
+
+        IList<Dictionary<string,object>> persons = await _neo4JDataAccess.ExecuteReadDictionaryAsync(query, "p", parameters);
+
         Person? person = null;
-        IResultCursor cursor = await _session.RunAsync("MATCH (u:Person WHERE u.userId = $userId) RETURN u", statementParameters);
-        while (await cursor.FetchAsync())
+        
+        if (persons.Any())
         {
-            object? personRecord = cursor.Current["u"];
-            if (personRecord is not null)
-            {
-                //TODO: init
-                person = new Person(Guid.NewGuid(), "", "");
-            }
+            person = CreatePersonFromResult(persons.Single());
         }
 
         return person;
@@ -46,5 +46,37 @@ public class PersonRepository : IPersonRepository
             await tx.RunAsync("CREATE (p:Person {id: $id, userId: $userId, name: $name}) ",
                 statementParameters);
         });
+    }
+    
+    
+
+    /// <summary>
+    /// Searches the name of the person.
+    /// </summary>
+    public async Task<Person?> GetAsync(Guid id)
+    {
+        string query = @"MATCH (p:Person WHERE p.id = $id) RETURN p{ id: p.id, userId: p.userId, name: p.name }";
+
+        IDictionary<string, object> parameters = new Dictionary<string, object> { { "id", id.ToString() } };
+
+        IList<Dictionary<string,object>> persons = await _neo4JDataAccess.ExecuteReadDictionaryAsync(query, "p", parameters);
+
+        Person? person = null;
+        
+        if (persons.Any())
+        {
+            person = CreatePersonFromResult(persons.Single());
+        }
+
+        return person;
+    }
+    
+    private Person CreatePersonFromResult(Dictionary<string,object> dict)
+    {
+        return new Person(
+            Guid.Parse(dict["id"].ToString()),
+            dict["userId"].ToString(),
+            dict["name"].ToString()
+        );
     }
 }

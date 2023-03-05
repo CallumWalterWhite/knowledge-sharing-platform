@@ -1,4 +1,5 @@
 ﻿using KnowledgeShare.Core.Authentication;
+using KnowledgeShare.Core.Persons;
 using KnowledgeShare.Core.Posts.Types;
 
 namespace KnowledgeShare.Core.Posts;
@@ -12,14 +13,20 @@ public class PostFactory : IPostFactory
         _currentAuthUser = currentAuthUser;
     }
     
-    public Post Create(CreatePostDto createPostDto)
+    public async Task<Post> Create(CreatePostDto createPostDto)
     {
+        Person? person = await _currentAuthUser.GetPersonAsync();
+        if (person is null)
+        {
+            //TODO: Raise exception
+            throw new ArgumentException();
+        }
         switch (createPostDto.Discriminator)
         {
             case PostTypeDiscriminator.Article:
-                return ArticlePost.Create(_currentAuthUser.Person, createPostDto.Title, createPostDto.Link, createPostDto.Summary);
+                return ArticlePost.Create(person, createPostDto.Title, createPostDto.Link, createPostDto.Summary);
             case PostTypeDiscriminator.Book:
-                return BookPost.Create(_currentAuthUser.Person, createPostDto.Title, createPostDto.Summary);
+                return BookPost.Create(person, createPostDto.Title, createPostDto.Summary);
             default:
                 throw new InvalidCastException();
         }

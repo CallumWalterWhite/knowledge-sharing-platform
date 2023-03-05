@@ -31,7 +31,8 @@ public class ArticlePostRepository<TPost> : IPostRepository<ArticlePost>
                 statementParameters);
         });
         
-        await AddTagsAsync(post.Id, post.Tags);
+        await AddTagsAsync(post);
+        await AddAuthor(post);
     }
 
     public Task DeleteAsync(ArticlePost post)
@@ -56,13 +57,13 @@ public class ArticlePostRepository<TPost> : IPostRepository<ArticlePost>
         return articleSummaries;
     }
 
-    private async Task AddTagsAsync(Guid id, IEnumerable<Tag> tags)
+    private async Task AddTagsAsync(ArticlePost post)
     {
-        foreach(Tag tag in tags)
+        foreach(Tag tag in post.Tags)
         {
             Dictionary<string, object?> statementParameters = new Dictionary<string, object?>
             {
-                {"postId", id.ToString() },
+                {"postId", post.Id.ToString() },
                 {"value", tag.Value }
             };
 
@@ -74,6 +75,24 @@ public class ArticlePostRepository<TPost> : IPostRepository<ArticlePost>
                     statementParameters);
             });
         }
+    }
+
+    private async Task AddAuthor(ArticlePost post)
+    {
+        Dictionary<string, object?> statementParameters = new Dictionary<string, object?>
+        {
+            {"postId", post.Id.ToString() },
+            {"personId", post.GetAuthor().Id.ToString() }
+        };
+
+        await _session.ExecuteWriteAsync(async tx =>
+        {
+            string query = "MATCH (a:Person), (b:ArticlePost) " +
+                           "WHERE a.id = $personId AND b.id = $postId " +
+                           "CREATE (a)-[:WROTE]->(b)";
+            await tx.RunAsync(query,
+                statementParameters);
+        });
     }
 
     private ArticlePost CreateArticlePostFromResult(IRecord record)

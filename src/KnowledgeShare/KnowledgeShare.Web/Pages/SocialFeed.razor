@@ -1,0 +1,32 @@
+﻿@using System.Linq
+@using KnowledgeShare.Core.Posts
+@inject ISearchPostService SearchPostService;
+
+<h1>Social Feed</h1>
+
+<ListView Items="@PostsToShow">
+    <ItemTemplate>
+        
+        @foreach (var postResult in PostsToShow)
+        {
+            <Card>
+                <CardBody> 
+                    <h3>@postResult.Title</h3>
+                    <p>@postResult.Id</p>
+                </CardBody>
+            </Card>
+        }
+    </ItemTemplate>
+</ListView>
+
+@code {
+    private IEnumerable<SearchPostResultDto> AllPosts = new List<SearchPostResultDto>();
+
+    private List<SearchPostResultDto> PostsToShow = new List<SearchPostResultDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        AllPosts = await SearchPostService.RecommendAsync();
+        PostsToShow = AllPosts.Take(10).ToList();
+    }
+}

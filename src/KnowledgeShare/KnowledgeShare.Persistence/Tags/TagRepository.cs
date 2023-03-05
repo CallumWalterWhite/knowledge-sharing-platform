@@ -16,11 +16,12 @@ namespace KnowledgeShare.Persistence.Tags
         {
             Dictionary<string, object> statementParameters = new Dictionary<string, object>
             {
+                {"id", tag.Id.ToString() },
                 {"value", tag.Value }
             };
             await _session.ExecuteWriteAsync(async tx =>
             {
-                await tx.RunAsync("CREATE (tag:Tag {value: $value}) ",
+                await tx.RunAsync("CREATE (tag:Tag {value: $value, id: $id}) ",
                     statementParameters);
             });
         }
@@ -49,13 +50,14 @@ namespace KnowledgeShare.Persistence.Tags
                 {"value", tagValue }
             };
             Tag? tag = null;
-            IResultCursor cursor = await _session.RunAsync("MATCH (tag:Tag WHERE tag.value = $value) RETURN tag.value", statementParameters);
+            IResultCursor cursor = await _session.RunAsync("MATCH (tag:Tag WHERE tag.value = $value) RETURN tag.id, tag.value", statementParameters);
             while (await cursor.FetchAsync())
             {
                 object? value = cursor.Current["tag.value"];
+                object? id = cursor.Current["tag.id"];
                 if (value is not null)
                 {
-                    tag = new Tag(value.ToString());
+                    tag = new Tag(Guid.Parse(id.ToString()), value.ToString());
                 }
             }
 
@@ -70,13 +72,15 @@ namespace KnowledgeShare.Persistence.Tags
                 {"searchQuery", value },
             };
             IResultCursor cursor = await _session.RunAsync(
-                "MATCH (t:Tag)\nWHERE toLower(t.value) CONTAINS toLower($searchQuery)\nRETURN t.value, apoc.text.distance(t.value, $searchQuery, 2) AS distance\nORDER BY distance", statementParameters);
+                "MATCH (t:Tag)\nWHERE toLower(t.value) CONTAINS toLower($searchQuery)\nRETURN t.id, t.value, apoc.text.distance(t.value, $searchQuery, 2) AS distance\nORDER BY distance", statementParameters);
             while (await cursor.FetchAsync())
             {
                 object? tagValue = cursor.Current["tag.value"];
+                object? tagId = cursor.Current["tag.id"];
                 if (tagValue is not null)
                 {
                     results.Add(new Tag(
+                        Guid.Parse(tagId.ToString()),
                         tagValue.ToString() ?? string.Empty
                     ));   
                 }
@@ -96,6 +100,7 @@ namespace KnowledgeShare.Persistence.Tags
                 if (value is not null)
                 {
                     results.Add(new Tag(
+                        Guid.Parse(id.ToString()),
                         value.ToString() ?? string.Empty
                     ));   
                 }

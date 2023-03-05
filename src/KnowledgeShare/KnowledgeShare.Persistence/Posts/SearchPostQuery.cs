@@ -40,4 +40,32 @@ public class SearchPostQuery : ISearchPostQuery
 
         return results;
     }
+
+    public async Task<IEnumerable<SearchPostResultDto>> RecommendAsync(Guid personId)
+    {
+        List<SearchPostResultDto> results = new List<SearchPostResultDto>();
+        Dictionary<string, object> statementParameters = new Dictionary<string, object>
+        {
+            {"searchTerm", personId.ToString() },
+        };
+        IResultCursor cursor = await _session.RunAsync(
+            "MATCH (n) WHERE (n:ArticlePost OR n:BookPost) " +
+            "RETURN n.id, n.title " +
+            "ORDER BY n.createdDateTime DESC", statementParameters);
+        while (await cursor.FetchAsync())
+        {
+            if (cursor.Current is not null)
+            {
+                results.Add(
+                    new SearchPostResultDto()
+                    {
+                        Id = Guid.Parse(cursor.Current["n.id"].ToString()),
+                        Title = cursor.Current["n.title"].ToString()
+                    }
+                );
+            }
+        }
+
+        return results;
+    }
 }

@@ -14,13 +14,15 @@ public class Post
     
     public string Title { get; set; }
 
-    private DateTime DateTimeCreated { get; set; }
-    
-    public Person Author { get; set; }
+    private DateTime DateTimeCreated { get; }
+
+    private Person Author { get; }
     
     public Guid Id { get; set; }
     
     public IEnumerable<Tag> Tags { get; set; }
 
     public DateTime GetDateTimeCreated() => DateTimeCreated;
+    
+    public Person GetAuthor() => Author;
 }

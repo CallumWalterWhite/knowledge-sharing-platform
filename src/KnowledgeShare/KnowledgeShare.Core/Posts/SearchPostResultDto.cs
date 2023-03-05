@@ -8,7 +8,7 @@ public class SearchPostResultDto
     
     public string CreatedDate { get; set; }
     
-    public Guid UserCreated { get; set; }
+    public string UserCreatedName { get; set; }
     
     public int Distance { get; set; }
 }

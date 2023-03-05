@@ -1,4 +1,5 @@
-﻿using KnowledgeShare.Core.Posts.Types;
+﻿using KnowledgeShare.Core.Persons;
+using KnowledgeShare.Core.Posts.Types;
 using KnowledgeShare.Core.Tags;
 
 namespace KnowledgeShare.Core.Posts;
@@ -27,7 +28,7 @@ public class CreatePostService : ICreatePostService
     
     public async Task Create(CreatePostDto createPostDto)
     {
-        Post post = _postFactory.Create(createPostDto);
+        Post post = await _postFactory.Create(createPostDto);
         post.Tags = await CreateTags(createPostDto.Tags);
         if (post is ArticlePost articlePost)
         {
@@ -50,7 +51,7 @@ public class CreatePostService : ICreatePostService
             }
             else
             {
-                Tag newTag = new Tag(value);
+                Tag newTag = Tag.Create(value);
                 await _tagRepository.AddAsync(newTag);
                 tagEntities.Add(newTag);
             }

@@ -26,11 +26,12 @@ public class BookPostRepository<TPost> : IPostRepository<BookPost>
         };
         await _session.ExecuteWriteAsync(async tx =>
         {
-            await tx.RunAsync("CREATE (post:BookPost {id: $id, title: $title, summary: $summary, link: $link, createdDateTime: $createdDateTime}) ",
+            await tx.RunAsync("CREATE (post:BookPost {id: $id, title: $title, summary: $summary, createdDateTime: $createdDateTime}) ",
                 statementParameters);
         });
         
-        await AddTagsAsync(post.Id, post.Tags);
+        await AddTagsAsync(post);
+        await AddAuthor(post);
     }
 
     public Task DeleteAsync(BookPost post)
@@ -55,13 +56,13 @@ public class BookPostRepository<TPost> : IPostRepository<BookPost>
         return bookPosts;
     }
 
-    private async Task AddTagsAsync(Guid id, IEnumerable<Tag> tags)
+    private async Task AddTagsAsync(BookPost post)
     {
-        foreach(Tag tag in tags)
+        foreach(Tag tag in post.Tags)
         {
             Dictionary<string, object?> statementParameters = new Dictionary<string, object?>
             {
-                {"postId", id.ToString() },
+                {"postId", post.Id.ToString() },
                 {"tagId", tag.ToString() }
             };
 
@@ -73,6 +74,24 @@ public class BookPostRepository<TPost> : IPostRepository<BookPost>
                     statementParameters);
             });
         }
+    }
+    
+    private async Task AddAuthor(BookPost post)
+    {
+        Dictionary<string, object?> statementParameters = new Dictionary<string, object?>
+        {
+            {"postId", post.Id.ToString() },
+            {"personId", post.GetAuthor().Id.ToString() }
+        };
+
+        await _session.ExecuteWriteAsync(async tx =>
+        {
+            string query = "MATCH (a:Person), (b:BookPost) " +
+                           "WHERE a.id = $personId AND b.id = $postId " +
+                           "CREATE (a)-[:WROTE]->(b)";
+            await tx.RunAsync(query,
+                statementParameters);
+        });
     }
     
     private BookPost CreateBookPostFromResult(IRecord record)

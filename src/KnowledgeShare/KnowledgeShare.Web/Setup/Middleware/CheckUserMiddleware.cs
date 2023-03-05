@@ -1,4 +1,5 @@
-﻿using KnowledgeShare.Core.Persons;
+﻿using KnowledgeShare.Core.Authentication;
+using KnowledgeShare.Core.Persons;
 using Microsoft.Graph;
 using Person = KnowledgeShare.Core.Persons.Person;
 
@@ -26,7 +27,7 @@ public class CheckUserMiddleware
             if (person == null)
             {
                 await personService!.CreatePersonAsync(new CreatePersonDto(user.Id, user.DisplayName));
-            }
+            } 
         }
         await _next(context);
     }

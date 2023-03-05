@@ -1,14 +1,29 @@
-﻿using Microsoft.Graph;
+﻿using KnowledgeShare.Core.Persons;
+using Microsoft.Graph;
+using Person = KnowledgeShare.Core.Persons.Person;
 
 namespace KnowledgeShare.Core.Authentication;
 
 public class CurrentAuthUser : ICurrentAuthUser
 {
-    public CurrentAuthUser(GraphServiceClient graphServiceClient)
+    private bool _isPersonCreated;
+    private Persons.Person? _person;
+
+    private readonly IPersonRepository personRepository;
+    
+    public CurrentAuthUser(GraphServiceClient graphServiceClient, IPersonRepository personRepository)
     {
-        User = graphServiceClient.Me.Request().GetAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+        this.personRepository = personRepository;
+        User = graphServiceClient.Me.Request().GetAsync().ConfigureAwait(true).GetAwaiter().GetResult();
     }
     
     public User User { get; }
-    public Persons.Person Person { get; }
+    public async Task<Persons.Person?> GetPersonAsync()
+    {
+        if (_isPersonCreated) return _person;
+        _person = await personRepository.GetPersonByUserIdAsync(User.Id);
+        _isPersonCreated = true;
+        return _person;
+
+    }
 }

@@ -5,6 +5,6 @@ namespace KnowledgeShare.Core.Authentication;
 public interface ICurrentAuthUser
 {
     User User { get; }
-    
-    Persons.Person Person { get; }
+
+    Task<Persons.Person?> GetPersonAsync();
 }
