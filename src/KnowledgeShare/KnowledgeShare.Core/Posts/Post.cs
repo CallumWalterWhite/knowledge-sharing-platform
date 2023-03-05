@@ -12,6 +12,8 @@ public class Post
     
     public string Title { get; set; }
     
+    public DateTime DateCreated { get; set; }
+    
     public Guid Id { get; set; }
     
     public IEnumerable<Tag> Tags { get; set; }

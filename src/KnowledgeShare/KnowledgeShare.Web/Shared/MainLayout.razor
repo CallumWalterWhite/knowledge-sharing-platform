@@ -3,13 +3,11 @@
 @inject ISearchPostService SearchPostService;
 
 <PageTitle>MHR Knowledge sharing platform</PageTitle>
-<RadzenLayout Style="height: 300px; grid-template-columns: 1fr auto; grid-template-areas: 'rz-header rz-sidebar' 'rz-body rz-sidebar'">
+<RadzenLayout Style="grid-template-columns: 1fr auto; grid-template-areas: 'rz-header rz-sidebar' 'rz-body rz-sidebar'">
     <RadzenHeader>
-        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" AlignItems="AlignItems.Center" style="background-color: #c73333;" Gap="1rem">
-            <div class="rz-p-12 rz-text-align-center">
-                <RadzenAutoComplete @bind-Value=@postTitle Data=@posts TextProperty="PostTitle" LoadData=@OnLoadData Style="width: 13rem" />
-                <RadzenText TextStyle="TextStyle.Body2">Start typing e.g. France
-                    @((MarkupString)(!string.IsNullOrEmpty(postTitle) ? $", Value is: <strong>{postTitle}</strong>" : ""))</RadzenText>
+        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" AlignItems="AlignItems.Center">
+            <div class="rz-text-align-center">
+                <RadzenAutoComplete @bind-Value=@postTitle Data=@posts onclick="" TextProperty="PostTitle" LoadData=@OnLoadData Style="width: 13rem" />
             </div>
             <LoginDisplay />
             <RadzenSidebarToggle Click="@(() => sidebar4Expanded = !sidebar4Expanded)" Class="rz-m-0" />
@@ -28,12 +26,12 @@
     bool sidebar4Expanded = false;
     string postTitle;
 
-    IEnumerable<Post> posts;
+    IEnumerable<string> posts;
 
     async Task OnLoadData(LoadDataArgs args)
     {
-        posts = (await SearchPostService.SearchAsync(args.Filter))
-            .Where(c => c.Title.Contains(args.Filter))
-            .OrderBy(c => c.Title);
+        posts = (await SearchPostService.SearchAsync(args.Filter.ToLower()))
+            .Where(c => c.Title.ToLower().Contains(args.Filter.ToLower()))
+            .OrderBy(c => c.Title).Select(x => x.Title).ToList();
     }
 }
