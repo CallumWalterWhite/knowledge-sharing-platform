@@ -1,16 +1,18 @@
-﻿namespace KnowledgeShare.Core.Posts.Types;
+﻿using KnowledgeShare.Core.Persons;
+
+namespace KnowledgeShare.Core.Posts.Types;
 
 public class BookPost : Post
 {
-    public BookPost(string title, string summary)
-        : base(Guid.NewGuid())
+    private BookPost(Person person, DateTime createdDateTime, string title, string summary)
+        : base(Guid.NewGuid(), person, createdDateTime)
     {
         Title = title;
         Summary = summary;
     }
     
-    public BookPost(Guid id, string title, string summary)
-        : base(id)
+    public BookPost(Guid id, Person person, DateTime createdDateTime, string title, string summary)
+        : base(id, person, createdDateTime)
     {
         Title = title;
         Summary = summary;
@@ -21,4 +23,9 @@ public class BookPost : Post
     public string GetTitle() => Title;
     
     public string GetSummary() => Summary;
+    
+    public static BookPost Create(Person person, string title, string summary)
+    {
+        return new BookPost(person, DateTime.Now, title, summary);
+    }
 }

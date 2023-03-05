@@ -1,8 +1,6 @@
-﻿using KnowledgeShare.Core.Posts;
+﻿namespace KnowledgeShare.Core.Posts;
 
-namespace KnowledgeShare.Core.Context.Posts;
-
-public interface IPostContext<T>
+public interface IPostRepository<T>
     where T : Post
 {
     Task CreateAsync(T post);

@@ -1,15 +1,16 @@
-﻿using KnowledgeShare.Core.Context.Posts;
-using KnowledgeShare.Core.Entities.Tags;
+﻿using KnowledgeShare.Core.Persons;
+using KnowledgeShare.Core.Posts;
 using KnowledgeShare.Core.Posts.Types;
+using KnowledgeShare.Core.Tags;
 using Neo4j.Driver;
 
 namespace KnowledgeShare.Persistence.Posts;
 
-public class ArticlePostContext<TPost> : IPostContext<ArticlePost>
+public class ArticlePostRepository<TPost> : IPostRepository<ArticlePost>
 {
     private readonly IAsyncSession _session;
     
-    public ArticlePostContext(IAsyncSession session)
+    public ArticlePostRepository(IAsyncSession session)
     {
         _session = session;
     }
@@ -21,11 +22,12 @@ public class ArticlePostContext<TPost> : IPostContext<ArticlePost>
             {"title", post.GetTitle() },
             {"summary", post.GetSummary() },
             {"link", post.GetLink() },
+            {"createdDateTime", post.GetDateTimeCreated() },
             {"id", post.Id.ToString() }
         };
         await _session.ExecuteWriteAsync(async tx =>
         {
-            await tx.RunAsync("CREATE (post:ArticlePost {id: $id, title: $title, summary: $summary, link: $link}) ",
+            await tx.RunAsync("CREATE (post:ArticlePost {id: $id, title: $title, summary: $summary, link: $link, createdDateTime: $createdDateTime}) ",
                 statementParameters);
         });
         
@@ -48,16 +50,7 @@ public class ArticlePostContext<TPost> : IPostContext<ArticlePost>
         IResultCursor cursor = await _session.RunAsync("MATCH (post:ArticlePost) RETURN post.id, post.title, post.summary, post.link");
         while (await cursor.FetchAsync())
         {
-            object? id = cursor.Current["post.id"];
-            object? title = cursor.Current["post.title"];
-            object? summary = cursor.Current["post.summary"];
-            object? link = cursor.Current["post.link"];
-            articleSummaries.Add(new ArticlePost(
-                Guid.Parse(id.ToString()),
-                title.ToString() ?? string.Empty,
-                summary.ToString() ?? string.Empty,
-                link.ToString() ?? string.Empty
-            ));
+            articleSummaries.Add(CreateArticlePostFromResult(cursor.Current));
         }
 
         return articleSummaries;
@@ -81,5 +74,25 @@ public class ArticlePostContext<TPost> : IPostContext<ArticlePost>
                     statementParameters);
             });
         }
+    }
+
+    private ArticlePost CreateArticlePostFromResult(IRecord record)
+    {
+        object? id = record["post.id"];
+        object? title = record["post.title"];
+        object? summary = record["post.summary"];
+        object? link = record["post.link"];
+        object? createdDateTime = record["post.createdDateTime"];
+        object? personId = record["person.id"];
+        object? userId = record["person.userId"];
+        object? name = record["person.name"];
+        return new ArticlePost(
+            Guid.Parse(id.ToString()),
+            new Person(Guid.Parse(personId.ToString()), userId.ToString(), name.ToString()),
+            DateTime.Parse(createdDateTime.ToString()),
+            title.ToString() ?? string.Empty,
+            summary.ToString() ?? string.Empty,
+            link.ToString() ?? string.Empty
+        );
     }
 }

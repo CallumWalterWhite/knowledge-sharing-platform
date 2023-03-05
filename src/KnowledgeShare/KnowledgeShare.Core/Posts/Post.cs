@@ -1,22 +1,26 @@
-﻿using KnowledgeShare.Core.Entities;
-using KnowledgeShare.Core.Entities.Tags;
+﻿using KnowledgeShare.Core.Persons;
+using KnowledgeShare.Core.Tags;
 
 namespace KnowledgeShare.Core.Posts;
 
 public class Post
 {
-    protected Post(Guid id)
+    protected Post(Guid id, Person author, DateTime dateTimeCreated)
     {
         Id = id;
+        Author = author;
+        DateTimeCreated = dateTimeCreated;
     }
     
     public string Title { get; set; }
+
+    private DateTime DateTimeCreated { get; set; }
     
-    public DateTime DateCreated { get; set; }
-    
-    public Guid UserCreated { get; set; }
+    public Person Author { get; set; }
     
     public Guid Id { get; set; }
     
     public IEnumerable<Tag> Tags { get; set; }
+
+    public DateTime GetDateTimeCreated() => DateTimeCreated;
 }

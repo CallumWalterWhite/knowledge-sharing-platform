@@ -1,6 +1,4 @@
-﻿using KnowledgeShare.Core.Entities.Tags;
-
-namespace KnowledgeShare.Core.Tags;
+﻿namespace KnowledgeShare.Core.Tags;
 
 public interface IGetAllTagsService
 {

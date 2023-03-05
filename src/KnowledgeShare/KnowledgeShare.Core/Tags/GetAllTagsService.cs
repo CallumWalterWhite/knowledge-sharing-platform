@@ -1,24 +1,21 @@
-﻿using KnowledgeShare.Core.Context;
-using KnowledgeShare.Core.Entities.Tags;
-
-namespace KnowledgeShare.Core.Tags;
+﻿namespace KnowledgeShare.Core.Tags;
 
 public class GetAllTagsService : IGetAllTagsService
 {
-    private readonly ITagContext _tagContext;
+    private readonly ITagRepository _tagRepository;
 
-    public GetAllTagsService(ITagContext tagContext)
+    public GetAllTagsService(ITagRepository tagRepository)
     {
-        _tagContext = tagContext;
+        _tagRepository = tagRepository;
     }
 
     public async Task<IEnumerable<Tag>> GetAllAsync()
     {
-        return await _tagContext.GetAllTags();
+        return await _tagRepository.GetAllTags();
     }
 
     public async Task<IEnumerable<Tag>> GetAllAsyncByValue(string value)
     {
-        return await _tagContext.GetAllTagsByValue(value);
+        return await _tagRepository.GetAllTagsByValue(value);
     }
 }

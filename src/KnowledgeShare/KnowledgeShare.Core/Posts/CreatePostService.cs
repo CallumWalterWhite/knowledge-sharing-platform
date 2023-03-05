@@ -1,7 +1,5 @@
-﻿using KnowledgeShare.Core.Context;
-using KnowledgeShare.Core.Context.Posts;
-using KnowledgeShare.Core.Entities.Tags;
-using KnowledgeShare.Core.Posts.Types;
+﻿using KnowledgeShare.Core.Posts.Types;
+using KnowledgeShare.Core.Tags;
 
 namespace KnowledgeShare.Core.Posts;
 
@@ -9,22 +7,22 @@ public class CreatePostService : ICreatePostService
 {
     private readonly IPostFactory _postFactory;
 
-    private readonly IPostContext<ArticlePost> _articlePostContext;
+    private readonly IPostRepository<ArticlePost> _articlePostRepository;
     
-    private readonly IPostContext<BookPost> _bookPostContext;
+    private readonly IPostRepository<BookPost> _bookPostRepository;
 
-    private readonly ITagContext _tagContext;
-    
+    private readonly ITagRepository _tagRepository;
+
     public CreatePostService(
-        IPostContext<ArticlePost> articlePostContext, 
-        IPostContext<BookPost> bookPostContext, 
+        IPostRepository<ArticlePost> articlePostRepository, 
+        IPostRepository<BookPost> bookPostRepository, 
         IPostFactory postFactory, 
-        ITagContext tagContext)
+        ITagRepository tagRepository)
     {
-        _articlePostContext = articlePostContext;
-        _bookPostContext = bookPostContext;
+        _articlePostRepository = articlePostRepository;
+        _bookPostRepository = bookPostRepository;
         _postFactory = postFactory;
-        _tagContext = tagContext;
+        _tagRepository = tagRepository;
     }
     
     public async Task Create(CreatePostDto createPostDto)
@@ -33,11 +31,11 @@ public class CreatePostService : ICreatePostService
         post.Tags = await CreateTags(createPostDto.Tags);
         if (post is ArticlePost articlePost)
         {
-            await _articlePostContext.CreateAsync(articlePost);
+            await _articlePostRepository.CreateAsync(articlePost);
         }
         else if (post is BookPost bookPost)
         {
-            await _bookPostContext.CreateAsync(bookPost);
+            await _bookPostRepository.CreateAsync(bookPost);
         }
     }
 
@@ -46,14 +44,14 @@ public class CreatePostService : ICreatePostService
         List<Tag> tagEntities = new List<Tag>();
         foreach (string value in tags)
         {
-            if (await _tagContext.MatchAsync(value))
+            if (await _tagRepository.MatchAsync(value))
             {
-                tagEntities.Add((await _tagContext.GetAsync(value))!);
+                tagEntities.Add((await _tagRepository.GetAsync(value))!);
             }
             else
             {
                 Tag newTag = new Tag(value);
-                await _tagContext.AddAsync(newTag);
+                await _tagRepository.AddAsync(newTag);
                 tagEntities.Add(newTag);
             }
         }

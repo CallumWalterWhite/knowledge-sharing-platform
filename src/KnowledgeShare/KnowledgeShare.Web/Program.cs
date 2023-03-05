@@ -1,4 +1,5 @@
 using KnowledgeShare.Web.Setup.Ioc;
+using KnowledgeShare.Web.Setup.Middleware;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
@@ -46,6 +47,8 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.UseMiddleware<CheckUserMiddleware>();
 
 app.MapControllers();
 app.MapBlazorHub();

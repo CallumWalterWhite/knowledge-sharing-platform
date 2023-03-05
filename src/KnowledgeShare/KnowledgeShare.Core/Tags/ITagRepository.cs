@@ -1,8 +1,8 @@
-﻿using KnowledgeShare.Core.Entities.Tags;
+﻿using KnowledgeShare.Core.Tags;
 
-namespace KnowledgeShare.Core.Context
+namespace KnowledgeShare.Core.Tags
 {
-    public interface ITagContext
+    public interface ITagRepository
     {
         Task AddAsync(Tag tag);
 

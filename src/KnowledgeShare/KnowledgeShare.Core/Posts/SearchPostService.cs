@@ -1,24 +1,22 @@
-﻿using System.Collections;
-using KnowledgeShare.Core.Context.Posts;
-using KnowledgeShare.Core.Posts.Types;
+﻿using KnowledgeShare.Core.Posts.Types;
 
 namespace KnowledgeShare.Core.Posts;
 
 public class SearchPostService : ISearchPostService
 {
-    private readonly IPostContext<ArticlePost> _articlePostContext;
+    private readonly IPostRepository<ArticlePost> _articlePostRepository;
     
-    private readonly IPostContext<BookPost> _bookPostContext;
+    private readonly IPostRepository<BookPost> _bookPostRepository;
 
     private readonly ISearchPostQuery _searchPostQuery;
 
     public SearchPostService(
-        IPostContext<ArticlePost> articlePostContext, 
-        IPostContext<BookPost> bookPostContext, 
+        IPostRepository<ArticlePost> articlePostRepository, 
+        IPostRepository<BookPost> bookPostRepository, 
         ISearchPostQuery searchPostQuery)
     {
-        _articlePostContext = articlePostContext;
-        _bookPostContext = bookPostContext;
+        _articlePostRepository = articlePostRepository;
+        _bookPostRepository = bookPostRepository;
         _searchPostQuery = searchPostQuery;
     }
 

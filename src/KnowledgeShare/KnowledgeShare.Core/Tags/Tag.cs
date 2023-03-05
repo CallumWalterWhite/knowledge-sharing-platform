@@ -1,4 +1,4 @@
-﻿namespace KnowledgeShare.Core.Entities.Tags
+﻿namespace KnowledgeShare.Core.Tags
 {
     public class Tag
     {

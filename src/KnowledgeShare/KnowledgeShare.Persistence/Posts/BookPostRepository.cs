@@ -1,15 +1,16 @@
-﻿using KnowledgeShare.Core.Context.Posts;
-using KnowledgeShare.Core.Entities.Tags;
+﻿using KnowledgeShare.Core.Persons;
+using KnowledgeShare.Core.Posts;
 using KnowledgeShare.Core.Posts.Types;
+using KnowledgeShare.Core.Tags;
 using Neo4j.Driver;
 
 namespace KnowledgeShare.Persistence.Posts;
 
-public class BookPostContext<TPost> : IPostContext<BookPost>
+public class BookPostRepository<TPost> : IPostRepository<BookPost>
 {
     private readonly IAsyncSession _session;
     
-    public BookPostContext(IAsyncSession session)
+    public BookPostRepository(IAsyncSession session)
     {
         _session = session;
     }
@@ -20,11 +21,12 @@ public class BookPostContext<TPost> : IPostContext<BookPost>
         {
             {"title", post.GetTitle() },
             {"summary", post.GetSummary() },
+            {"createdDateTime", post.GetDateTimeCreated() },
             {"id", post.Id.ToString() }
         };
         await _session.ExecuteWriteAsync(async tx =>
         {
-            await tx.RunAsync("CREATE (post:BookPost {id: $id, title: $title, summary: $summary, link: $link}) ",
+            await tx.RunAsync("CREATE (post:BookPost {id: $id, title: $title, summary: $summary, link: $link, createdDateTime: $createdDateTime}) ",
                 statementParameters);
         });
         
@@ -47,14 +49,7 @@ public class BookPostContext<TPost> : IPostContext<BookPost>
         IResultCursor cursor = await _session.RunAsync("MATCH (post:BookPost) RETURN post.id, post.title, post.summary, post.link");
         while (await cursor.FetchAsync())
         {
-            object? id = cursor.Current["post.id"];
-            object? title = cursor.Current["post.title"];
-            object? summary = cursor.Current["post.summary"];
-            bookPosts.Add(new BookPost(
-                Guid.Parse(id.ToString()),
-                title.ToString() ?? string.Empty,
-                summary.ToString() ?? string.Empty
-            ));
+            bookPosts.Add(CreateBookPostFromResult(cursor.Current));
         }
 
         return bookPosts;
@@ -78,5 +73,23 @@ public class BookPostContext<TPost> : IPostContext<BookPost>
                     statementParameters);
             });
         }
+    }
+    
+    private BookPost CreateBookPostFromResult(IRecord record)
+    {
+        object? id = record["post.id"];
+        object? title = record["post.title"];
+        object? summary = record["post.summary"];
+        object? createdDateTime = record["post.createdDateTime"];
+        object? personId = record["person.id"];
+        object? userId = record["person.userId"];
+        object? name = record["person.name"];
+        return new BookPost(
+            Guid.Parse(id.ToString()),
+            new Person(Guid.Parse(personId.ToString()), userId.ToString(), name.ToString()),
+            DateTime.Parse(createdDateTime.ToString()),
+            title.ToString() ?? string.Empty,
+            summary.ToString() ?? string.Empty
+        );
     }
 }

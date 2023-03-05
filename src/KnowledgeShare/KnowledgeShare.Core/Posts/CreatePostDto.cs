@@ -1,6 +1,4 @@
-﻿using KnowledgeShare.Core.Entities.Tags;
-
-namespace KnowledgeShare.Core.Posts;
+﻿namespace KnowledgeShare.Core.Posts;
 
 public class CreatePostDto
 {

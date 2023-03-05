@@ -1,14 +1,13 @@
-﻿using KnowledgeShare.Core.Context;
-using KnowledgeShare.Core.Entities.Tags;
+﻿using KnowledgeShare.Core.Tags;
 using Neo4j.Driver;
 
 namespace KnowledgeShare.Persistence.Tags
 {
-    public class TagContext : ITagContext
+    public class TagRepository : ITagRepository
     {
         private readonly IAsyncSession _session;
 
-        public TagContext(IAsyncSession session)
+        public TagRepository(IAsyncSession session)
         {
             _session = session;
         }
