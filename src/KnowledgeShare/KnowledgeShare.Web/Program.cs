@@ -1,6 +1,7 @@
 using KnowledgeShare.Web.Setup.Ioc;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.HttpOverrides;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Identity.Web;
 
 WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
