@@ -1,4 +1,4 @@
-# Knowledge Sharing Platform
+# Knowledge Sharing Platform (WIP)
 This is a knowledge sharing platform built using .NET and Neo4j graph database. The platform enables users to easily create, search, and browse through knowledge-based content, tailored to their interests and experience level.
 
 ## Features
@@ -9,7 +9,8 @@ This is a knowledge sharing platform built using .NET and Neo4j graph database. 
 * Integrated commenting and feedback functionality to encourage collaboration and sharing
 
 ## Technologies
-* .NET framework for web application development
+* Blazor web app for web application development
+* .NET framework for server-side programming
 * Neo4j graph database for efficient and scalable data management
 * HTML, CSS, and JavaScript for front-end development
 * Bootstrap for responsive web design
