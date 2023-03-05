@@ -5,7 +5,6 @@ using KnowledgeShare.Core.Posts.Types;
 using KnowledgeShare.Core.Tags;
 using KnowledgeShare.Persistence.Posts;
 using KnowledgeShare.Persistence.Tags;
-using KnowledgeShare.Web.Data;
 using Radzen;
 
 namespace KnowledgeShare.Web.Setup.Ioc;
@@ -28,7 +27,5 @@ public class CoreInstaller
         services.AddScoped(typeof(IPostContextProvider), typeof(PostContextProvider));
         services.AddScoped(typeof(IPostContext<ArticlePost>), typeof(ArticlePostContext<ArticlePost>));
         services.AddScoped(typeof(IPostContext<BookPost>), typeof(BookPostContext<BookPost>));
-        //TODO: REMOVE
-        services.AddSingleton<WeatherForecastService>();
     }
 }
