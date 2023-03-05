@@ -23,6 +23,7 @@ public class CoreInstaller
         services.AddScoped(typeof(ISearchPostService), typeof(SearchPostService));
         services.AddScoped(typeof(IPostContextProvider), typeof(PostContextProvider));
         services.AddScoped(typeof(IPostFactory), typeof(PostFactory));
+        services.AddScoped(typeof(ISearchPostQuery), typeof(SearchPostQuery));
         
         services.AddScoped(typeof(IPostContextProvider), typeof(PostContextProvider));
         services.AddScoped(typeof(IPostContext<ArticlePost>), typeof(ArticlePostContext<ArticlePost>));

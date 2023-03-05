@@ -10,17 +10,18 @@ public class SearchPostService : ISearchPostService
     
     private readonly IPostContext<BookPost> _bookPostContext;
 
-    public SearchPostService(IPostContext<ArticlePost> articlePostContext, IPostContext<BookPost> bookPostContext)
+    private readonly ISearchPostQuery _searchPostQuery;
+
+    public SearchPostService(
+        IPostContext<ArticlePost> articlePostContext, 
+        IPostContext<BookPost> bookPostContext, 
+        ISearchPostQuery searchPostQuery)
     {
         _articlePostContext = articlePostContext;
         _bookPostContext = bookPostContext;
+        _searchPostQuery = searchPostQuery;
     }
 
-    public async Task<IEnumerable<Post>> SearchAsync(string search)
-    {
-        List<Post> posts = new List<Post>();
-        posts.AddRange(await _articlePostContext.GetAllAsync());
-        posts.AddRange(await _bookPostContext.GetAllAsync());
-        return posts;
-    }
+    public async Task<IEnumerable<SearchPostResultDto>> SearchAsync(string search)
+        => await _searchPostQuery.SearchAsync(search);
 }

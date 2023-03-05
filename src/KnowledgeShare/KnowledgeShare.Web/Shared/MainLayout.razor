@@ -7,7 +7,7 @@
     <RadzenHeader>
         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" AlignItems="AlignItems.Center">
             <div class="rz-text-align-center">
-                <RadzenAutoComplete @bind-Value=@postTitle Data=@posts onclick="" TextProperty="PostTitle" LoadData=@OnLoadData Style="width: 13rem" />
+                <RadzenAutoComplete @bind-Value=@postTitle Data=@posts onclick="@OnClick" TextProperty="PostTitle" LoadData=@OnLoadData Style="width: 13rem" />
             </div>
             <LoginDisplay />
             <RadzenSidebarToggle Click="@(() => sidebar4Expanded = !sidebar4Expanded)" Class="rz-m-0" />
@@ -28,10 +28,15 @@
 
     IEnumerable<string> posts;
 
+    IEnumerable<SearchPostResultDto> contextPosts = new List<SearchPostResultDto>();
+
     async Task OnLoadData(LoadDataArgs args)
     {
-        posts = (await SearchPostService.SearchAsync(args.Filter.ToLower()))
-            .Where(c => c.Title.ToLower().Contains(args.Filter.ToLower()))
-            .OrderBy(c => c.Title).Select(x => x.Title).ToList();
+        contextPosts = await SearchPostService.SearchAsync(args.Filter.ToLower());
+        posts = contextPosts.Select(x => x.Title);
+    }
+    
+    async Task OnClick()
+    {
     }
 }
