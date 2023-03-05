@@ -394,4 +394,5 @@ FodyWeavers.xsd
 *.msm
 *.msp
 
+.env
 # JetBrains Rider
