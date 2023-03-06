@@ -1,26 +1,33 @@
 ﻿@using System.Linq
 @using KnowledgeShare.Core.Posts
 @inject ISearchPostService SearchPostService;
+@inject IJSRuntime JSRuntime;
 
-<h1>Social Feed</h1>
-
-<ListView Items="@PostsToShow">
+<ListView Items="@PostsToShow" @ref="scrollableContent" OnScroll="@OnScroll">
     <ItemTemplate>
-        
-        @foreach (var postResult in PostsToShow)
-        {
-            <RadzenCard Class="rz-my-12 rz-mx-auto" Style="max-width: 420px">
-                    <RadzenCard class="rz-background-color-primary-lighter rz-shadow-0 rz-border-radius-0 rz-p-8" style="margin: 1rem;">
-                        <RadzenText TextStyle="TextStyle.H6" class="rz-color-primary-light"><strong>@postResult.Title</strong></RadzenText>
-                        <RadzenRow RowGap="0">
-                            <RadzenColumn SizeSM="8">
-                                <RadzenText TextStyle="TextStyle.Overline" class="rz-color-primary-light rz-display-flex rz-mt-4 rz-mb-0">Id</RadzenText>
-                                <RadzenText TextStyle="TextStyle.Body1"><b>@postResult.Id</b></RadzenText>
-                            </RadzenColumn>
-                        </RadzenRow>
-                    </RadzenCard>
-                </RadzenCard>   
-        }
+        <div class="row justify-content-center">
+            @foreach (var postResult in PostsToShow)
+            {
+                <RadzenCard Style="margin-top: 40px; padding: 20px 40px 40px; width: 800px; float: none">
+                    <div class="row">
+                        <RadzenLabel Text=@postResult.Title
+                        Style="font-style: normal; text-transform: none; font-size: 24px; font-weight: bold" />
+                    </div>
+                    <div class="row">
+                        <RadzenLabel Text=@postResult.Summary />
+                        <div class="row" style="margin-top: 20px;">
+                            @foreach (var tag in postResult.Tags)
+                            {
+                                <RadzenBadge Text=@tag Style="max-width: 90px; margin-right: 5px;"></RadzenBadge>
+                            }
+                        </div>
+                        <div class="row rz-justify-content-right" style="margin-top: 20px; float: none">
+                            <RadzenButton Style="width: 72px; height: 26px; float: none" Text="View"></RadzenButton>
+                        </div>
+                    </div>
+                </RadzenCard>
+            }
+        </div>
     </ItemTemplate>
 </ListView>
 
@@ -28,10 +35,28 @@
     private IEnumerable<SearchPostResultDto> AllPosts = new List<SearchPostResultDto>();
 
     private List<SearchPostResultDto> PostsToShow = new List<SearchPostResultDto>();
+    
+    private ElementReference scrollableContent;
 
     protected override async Task OnInitializedAsync()
     {
         AllPosts = await SearchPostService.RecommendAsync();
         PostsToShow = AllPosts.Take(10).ToList();
+    }
+
+    private async Task OnScroll()
+    {
+        var scrollHeight = await JSRuntime.InvokeAsync<int>("getScrollHeight", scrollableContent);
+
+        if (scrollHeight - 50 <= await JSRuntime.InvokeAsync<int>("getScrollTop", scrollableContent))
+        {
+            var nextPage = PostsToShow.Count / 10 + 1; // Each page shows 10 posts
+            var newPosts = AllPosts.Skip(nextPage * 10).Take(10).ToList();
+            if (newPosts.Any())
+            {
+                PostsToShow.AddRange(newPosts);
+                StateHasChanged();
+            }
+        }
     }
 }

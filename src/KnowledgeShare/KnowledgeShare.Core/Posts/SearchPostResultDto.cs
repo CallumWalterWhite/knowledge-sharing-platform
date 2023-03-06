@@ -6,9 +6,13 @@ public class SearchPostResultDto
     
     public string Title { get; set; }
     
+    public string Summary { get; set; }
+    
     public string CreatedDate { get; set; }
     
     public string UserCreatedName { get; set; }
     
+    public IList<string> Tags { get; set; }
+
     public int Distance { get; set; }
 }

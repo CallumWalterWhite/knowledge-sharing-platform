@@ -89,6 +89,33 @@ namespace KnowledgeShare.Persistence.Tags
             return results;
         }
 
+        public async Task<IEnumerable<Tag>> GetAllTagsByPostId(Guid postId)
+        {
+            List<Tag> results = new List<Tag>();
+            Dictionary<string, object> statementParameters = new Dictionary<string, object>
+            {
+                {"searchTerm", postId.ToString() },
+            };
+            IResultCursor cursor = await _session.RunAsync(
+                "MATCH (n) WHERE (n:ArticlePost OR n:BookPost) AND n.id = $searchTerm " +
+                "MATCH (n)-[r:HAS_TAG]->(t) " + 
+                "RETURN t.id, t.value", statementParameters);
+            while (await cursor.FetchAsync())
+            {
+                object? tagValue = cursor.Current["t.value"];
+                object? tagId = cursor.Current["t.id"];
+                if (tagValue is not null)
+                {
+                    results.Add(new Tag(
+                        Guid.Parse(tagId.ToString()),
+                        tagValue.ToString() ?? string.Empty
+                    ));   
+                }
+            }
+
+            return results;
+        }
+
         public async Task<IEnumerable<Tag>> GetAllTags()
         {
             List<Tag> results = new List<Tag>();

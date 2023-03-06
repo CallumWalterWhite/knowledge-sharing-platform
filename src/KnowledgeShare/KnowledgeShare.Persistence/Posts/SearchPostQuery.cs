@@ -50,7 +50,7 @@ public class SearchPostQuery : ISearchPostQuery
         };
         IResultCursor cursor = await _session.RunAsync(
             "MATCH (n) WHERE (n:ArticlePost OR n:BookPost) " +
-            "RETURN n.id, n.title " +
+            "RETURN n.id, n.summary, n.title " +
             "ORDER BY n.createdDateTime DESC", statementParameters);
         while (await cursor.FetchAsync())
         {
@@ -60,7 +60,8 @@ public class SearchPostQuery : ISearchPostQuery
                     new SearchPostResultDto()
                     {
                         Id = Guid.Parse(cursor.Current["n.id"].ToString()),
-                        Title = cursor.Current["n.title"].ToString()
+                        Title = cursor.Current["n.title"].ToString(),
+                        Summary = cursor.Current["n.summary"].ToString()
                     }
                 );
             }

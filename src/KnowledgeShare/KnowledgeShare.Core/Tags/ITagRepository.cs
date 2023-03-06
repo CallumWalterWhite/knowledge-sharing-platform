@@ -13,5 +13,7 @@ namespace KnowledgeShare.Core.Tags
         Task<Tag?> GetAsync(string value);
         
         Task<IEnumerable<Tag>> GetAllTagsByValue(string value);
+        
+        Task<IEnumerable<Tag>> GetAllTagsByPostId(Guid postId);
     }
 }
