@@ -9,12 +9,17 @@
         
         @foreach (var postResult in PostsToShow)
         {
-            <Card>
-                <CardBody> 
-                    <h3>@postResult.Title</h3>
-                    <p>@postResult.Id</p>
-                </CardBody>
-            </Card>
+            <RadzenCard Class="rz-my-12 rz-mx-auto" Style="max-width: 420px">
+                    <RadzenCard class="rz-background-color-primary-lighter rz-shadow-0 rz-border-radius-0 rz-p-8" style="margin: 1rem;">
+                        <RadzenText TextStyle="TextStyle.H6" class="rz-color-primary-light"><strong>@postResult.Title</strong></RadzenText>
+                        <RadzenRow RowGap="0">
+                            <RadzenColumn SizeSM="8">
+                                <RadzenText TextStyle="TextStyle.Overline" class="rz-color-primary-light rz-display-flex rz-mt-4 rz-mb-0">Id</RadzenText>
+                                <RadzenText TextStyle="TextStyle.Body1"><b>@postResult.Id</b></RadzenText>
+                            </RadzenColumn>
+                        </RadzenRow>
+                    </RadzenCard>
+                </RadzenCard>   
         }
     </ItemTemplate>
 </ListView>
