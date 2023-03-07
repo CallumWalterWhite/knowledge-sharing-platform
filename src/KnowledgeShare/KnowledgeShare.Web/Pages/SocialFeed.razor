@@ -3,40 +3,44 @@
 @inject ISearchPostService SearchPostService;
 @inject IJSRuntime JSRuntime;
 
-<ListView Items="@PostsToShow" @ref="scrollableContent" OnScroll="@OnScroll">
-    <ItemTemplate>
-        <div class="row justify-content-center">
-            @foreach (var postResult in PostsToShow)
-            {
-                <RadzenCard Style="margin-top: 40px; padding: 20px 40px 40px; width: 800px; float: none">
-                    <div class="row">
-                        <RadzenLabel Text=@postResult.Title
-                        Style="font-style: normal; text-transform: none; font-size: 24px; font-weight: bold" />
-                    </div>
-                    <div class="row">
-                        <RadzenLabel Text=@postResult.Summary />
-                        <div class="row" style="margin-top: 20px;">
-                            @foreach (var tag in postResult.Tags)
-                            {
-                                <RadzenBadge Text=@tag Style="max-width: 90px; margin-right: 5px;"></RadzenBadge>
-                            }
+<div @onwheel="@OnScroll" id="myDiv" style="overflow-y: scroll;">
+    <ListView Items="@PostsToShow">
+        <ItemTemplate>
+            <div class="row justify-content-center">
+                @foreach (var postResult in PostsToShow)
+                {
+                    <RadzenCard Style="margin-top: 40px; padding: 20px 40px 40px; width: 800px; float: none">
+                        <div class="row">
+                            <RadzenLabel Text=@postResult.Title
+                            Style="font-style: normal; text-transform: none; font-size: 24px; font-weight: bold" />
                         </div>
-                        <div class="row rz-justify-content-right" style="margin-top: 20px; float: none">
-                            <RadzenButton Style="width: 72px; height: 26px; float: none" Text="View"></RadzenButton>
+                        <div class="row">
+                            <RadzenLabel Text=@postResult.Summary />
+                            <div class="row" style="margin-top: 20px;">
+                                @foreach (var tag in postResult.Tags)
+                                {
+                                    <RadzenBadge Text=@tag Style="max-width: 90px; margin-right: 5px;"></RadzenBadge>
+                                }
+                            </div>
+                            <div class="row rz-justify-content-right" style="margin-top: 20px; float: none">
+                                <RadzenButton Style="width: 72px; height: 26px; float: none" Text="View"></RadzenButton>
+                            </div>
                         </div>
-                    </div>
-                </RadzenCard>
-            }
-        </div>
-    </ItemTemplate>
-</ListView>
+                    </RadzenCard>
+                }
+            </div>
+        </ItemTemplate>
+    </ListView>
+</div>
 
 @code {
     private IEnumerable<SearchPostResultDto> AllPosts = new List<SearchPostResultDto>();
 
     private List<SearchPostResultDto> PostsToShow = new List<SearchPostResultDto>();
     
-    private ElementReference scrollableContent;
+    int pageSize = 10; // number of items to load per page
+    int page = 1; // current page
+    bool isLoading = false; // flag to prevent multiple requests
 
     protected override async Task OnInitializedAsync()
     {
@@ -44,19 +48,24 @@
         PostsToShow = AllPosts.Take(10).ToList();
     }
 
-    private async Task OnScroll()
+    private async Task OnScroll(EventArgs e)
     {
-        var scrollHeight = await JSRuntime.InvokeAsync<int>("getScrollHeight", scrollableContent);
+        var scrollTop = await JSRuntime.InvokeAsync<int>(
+            "eval", "document.getElementsByClassName('rz-body')[0].scrollTop");
+        var scrollHeight = await JSRuntime.InvokeAsync<int>(
+            "eval", "document.getElementsByClassName('rz-body')[0].scrollHeight");;
+        var clientHeight = await JSRuntime.InvokeAsync<int>(
+            "eval", "document.getElementsByClassName('rz-body')[0].clientHeight");
+        var isBottom = scrollTop + clientHeight >= scrollHeight;
 
-        if (scrollHeight - 50 <= await JSRuntime.InvokeAsync<int>("getScrollTop", scrollableContent))
+        if (isBottom && !isLoading)
         {
-            var nextPage = PostsToShow.Count / 10 + 1; // Each page shows 10 posts
+            isLoading = true;
+            page++;
+            var nextPage = (int)Math.Truncate(100 * ((double)PostsToShow.Count / 10) + page) / 100;
             var newPosts = AllPosts.Skip(nextPage * 10).Take(10).ToList();
-            if (newPosts.Any())
-            {
-                PostsToShow.AddRange(newPosts);
-                StateHasChanged();
-            }
+            PostsToShow.AddRange(newPosts);
+            isLoading = false;
         }
     }
 }
