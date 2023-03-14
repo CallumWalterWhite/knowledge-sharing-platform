@@ -7,7 +7,7 @@ namespace KnowledgeShare.Core.Authentication;
 public class CurrentAuthUser : ICurrentAuthUser
 {
     private bool _isPersonCreated;
-    private Persons.Person? _person;
+    private Person? _person;
 
     private readonly IPersonRepository _personRepository;
 
@@ -24,7 +24,7 @@ public class CurrentAuthUser : ICurrentAuthUser
     }
     
     public User User { get; }
-    public async Task<Persons.Person?> GetPersonAsync()
+    public async Task<Person?> GetPersonAsync()
     {
         if (_isPersonCreated) return _person;
         Person? person = await _personService.GetPersonByUserIdAsync(User.Id);
