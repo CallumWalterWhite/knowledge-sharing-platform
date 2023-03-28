@@ -27,6 +27,8 @@ public class PostFactory : IPostFactory
                 return ArticlePost.Create(person, createPostDto.Title, createPostDto.Link, createPostDto.Summary);
             case PostTypeDiscriminator.Book:
                 return BookPost.Create(person, createPostDto.Title, createPostDto.Summary);
+            case PostTypeDiscriminator.Free:
+                return FreeFormPost.Create(person, createPostDto.Title, createPostDto.Body);
             default:
                 throw new InvalidCastException();
         }

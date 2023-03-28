@@ -97,7 +97,7 @@ namespace KnowledgeShare.Persistence.Tags
                 {"searchTerm", postId.ToString() },
             };
             IResultCursor cursor = await _session.RunAsync(
-                "MATCH (n) WHERE (n:ArticlePost OR n:BookPost) AND n.id = $searchTerm " +
+                "MATCH (n) WHERE (n:Post) AND n.id = $searchTerm " +
                 "MATCH (n)-[r:HAS_TAG]->(t) " + 
                 "RETURN t.id, t.value", statementParameters);
             while (await cursor.FetchAsync())

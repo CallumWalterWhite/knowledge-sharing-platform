@@ -11,6 +11,8 @@ public class CreatePostService : ICreatePostService
     private readonly IPostRepository<ArticlePost> _articlePostRepository;
     
     private readonly IPostRepository<BookPost> _bookPostRepository;
+    
+    private readonly IPostRepository<FreeFormPost> _freeFormPostRepository;
 
     private readonly ITagRepository _tagRepository;
 
@@ -18,12 +20,14 @@ public class CreatePostService : ICreatePostService
         IPostRepository<ArticlePost> articlePostRepository, 
         IPostRepository<BookPost> bookPostRepository, 
         IPostFactory postFactory, 
-        ITagRepository tagRepository)
+        ITagRepository tagRepository, 
+        IPostRepository<FreeFormPost> freeFormPostRepository)
     {
         _articlePostRepository = articlePostRepository;
         _bookPostRepository = bookPostRepository;
         _postFactory = postFactory;
         _tagRepository = tagRepository;
+        _freeFormPostRepository = freeFormPostRepository;
     }
     
     public async Task Create(CreatePostDto createPostDto)
@@ -37,6 +41,10 @@ public class CreatePostService : ICreatePostService
         else if (post is BookPost bookPost)
         {
             await _bookPostRepository.CreateAsync(bookPost);
+        }
+        else if (post is FreeFormPost freeFormPost)
+        {
+            await _freeFormPostRepository.CreateAsync(freeFormPost);
         }
     }
 

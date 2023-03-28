@@ -15,4 +15,6 @@ public class SearchPostResultDto
     public IList<string> Tags { get; set; }
 
     public int Distance { get; set; }
+    
+    public string Type { get; set; }
 }

@@ -10,5 +10,7 @@ public class CreatePostDto
     
     public string Summary { get; set; }
     
+    public string Body { get; set; }
+    
     public IEnumerable<string> Tags { get; set; }
 }

@@ -1,0 +1,22 @@
+﻿@page "/freeformpost/{Id:guid}"
+@using KnowledgeShare.Core.Posts.Types
+@inject IGetFreeFormPostService GetFreeFormPostService
+
+
+@if (FreeFormPost is not null)
+{
+    <h1>@FreeFormPost.Title</h1>
+    <div >@((MarkupString)@FreeFormPost.GetBody())</div>
+}
+
+@code {
+    [Parameter]  
+    public Guid Id { get; set; }
+
+    public FreeFormPost? FreeFormPost = null;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        FreeFormPost = await GetFreeFormPostService.GetFreeFormPostAsync(Id);
+    }
+}

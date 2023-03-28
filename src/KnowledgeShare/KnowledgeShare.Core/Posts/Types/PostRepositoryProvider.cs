@@ -10,11 +10,13 @@ public class PostRepositoryProvider : IPostRepositoryProvider
 
     public PostRepositoryProvider(IAsyncSession asyncSession, 
         IPostRepository<ArticlePost> articlePostRepository,
-        IPostRepository<BookPost> bookPostRepository)
+        IPostRepository<BookPost> bookPostRepository,
+        IPostRepository<FreeFormPost> freeFormPostRepository)
     {
         _asyncSession = asyncSession;
         _contexts.Add(typeof(ArticlePost), articlePostRepository);
         _contexts.Add(typeof(BookPost), bookPostRepository);
+        _contexts.Add(typeof(FreeFormPost), freeFormPostRepository);
     }
 
     public IPostRepository<Post> Get(Type type)

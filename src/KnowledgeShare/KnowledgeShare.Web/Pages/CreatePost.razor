@@ -15,6 +15,7 @@
         <select class="form-control" id="postType" @bind="@post.Discriminator">
             <option value="@PostTypeDiscriminator.Article">Article</option>
             <option value="@PostTypeDiscriminator.Book">Book</option>
+            <option value="@PostTypeDiscriminator.Free">Free Form</option>
         </select>
     </div>
 
@@ -53,6 +54,20 @@
             <ValidationMessage For="@(() => (post).Summary)" />
         </div>
     }
+    
+
+    @if (post.Discriminator == PostTypeDiscriminator.Free)
+    {
+        <div class="form-group">
+            <label for="title">Title</label>
+            <InputText class="form-control" id="title" @bind-Value="@(post.Title)" />
+            <ValidationMessage For="@(() => (post).Title)" />
+        </div>
+        
+        <RadzenHtmlEditor @bind-Value=@freeFormValue style="height: 500px;" UploadUrl="upload/image">
+        </RadzenHtmlEditor>
+    }
+    
     <div class="form-group">
         <label for="tagSearchInput">Search for a tag:</label>
         <div class="input-group">
@@ -89,6 +104,8 @@
 </EditForm>
 
 @code {
+    string freeFormValue = @"";
+    
     private CreatePostDto post = new CreatePostDto()
     {
         Discriminator = PostTypeDiscriminator.Article,
@@ -98,8 +115,8 @@
 
     private async Task Create()
     {
+        post.Body = freeFormValue;
         post.Tags = Tags;
-        // Call your API to create the post with the data from the form
         await CreatePostService.Create(post);
     }
     

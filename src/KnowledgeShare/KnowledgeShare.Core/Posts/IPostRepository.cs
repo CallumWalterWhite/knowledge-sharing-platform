@@ -7,7 +7,7 @@ public interface IPostRepository<T>
     
     Task DeleteAsync(T post);
     
-    Task AddTags(T post);
-    
     Task<IEnumerable<T>> GetAllAsync();
+    
+    Task<T?> GetByIdAsync(Guid id);
 }

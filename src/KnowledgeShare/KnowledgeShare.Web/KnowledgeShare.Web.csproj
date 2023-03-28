@@ -28,7 +28,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Pages\Feed" />
     <Folder Include="wwwroot\Images" />
   </ItemGroup>
 

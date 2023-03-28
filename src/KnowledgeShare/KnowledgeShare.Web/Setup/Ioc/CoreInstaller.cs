@@ -1,4 +1,5 @@
-﻿using KnowledgeShare.Core.Authentication;
+﻿using System.Reflection;
+using KnowledgeShare.Core.Authentication;
 using KnowledgeShare.Core.Persons;
 using KnowledgeShare.Core.Posts;
 using KnowledgeShare.Core.Posts.Types;
@@ -33,7 +34,27 @@ public class CoreInstaller
         services.AddScoped(typeof(INeo4jDataAccess), typeof(Neo4jDataAccess));
 
         services.AddScoped(typeof(IPostRepositoryProvider), typeof(PostRepositoryProvider));
-        services.AddScoped(typeof(IPostRepository<ArticlePost>), typeof(ArticlePostRepository<ArticlePost>));
-        services.AddScoped(typeof(IPostRepository<BookPost>), typeof(BookPostRepository<BookPost>));
+        services.AddScoped(typeof(IPostRepository<ArticlePost>), typeof(ArticlePostRepository));
+        services.AddScoped(typeof(IPostRepository<BookPost>), typeof(BookPostRepository));
+        services.AddScoped(typeof(IPostRepository<FreeFormPost>), typeof(FreeFormPostRepository));
+        var assembly = typeof(IGetArticlePostService).Assembly;
+        AddScopedByConvention(services, assembly, x => x.Name.EndsWith("Service"));
+    }
+
+    private static void AddScopedByConvention(IServiceCollection services, Assembly assembly,
+        Func<Type, bool> predicate)
+    {
+        var interfaces = assembly.ExportedTypes
+            .Where(x => x.IsInterface && predicate(x))
+            .ToList();
+        var implementations = assembly.ExportedTypes
+            .Where(x => x is { IsInterface: false, IsAbstract: false } && predicate(x))
+            .ToList();
+        foreach (var @interface in interfaces)
+        {
+            var implementation = implementations.FirstOrDefault(x => @interface.IsAssignableFrom(x));
+            if (implementation == null) continue;
+            services.AddScoped(@interface, implementation);
+        }
     }
 }

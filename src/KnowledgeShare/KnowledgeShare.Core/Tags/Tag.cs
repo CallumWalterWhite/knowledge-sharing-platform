@@ -5,6 +5,7 @@
         private Tag(
             string value)
         {
+            Id = Guid.NewGuid();
             Value = value;
         }
         
@@ -12,6 +13,7 @@
             Guid id,
             string value)
         {
+            Id = id;
             Value = value;
         }
         

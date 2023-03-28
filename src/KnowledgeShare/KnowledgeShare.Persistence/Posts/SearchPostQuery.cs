@@ -20,10 +20,10 @@ public class SearchPostQuery : ISearchPostQuery
             {"searchTerm", searchQuery },
         };
         IResultCursor cursor = await _session.RunAsync(
-            "MATCH (n) WHERE (n:ArticlePost OR n:BookPost)" +
+            "MATCH (n) WHERE (n:Post)" +
             "MATCH (n)-[r:HAS_TAG]->(t)" +
             "WHERE toLower(n.title) CONTAINS toLower($searchTerm) OR toLower(t.value) CONTAINS toLower($searchTerm)" +
-            "RETURN n.id, n.title", statementParameters);
+            "RETURN n.id, n.title, n.type", statementParameters);
         while (await cursor.FetchAsync())
         {
             if (cursor.Current is not null)
@@ -32,7 +32,8 @@ public class SearchPostQuery : ISearchPostQuery
                     new SearchPostResultDto()
                     {
                         Id = Guid.Parse(cursor.Current["n.id"].ToString()),
-                        Title = cursor.Current["n.title"].ToString()
+                        Title = cursor.Current["n.title"].ToString(),
+                        Type = cursor.Current["n.type"].ToString()
                     }
                 );
             }
@@ -49,8 +50,8 @@ public class SearchPostQuery : ISearchPostQuery
             {"searchTerm", personId.ToString() },
         };
         IResultCursor cursor = await _session.RunAsync(
-            "MATCH (n) WHERE (n:ArticlePost OR n:BookPost) " +
-            "RETURN n.id, n.summary, n.title " +
+            "MATCH (n) WHERE (n:Post) " +
+            "RETURN n.id, n.summary, n.title, n.type " +
             "ORDER BY n.createdDateTime DESC", statementParameters);
         while (await cursor.FetchAsync())
         {
@@ -61,7 +62,8 @@ public class SearchPostQuery : ISearchPostQuery
                     {
                         Id = Guid.Parse(cursor.Current["n.id"].ToString()),
                         Title = cursor.Current["n.title"].ToString(),
-                        Summary = cursor.Current["n.summary"].ToString()
+                        Summary = cursor.Current["n.summary"].ToString(),
+                        Type = cursor.Current["n.type"].ToString()
                     }
                 );
             }

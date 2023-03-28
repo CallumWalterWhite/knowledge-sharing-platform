@@ -2,6 +2,7 @@
 @using KnowledgeShare.Core.Posts
 @inject ISearchPostService SearchPostService;
 @inject IJSRuntime JSRuntime;
+@inject NavigationManager NavigationManager;
 
 <div @onwheel="@OnScroll" id="myDiv" style="overflow-y: scroll;">
     <ListView Items="@PostsToShow">
@@ -23,7 +24,7 @@
                                 }
                             </div>
                             <div class="row rz-justify-content-right" style="margin-top: 20px; float: none">
-                                <RadzenButton Style="width: 72px; height: 26px; float: none" Text="View"></RadzenButton>
+                                <RadzenButton Click="() => GoToPost(postResult)" Style="width: 72px; height: 26px; float: none" Text="View"></RadzenButton>
                             </div>
                         </div>
                     </RadzenCard>
@@ -42,6 +43,22 @@
     int page = 1; // current page
     bool isLoading = false; // flag to prevent multiple requests
 
+    private void GoToPost(SearchPostResultDto searchPostResultDto)
+    {
+        switch (searchPostResultDto.Type)
+        {
+            case "ArticlePost":
+                NavigationManager.NavigateTo($"/articlepost/{searchPostResultDto.Id}");
+                break;
+            case "BookPost":
+                NavigationManager.NavigateTo($"/bookpost/{searchPostResultDto.Id}");
+                break;
+            case "FreeFormPost":
+                NavigationManager.NavigateTo($"/freeformpost/{searchPostResultDto.Id}");
+                break;
+        }
+    }
+    
     protected override async Task OnInitializedAsync()
     {
         AllPosts = await SearchPostService.RecommendAsync();

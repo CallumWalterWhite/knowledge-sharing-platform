@@ -3,5 +3,6 @@
 public enum PostTypeDiscriminator
 {
     Article,
-    Book
+    Book,
+    Free
 }
