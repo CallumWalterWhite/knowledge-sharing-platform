@@ -22,12 +22,13 @@ public class BookPostRepository : PostBaseRepository, IPostRepository<BookPost>
             {"title", post.GetTitle() },
             {"type", "BookPost" },
             {"summary", post.GetSummary() },
+            {"author", post.GetAuthor() },
             {"createdDateTime", post.GetDateTimeCreated() },
             {"id", post.Id.ToString() }
         };
         await _session.ExecuteWriteAsync(async tx =>
         {
-            await tx.RunAsync("CREATE (post:Post {id: $id, title: $title, summary: $summary, type: $type, createdDateTime: $createdDateTime}) ",
+            await tx.RunAsync("CREATE (post:Post {id: $id, title: $title, summary: $summary, author: $author, type: $type, createdDateTime: $createdDateTime}) ",
                 statementParameters);
         });
         
@@ -43,7 +44,7 @@ public class BookPostRepository : PostBaseRepository, IPostRepository<BookPost>
     public async Task<IEnumerable<BookPost>> GetAllAsync()
     {
         List<BookPost> bookPosts = new List<BookPost>();
-        IResultCursor cursor = await _session.RunAsync("MATCH (post:Post) RETURN post.id, post.title, post.summary WHERE type='BookPost'");
+        IResultCursor cursor = await _session.RunAsync("MATCH (post:Post) RETURN post.id, post.title, post.author, post.summary WHERE type='BookPost'");
         while (await cursor.FetchAsync())
         {
             bookPosts.Add(CreateBookPostFromResult(cursor.Current));
@@ -59,7 +60,7 @@ public class BookPostRepository : PostBaseRepository, IPostRepository<BookPost>
         {
             {"value", id.ToString() }
         };
-        IResultCursor cursor = await _session.RunAsync("MATCH (post:Post WHERE post.id = $value) MATCH (post)-[r:WROTE]-(person) RETURN post.id, post.createdDateTime, post.title, post.summary, person.id, person.userId, person.name", statementParameters);
+        IResultCursor cursor = await _session.RunAsync("MATCH (post:Post WHERE post.id = $value) MATCH (post)-[r:WROTE]-(person) RETURN post.id, post.createdDateTime, post.title, post.author, post.summary, person.id, person.userId, person.name", statementParameters);
         while (await cursor.FetchAsync())
         {
             post = CreateBookPostFromResult(cursor.Current);
@@ -73,16 +74,18 @@ public class BookPostRepository : PostBaseRepository, IPostRepository<BookPost>
         object? id = record["post.id"];
         object? title = record["post.title"];
         object? summary = record["post.summary"];
+        object? author = record["post.author"];
         object? createdDateTime = record["post.createdDateTime"];
         object? personId = record["person.id"];
         object? userId = record["person.userId"];
         object? name = record["person.name"];
         return new BookPost(
-            Guid.Parse(id.ToString()),
-            new Person(Guid.Parse(personId.ToString()), userId.ToString(), name.ToString()),
-            DateTime.Parse(createdDateTime.ToString()),
-            title.ToString() ?? string.Empty,
-            summary.ToString() ?? string.Empty
+            Guid.Parse(id.ToString() ?? string.Empty),
+            new Person(Guid.Parse(personId?.ToString() ?? string.Empty), userId.ToString() ?? string.Empty, name.ToString() ?? string.Empty),
+            DateTime.Parse(createdDateTime.ToString() ?? string.Empty),
+            title?.ToString() ?? string.Empty,
+            author?.ToString() ?? string.Empty,
+            summary?.ToString() ?? string.Empty
         );
     }
 }

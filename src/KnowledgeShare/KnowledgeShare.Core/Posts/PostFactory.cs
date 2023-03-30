@@ -26,7 +26,7 @@ public class PostFactory : IPostFactory
             case PostTypeDiscriminator.Article:
                 return ArticlePost.Create(person, createPostDto.Title, createPostDto.Link, createPostDto.Summary);
             case PostTypeDiscriminator.Book:
-                return BookPost.Create(person, createPostDto.Title, createPostDto.Summary);
+                return BookPost.Create(person, createPostDto.Title, createPostDto.Author, createPostDto.Summary);
             case PostTypeDiscriminator.Free:
                 return FreeFormPost.Create(person, createPostDto.Title, createPostDto.Body);
             default:

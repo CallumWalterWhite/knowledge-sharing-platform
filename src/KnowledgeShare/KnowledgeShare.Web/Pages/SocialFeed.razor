@@ -1,5 +1,8 @@
 ﻿@using System.Linq
 @using KnowledgeShare.Core.Posts
+@using KnowledgeShare.Web.Shared.Posts.Article
+@using KnowledgeShare.Web.Shared.Posts.Book
+@using KnowledgeShare.Web.Shared.Posts.FreeForm
 @inject ISearchPostService SearchPostService;
 @inject IJSRuntime JSRuntime;
 @inject NavigationManager NavigationManager;
@@ -10,24 +13,19 @@
             <div class="row justify-content-center">
                 @foreach (var postResult in PostsToShow)
                 {
-                    <RadzenCard Style="margin-top: 40px; padding: 20px 40px 40px; width: 800px; float: none">
-                        <div class="row">
-                            <RadzenLabel Text=@postResult.Title
-                            Style="font-style: normal; text-transform: none; font-size: 24px; font-weight: bold" />
-                        </div>
-                        <div class="row">
-                            <RadzenLabel Text=@postResult.Summary />
-                            <div class="row" style="margin-top: 20px;">
-                                @foreach (var tag in postResult.Tags)
-                                {
-                                    <RadzenBadge Text=@tag Style="max-width: 90px; margin-right: 5px;"></RadzenBadge>
-                                }
-                            </div>
-                            <div class="row rz-justify-content-right" style="margin-top: 20px; float: none">
-                                <RadzenButton Click="() => GoToPost(postResult)" Style="width: 72px; height: 26px; float: none" Text="View"></RadzenButton>
-                            </div>
-                        </div>
-                    </RadzenCard>
+                    @switch (postResult.Type)
+                    {
+                        case "ArticlePost":
+                            <ArticlePostSocialFeedDisplay Id=@postResult.Id/>
+                            break;
+                        case "BookPost":
+                            <BookPostSocialFeedDisplay Id=@postResult.Id/>
+                            break;
+                        case "FreeFormPost":
+                            <FreeFormSocialFeedDisplay Id=@postResult.Id/>
+                            break;
+                            
+                    }
                 }
             </div>
         </ItemTemplate>
@@ -42,22 +40,6 @@
     int pageSize = 10; // number of items to load per page
     int page = 1; // current page
     bool isLoading = false; // flag to prevent multiple requests
-
-    private void GoToPost(SearchPostResultDto searchPostResultDto)
-    {
-        switch (searchPostResultDto.Type)
-        {
-            case "ArticlePost":
-                NavigationManager.NavigateTo($"/articlepost/{searchPostResultDto.Id}");
-                break;
-            case "BookPost":
-                NavigationManager.NavigateTo($"/bookpost/{searchPostResultDto.Id}");
-                break;
-            case "FreeFormPost":
-                NavigationManager.NavigateTo($"/freeformpost/{searchPostResultDto.Id}");
-                break;
-        }
-    }
     
     protected override async Task OnInitializedAsync()
     {
@@ -80,7 +62,7 @@
             isLoading = true;
             page++;
             var nextPage = (int)Math.Truncate(100 * ((double)PostsToShow.Count / 10) + page) / 100;
-            var newPosts = AllPosts.Skip(nextPage * 10).Take(10).ToList();
+            var newPosts = AllPosts.Skip(nextPage * 10).Take(10).Where(x => PostsToShow.Contains(x) is false).ToList();
             PostsToShow.AddRange(newPosts);
             isLoading = false;
         }

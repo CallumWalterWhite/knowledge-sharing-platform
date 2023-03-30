@@ -2,5 +2,5 @@
 
 public interface ICreatePostService
 {
-    Task Create(CreatePostDto createPostDto);
+    Task<Guid> Create(CreatePostDto createPostDto);
 }

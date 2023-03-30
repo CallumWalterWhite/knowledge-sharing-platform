@@ -1,0 +1,80 @@
+﻿@using System.Web
+@using System.Text.RegularExpressions
+<div class="link-preview">
+    @if (IsYoutubeLink(Link))
+    {
+        <img src="https://img.youtube.com/vi/@GetYoutubeVideoId(Link)/hqdefault.jpg" />
+    }
+    else if (IsSharePointLink(Link))
+    {
+        <a href="@Link" target="_blank" rel="noopener">
+            <img height="150" width="150" src="@ThumbnailUrl" alt="@Title" />
+        </a>
+        <div>@Title</div>
+    }
+    else
+    {
+        <a href="@Link">@Link</a>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public string Link { get; set; }
+
+    private string ThumbnailUrl => GetSharePointThumbnailUrl(Link);
+
+    private string Title => GetSharePointTitle(Link);
+
+    private bool IsYoutubeLink(string link)
+    {
+        return link.Contains("youtube.com") || link.Contains("youtu.be");
+    }
+
+    private string GetYoutubeVideoId(string link)
+    {
+        if (link.Contains("youtube.com"))
+        {
+            var uri = new Uri(link);
+            var query = HttpUtility.ParseQueryString(uri.Query);
+            return query["v"];
+        }
+        else
+        {
+            return link.Split('/').Last();
+        }
+    }
+
+    private bool IsSharePointLink(string link)
+    {
+        return link.Contains("sharepoint.com");
+    }
+
+    private string GetSharePointThumbnailUrl(string link)
+    {
+        if (Regex.IsMatch(link, @"\.docx(?:$|\?)"))
+        if (Regex.IsMatch(link, @"\.doc(?:$|\?)"))
+        {
+            return "/Images/doc_thumbnail/docx_icon.svg.png";
+        }
+        if (Regex.IsMatch(link, @"\.xlsx(?:$|\?)"))
+        if (Regex.IsMatch(link, @"\.xls(?:$|\?)"))
+        {
+            return "/Images/doc_thumbnail/xlsx_icon.svg.png";
+        }
+        if (Regex.IsMatch(link, @"\.pptx(?:$|\?)"))
+        if (Regex.IsMatch(link, @"\.ppt(?:$|\?)"))
+        {
+            return "/Images/doc_thumbnail/powerpoint.png";
+        }
+        return "/Images/doc_thumbnail/Microsoft_Office_SharePoint.png";
+    }
+    
+
+    private string GetSharePointTitle(string link)
+    {
+        var uri = new Uri(link);
+        var queryString = HttpUtility.ParseQueryString(uri.Query);
+        return queryString["FileName"] ?? uri.Segments.Last();
+    }
+}

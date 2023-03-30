@@ -1,4 +1,5 @@
-﻿using KnowledgeShare.Core.Persons;
+﻿using System.Text.RegularExpressions;
+using KnowledgeShare.Core.Persons;
 
 namespace KnowledgeShare.Core.Posts.Types;
 
@@ -31,8 +32,8 @@ public class FreeFormPost : Post
 
     private void CreateSummary()
     {
-        int maxCharLenth = 300;
-        Summary = Body.Length > maxCharLenth ? Body.Substring(0, maxCharLenth) : Body;
+        int maxCharLength = 300;
+        Summary = Body.Length > maxCharLength ? Regex.Match(Body.Substring(0, Math.Min(Body.Length, maxCharLength)), @"^(.*?)\b").Value : Body;
     }
     
     public static FreeFormPost Create(Person person, string title, string body)

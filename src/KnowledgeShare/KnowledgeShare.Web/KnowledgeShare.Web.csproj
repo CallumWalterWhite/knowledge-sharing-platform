@@ -28,7 +28,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\Images" />
+    <Folder Include="wwwroot\Images\doc_thumbnail" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AdditionalFiles Include="Shared\Posts\Article\ArticlePostSocialFeedDisplay.razor" />
   </ItemGroup>
 
 </Project>

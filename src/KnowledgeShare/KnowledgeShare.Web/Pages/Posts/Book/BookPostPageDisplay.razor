@@ -1,0 +1,37 @@
+﻿@page "/bookpost/{Id:guid}"
+@using KnowledgeShare.Core.Posts.Types
+@inject IGetBookPostService GetBookPostService
+
+
+@if (BookPost is not null)
+{
+    <h1>@BookPost.Title</h1>
+    <RadzenCard Style="margin-top: 40px; padding: 20px 40px 40px; width: 800px; float: none">
+        <div class="row">
+            <RadzenLabel Text=@BookPost.Title
+                         Style="font-style: normal; text-transform: none; font-size: 24px; font-weight: bold" />
+        </div>
+        <div class="row">
+            <RadzenLabel Text=@BookPost.GetAuthor() />
+            <RadzenLabel Text=@BookPost.GetSummary() />
+            <div class="row" style="margin-top: 20px;">
+                @foreach (var tag in BookPost.Tags)
+                {
+                    <RadzenBadge Text=@tag.Value Style="max-width: 90px; margin-right: 5px;"></RadzenBadge>
+                }
+            </div>
+        </div>
+    </RadzenCard>
+}
+
+@code {
+    [Parameter]  
+    public Guid Id { get; set; }
+
+    public BookPost? BookPost = null;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        BookPost = await GetBookPostService.GetBookPostAsync(Id);
+    }
+}

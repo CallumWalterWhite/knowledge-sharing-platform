@@ -1,0 +1,47 @@
+﻿@using KnowledgeShare.Core.Posts.Types
+@inject IGetFreeFormPostService GetFreeFormPostService;
+@inject NavigationManager NavigationManager;
+
+
+@if (FreeFormPost is not null)
+{
+    <RadzenCard Style="margin-top: 40px; padding: 20px 40px 40px; width: 800px; float: none">
+        <div class="row">
+            <RadzenLabel Text=@FreeFormPost.Title
+                         Style="font-style: normal; text-transform: none; font-size: 24px; font-weight: bold" />
+        </div>
+        <div class="row">
+            <div >@((MarkupString)@FreeFormPost.GetSummary())</div>
+            <div class="row" style="margin-top: 20px;">
+                @foreach (var tag in FreeFormPost.Tags)
+                {
+                    <RadzenBadge Text=@tag.Value Style="max-width: 90px; margin-right: 5px;"></RadzenBadge>
+                }
+            </div>
+            <div class="row rz-justify-content-right" style="margin-top: 20px; float: none">
+                <RadzenButton Click="() => GoToPost()" Style="width: 72px; height: 26px; float: none" Text="View"></RadzenButton>
+            </div>
+        </div>
+    </RadzenCard>
+}
+
+@code {
+    [Parameter]  
+    public Guid Id { get; set; }
+
+    public FreeFormPost? FreeFormPost = null;
+    
+    protected override void OnInitialized()
+    {
+        Task t = Task.Run(async () =>
+        {
+            FreeFormPost = await GetFreeFormPostService.GetFreeFormPostAsync(Id);
+        });
+        Task.WaitAll(t);
+    }
+    
+    private void GoToPost()
+    {
+        NavigationManager.NavigateTo($"/freeformpost/{FreeFormPost.Id}");
+    }
+}

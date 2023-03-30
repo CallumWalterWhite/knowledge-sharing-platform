@@ -84,8 +84,8 @@ public class ArticlePostRepository : PostBaseRepository, IPostRepository<Article
             new Person(Guid.Parse(personId.ToString()), userId.ToString(), name.ToString()),
             DateTime.Parse(createdDateTime.ToString()),
             title?.ToString() ?? string.Empty,
-            summary?.ToString() ?? string.Empty,
-            link?.ToString() ?? string.Empty
+            link?.ToString() ?? string.Empty,
+            summary?.ToString() ?? string.Empty
         );
     }
 }

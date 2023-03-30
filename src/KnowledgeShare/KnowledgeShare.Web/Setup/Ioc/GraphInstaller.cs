@@ -6,14 +6,15 @@ public class GraphInstaller
 {
     public static void Install(IServiceCollection services)
     {
-        services.AddScoped<IAsyncSession>(
+        services.AddTransient<IAsyncSession>(
             (serviceProvider) =>
             {
                 IDriver driver = serviceProvider.GetService<IDriver>();
-                return driver.AsyncSession();
+                IAsyncSession asyncSession = driver.AsyncSession();
+                return asyncSession;
             }
         );
-        services.AddScoped<IDriver>(
+        services.AddSingleton<IDriver>(
             (serviceProvider) =>
             {
 #if DEBUG

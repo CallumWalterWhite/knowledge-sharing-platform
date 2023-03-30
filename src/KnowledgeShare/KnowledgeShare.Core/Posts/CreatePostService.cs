@@ -30,7 +30,7 @@ public class CreatePostService : ICreatePostService
         _freeFormPostRepository = freeFormPostRepository;
     }
     
-    public async Task Create(CreatePostDto createPostDto)
+    public async Task<Guid> Create(CreatePostDto createPostDto)
     {
         Post post = await _postFactory.Create(createPostDto);
         post.Tags = await CreateTags(createPostDto.Tags);
@@ -46,6 +46,8 @@ public class CreatePostService : ICreatePostService
         {
             await _freeFormPostRepository.CreateAsync(freeFormPost);
         }
+
+        return post.Id;
     }
 
     private async Task<IEnumerable<Tag>> CreateTags(IEnumerable<string> tags)
