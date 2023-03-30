@@ -8,7 +8,7 @@ public class BookPost : Post
         : base(Guid.NewGuid(), person, createdDateTime)
     {
         Title = title;
-        Author = author;
+        BookAuthor = author;
         Summary = summary;
     }
     
@@ -16,18 +16,18 @@ public class BookPost : Post
         : base(id, person, createdDateTime)
     {
         Title = title;
-        Author = author;
+        BookAuthor = author;
         Summary = summary;
     }
     private string Summary { get; set; }
     
-    private string Author { get; set; }
+    private string BookAuthor { get; set; }
 
     public string GetTitle() => Title;
     
     public string GetSummary() => Summary;
     
-    public string GetAuthor() => Author;
+    public string GetBookAuthor() => BookAuthor;
     
     public static BookPost Create(Person person, string title, string author, string summary)
     {

@@ -1,0 +1,100 @@
+﻿@using System.Linq
+@using KnowledgeShare.Core.Posts
+@using KnowledgeShare.Web.Shared.Posts.Article
+@using KnowledgeShare.Web.Shared.Posts.Book
+@using KnowledgeShare.Web.Shared.Posts.FreeForm
+@using Microsoft.AspNetCore.Components.Web
+@inject ISearchPostService SearchPostService;
+@inject IJSRuntime JSRuntime;
+@inject NavigationManager NavigationManager;
+
+
+<div style="height: 100vh; overflow-y: scroll;" class="scrollable-content" @onscroll="@OnScroll">
+    <div style="height: @contentHeight px;">
+            <div class="row justify-content-center">
+                @foreach (var postResult in PostsToShow)
+                {
+                    @switch (postResult.Type)
+                    {
+                        case "ArticlePost":
+                            <ArticlePostSocialFeedDisplay Id=@postResult.Id/>
+                            break;
+                        case "BookPost":
+                            <BookPostSocialFeedDisplay Id=@postResult.Id/>
+                            break;
+                        case "FreeFormPost":
+                            <FreeFormSocialFeedDisplay Id=@postResult.Id/>
+                            break;
+                            
+                    }
+                }
+            </div>
+    </div>
+</div>
+
+@code {
+    private IEnumerable<SearchPostResultDto> AllPosts = new List<SearchPostResultDto>();
+
+    private List<SearchPostResultDto> PostsToShow = new List<SearchPostResultDto>();
+    private List<object> items = new List<object>();
+    private int contentHeight;
+    
+    int pageSize = 10; // number of items to load per page
+    int page = 1; // current page
+    bool isLoading = false; // flag to prevent multiple requests
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await UpdateContentHeight();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        AllPosts = await SearchPostService.RecommendAsync();
+        PostsToShow = AllPosts.Take(10).ToList();
+    }
+
+    [JSInvokable]
+    public async Task OnResize()
+    {
+        await UpdateContentHeight();
+    }
+
+    private async Task UpdateContentHeight()
+    {
+        contentHeight = await JSRuntime.InvokeAsync<int>(
+            "eval", "document.getElementsByClassName('scrollable-content')[0].offsetHeight");
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task OnScroll()
+    {
+        try
+        {
+            var scrollTop = await JSRuntime.InvokeAsync<int>(
+                "eval", "document.getElementsByClassName('scrollable-content')[0].scrollTop");
+            var scrollHeight = await JSRuntime.InvokeAsync<int>(
+                "eval", "document.getElementsByClassName('scrollable-content')[0].scrollHeight");
+            ;
+            var clientHeight = await JSRuntime.InvokeAsync<int>(
+                "eval", "document.getElementsByClassName('scrollable-content')[0].clientHeight");
+            if (scrollTop + clientHeight >= scrollHeight)
+            {
+                isLoading = true;
+                page++;
+                var nextPage = (int)Math.Truncate(100 * ((double)PostsToShow.Count / 10) + page) / 100;
+                var newPosts = AllPosts.Skip(nextPage * 10).Take(10).Where(x => PostsToShow.Contains(x) is false).ToList();
+                PostsToShow.AddRange(newPosts);
+                isLoading = false;
+                await UpdateContentHeight();
+            }
+        }
+        catch (Exception ex)
+        {
+            //IGNORE
+        }
+    }
+}

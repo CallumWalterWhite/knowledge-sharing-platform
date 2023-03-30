@@ -6,22 +6,18 @@
 @if (ArticlePost is not null)
 {
     <h1>@ArticlePost.Title</h1>
-    <RadzenCard Style="margin-top: 40px; padding: 20px 40px 40px; width: 800px; float: none">
-        <div class="row">
-            <RadzenLabel Text=@ArticlePost.Title
-                         Style="font-style: normal; text-transform: none; font-size: 24px; font-weight: bold" />
+    <div class="row">
+        <RadzenLabel Text=@ArticlePost.GetSummary() />
+        <LinkPreview Link="@ArticlePost.GetLink()" />
+        <RadzenLabel Text="@ArticlePost.GetDateTimeCreated().ToShortDateString()" />
+        <RadzenLabel Text="@ArticlePost.GetAuthor().Name" />
+        <div class="row" style="margin-top: 20px;">
+            @foreach (var tag in ArticlePost.Tags)
+            {
+                <RadzenBadge Text=@tag.Value Style="max-width: 90px; margin-right: 5px;"></RadzenBadge>
+            }
         </div>
-        <div class="row">
-            <RadzenLabel Text=@ArticlePost.GetSummary() />
-            <LinkPreview Link="@ArticlePost.GetLink()" />
-            <div class="row" style="margin-top: 20px;">
-                @foreach (var tag in ArticlePost.Tags)
-                {
-                    <RadzenBadge Text=@tag.Value Style="max-width: 90px; margin-right: 5px;"></RadzenBadge>
-                }
-            </div>
-        </div>
-    </RadzenCard>
+    </div>
 }
 
 @code {

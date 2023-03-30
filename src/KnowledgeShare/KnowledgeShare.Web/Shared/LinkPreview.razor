@@ -3,7 +3,10 @@
 <div class="link-preview">
     @if (IsYoutubeLink(Link))
     {
-        <img src="https://img.youtube.com/vi/@GetYoutubeVideoId(Link)/hqdefault.jpg" />
+        <a href="@Link" target="_blank" rel="noopener">
+            <img src="https://img.youtube.com/vi/@GetYoutubeVideoId(Link)/hqdefault.jpg" />
+        </a>
+        <div>@Title</div>
     }
     else if (IsSharePointLink(Link))
     {

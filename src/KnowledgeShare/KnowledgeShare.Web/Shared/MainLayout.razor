@@ -1,6 +1,7 @@
 ﻿@using KnowledgeShare.Core.Posts
 @inherits LayoutComponentBase
 @inject ISearchPostService SearchPostService;
+@inject NavigationManager NavigationManager;
 
 <RadzenLayout style="grid-template-areas: 'rz-sidebar rz-header' 'rz-sidebar rz-body';">
     <RadzenHeader>
@@ -12,7 +13,10 @@
                 <div class="col-3 d-flex align-items-center justify-content-start pr-0 pe-0">
                     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" AlignItems="AlignItems.Center">
                         <div class="rz-text-align-center">
-                            <RadzenAutoComplete @bind-Value=@postTitle Data=@posts onclick="@OnClick" TextProperty="PostTitle" LoadData=@OnLoadData Style="width: 24rem; float: left; visibility: visible" />
+                            @*<RadzenAutoComplete @bind-Value=@selected_post TextProperty="Title" Data=@posts onchange=@OnChange LoadData=@OnLoadData Style="width: 24rem; float: left; visibility: visible" />*@
+                            <RadzenDropDown AllowClear="true" @bind-Value=@selected_post
+                                                LoadData=@OnLoadData AllowFiltering="true"
+                                                Data=@posts TextProperty="Title" ValueProperty="Id" Change="@HandleSelection" Style="width: 24rem; float: left; visibility: visible" />
                         </div>
                     </RadzenStack>
                 </div>
@@ -45,20 +49,34 @@
 </RadzenLayout>
 @code {
     bool sidebar4Expanded = false;
-    string postTitle;
+    Guid selected_post;
 
-    IEnumerable<string> posts;
+    IEnumerable<SearchPostResultDto> posts;
 
     IEnumerable<SearchPostResultDto> contextPosts = new List<SearchPostResultDto>();
 
     async Task OnLoadData(LoadDataArgs args)
     {
         contextPosts = await SearchPostService.SearchAsync(args.Filter.ToLower());
-        posts = contextPosts.Select(x => x.Title);
+        posts = contextPosts;
+        await InvokeAsync(StateHasChanged);
     }
-    
-    async Task OnClick()
+
+    async Task HandleSelection()
     {
+        SearchPostResultDto selectPost = contextPosts.First(x => x.Id == selected_post);
+        switch (selectPost.Type)
+        {
+            case "ArticlePost":
+                NavigationManager.NavigateTo($"/articlepost/{selectPost.Id}");
+                break;
+            case "BookPost":
+                NavigationManager.NavigateTo($"/bookpost/{selectPost.Id}");
+                break;
+            case "FreeFormPost":
+                NavigationManager.NavigateTo($"/freeformpost/{selectPost.Id}");
+                break;
+        }
     }
     
     private bool sidebarExpanded = true;
