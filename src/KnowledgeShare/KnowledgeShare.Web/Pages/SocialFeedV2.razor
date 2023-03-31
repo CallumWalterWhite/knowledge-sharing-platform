@@ -51,9 +51,14 @@
         }
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override void OnInitialized()
     {
-        AllPosts = await SearchPostService.RecommendAsync();
+        
+        Task t = Task.Run(async () =>
+        {
+            AllPosts = await SearchPostService.RecommendAsync();
+        });
+        Task.WaitAll(t);
         PostsToShow = AllPosts.Take(10).ToList();
     }
 

@@ -55,10 +55,14 @@
 
     IEnumerable<SearchPostResultDto> contextPosts = new List<SearchPostResultDto>();
 
-    async Task OnLoadData(LoadDataArgs args)
+    async void OnLoadData(LoadDataArgs args)
     {
-        contextPosts = await SearchPostService.SearchAsync(args.Filter.ToLower());
-        posts = contextPosts;
+        Task t = Task.Run(async () =>
+        {
+            contextPosts = await SearchPostService.SearchAsync(args.Filter.ToLower());
+            posts = contextPosts;
+        });
+        Task.WaitAll(t);
         await InvokeAsync(StateHasChanged);
     }
 
