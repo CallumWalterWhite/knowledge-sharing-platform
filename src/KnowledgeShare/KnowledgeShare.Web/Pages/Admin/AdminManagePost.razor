@@ -1,0 +1,40 @@
+﻿@page "/admin-posts"
+@using KnowledgeShare.Core.Posts
+@inject ISearchPostService SearchPostService;
+<div style="display: flex; align-items: center; margin-bottom: 16px">
+    <RadzenButton Click="@ClearSelection" Text="Clear Selection" />
+    @if (selectedPosts?.Any() == true)
+    {
+        <div style="margin-left: 16px">
+            Selected Employee: @selectedPosts[0].Title @selectedPosts[0].UserCreatedName
+        </div>
+    }
+</div>
+
+<RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+                AllowSorting="true" Data="@AllPosts" TItem="SearchPostResultDto" ColumnWidth="200px"
+                SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedPosts>
+    <Columns>
+        <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Title" Title="Title" />
+        <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Id" Title="ID" />
+        <RadzenDataGridColumn TItem="SearchPostResultDto" Property="CreatedDate" Title="Created Date" FormatString="{0:d}" />
+        <RadzenDataGridColumn TItem="SearchPostResultDto" Property="UserCreatedName" Title="User Created Name" />
+        <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Summary" Title="Summary" />
+    </Columns>
+</RadzenDataGrid>
+
+@code {
+    private IEnumerable<SearchPostResultDto> AllPosts = new List<SearchPostResultDto>();
+    IList<SearchPostResultDto> selectedPosts;
+
+    void ClearSelection()
+    {
+        selectedPosts = null;
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        AllPosts = await SearchPostService.GetAllAsync();
+        selectedPosts = AllPosts.Take(1).ToList();
+    }
+}

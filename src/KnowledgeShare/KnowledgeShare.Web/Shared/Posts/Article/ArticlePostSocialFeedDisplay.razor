@@ -5,25 +5,75 @@
 
 @if (ArticlePost is not null)
 {
-    <RadzenCard Style="margin-top: 40px; padding: 20px 40px 40px; width: 800px; float: none">
-        <div class="row">
-            <RadzenLabel Text=@ArticlePost.Title
-                         Style="font-style: normal; text-transform: none; font-size: 24px; font-weight: bold" />
+    <div class="container">
+        <h1 class="title">@ArticlePost.Title</h1>
+        <p class="summary">@ArticlePost.GetSummary()</p>
+        <div class="row" style="margin-top: 20px;">
+            @foreach (var tag in ArticlePost.Tags)
+            {
+                <RadzenBadge Text=@tag.Value Style="max-width: 90px; margin-right: 5px;"></RadzenBadge>
+            }
         </div>
-        <div class="row">
-            <RadzenLabel Text=@ArticlePost.GetSummary() />
-            <div class="row" style="margin-top: 20px;">
-                @foreach (var tag in ArticlePost.Tags)
-                {
-                    <RadzenBadge Text=@tag.Value Style="max-width: 90px; margin-right: 5px;"></RadzenBadge>
-                }
-            </div>
-            <div class="row rz-justify-content-right" style="margin-top: 20px; float: none">
-                <RadzenButton Click="() => GoToPost()" Style="width: 72px; height: 26px; float: none" Text="View"></RadzenButton>
-            </div>
+        <div class="info">
+            <p class="author">Created by: @ArticlePost.GetAuthor().Name</p>
+            <p class="date">Created on: @ArticlePost.GetDateTimeCreated().ToShortDateString()</p>
         </div>
-    </RadzenCard>
+
+        <RadzenRow Gap="0.5rem" RowGap="0.5rem">
+            <RadzenColumn Size="6" class="rz-justify-content-left rz-p-5">
+                <RadzenButton ButtonStyle="ButtonStyle.Primary">
+                        Likes
+                    <RadzenBadge Variant="Variant.Outlined" BadgeStyle="BadgeStyle.Light" Text="0" class="rz-ml-2"/>
+                </RadzenButton>
+            </RadzenColumn>
+            <RadzenColumn Size="6" class="rz-justify-content-right rz-p-5">
+                <RadzenButton Click="() => GoToPost()" Style="width: 72px; height: 26px; float: right;" Text="View"></RadzenButton>
+            </RadzenColumn>
+        </RadzenRow>
+    </div>
 }
+
+<style>
+    .container {
+        max-width: 800px;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        margin-bottom: 20px;
+    }
+
+    .title {
+        font-size: 32px;
+        font-weight: bold;
+        margin: 0 0 10px;
+    }
+
+    .summary {
+        font-size: 18px;
+        line-height: 1.5;
+        margin: 0 0 20px;
+    }
+
+    .info {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 0 0 20px;
+    }
+
+    .author {
+        font-size: 14px;
+        color: #888;
+        margin: 0;
+    }
+
+    .date {
+        font-size: 14px;
+        color: #888;
+        margin: 0;
+    }
+</style>
 
 @code {
     [Parameter]  

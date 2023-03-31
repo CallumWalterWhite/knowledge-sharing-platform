@@ -8,5 +8,7 @@ public interface ISearchPostService
     
     Task<IEnumerable<SearchPostResultDto>> RecommendAsync();
     
+    Task<IEnumerable<SearchPostResultDto>> GetAllAsync();
+    
     Task<IEnumerable<SearchPostResultDto>> GetPostsByCurrentPersonAsync();
 }

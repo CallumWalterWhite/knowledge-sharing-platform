@@ -44,34 +44,40 @@ else
         </RadzenCard>
     </RadzenCard>   
      
-     
-    <div class="row justify-content-center">
-        <RadzenText TextStyle="TextStyle.H6" class="rz-color-primary-light"><strong>Posts</strong></RadzenText>
-        @foreach (var postResult in Posts)
+    <RadzenText TextStyle="TextStyle.H6" class="rz-color-primary-light"><strong>Your Posts</strong></RadzenText>
+    <div style="display: flex; align-items: center; margin-bottom: 16px">
+        <RadzenButton Click="@ClearSelection" Text="Clear Selection" />
+        @if (selectedPosts?.Any() == true)
         {
-            @switch (postResult.Type)
-            {
-                case "ArticlePost":
-                    <ArticlePostSocialFeedDisplay Id=@postResult.Id/>
-                    break;
-                case "BookPost":
-                    <BookPostSocialFeedDisplay Id=@postResult.Id/>
-                    break;
-                case "FreeFormPost":
-                    <FreeFormSocialFeedDisplay Id=@postResult.Id/>
-                    break;
-
-            }
+            <div style="margin-left: 16px">
+                Selected Employee: @selectedPosts[0].Title @selectedPosts[0].UserCreatedName
+            </div>
         }
     </div>
+
+    <RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+                    AllowSorting="true" Data="@Posts" TItem="SearchPostResultDto" ColumnWidth="200px"
+                    SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedPosts>
+        <Columns>
+            <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Title" Title="Title" />
+            <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Id" Title="ID" />
+            <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Summary" Title="Summary" />
+        </Columns>
+    </RadzenDataGrid>
 }
 
 @code {
     User user;
     
     private IEnumerable<SearchPostResultDto> Posts = new List<SearchPostResultDto>();
+    IList<SearchPostResultDto> selectedPosts;
     
     string UserPhotoPath = "/Images/avatardefault.png";
+    
+    void ClearSelection()
+    {
+        selectedPosts = null;
+    }
     
     protected override async Task OnInitializedAsync()
     {
