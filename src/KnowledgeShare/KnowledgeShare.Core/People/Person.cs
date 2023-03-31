@@ -1,6 +1,6 @@
 ﻿using Microsoft.Graph.SecurityNamespace;
 
-namespace KnowledgeShare.Core.Persons;
+namespace KnowledgeShare.Core.People;
 
 public class Person
 {

@@ -1,5 +1,5 @@
 ﻿using System.Text.RegularExpressions;
-using KnowledgeShare.Core.Persons;
+using KnowledgeShare.Core.People;
 
 namespace KnowledgeShare.Core.Posts.Types;
 

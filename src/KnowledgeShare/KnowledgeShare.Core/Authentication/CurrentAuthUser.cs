@@ -1,6 +1,6 @@
-﻿using KnowledgeShare.Core.Persons;
+﻿using KnowledgeShare.Core.People;
 using Microsoft.Graph;
-using Person = KnowledgeShare.Core.Persons.Person;
+using Person = KnowledgeShare.Core.People.Person;
 
 namespace KnowledgeShare.Core.Authentication;
 
@@ -9,16 +9,10 @@ public class CurrentAuthUser : ICurrentAuthUser
     private bool _isPersonCreated;
     private Person? _person;
 
-    private readonly IPersonRepository _personRepository;
-
     private readonly IPersonService _personService;
-
-    private readonly GraphServiceClient _graphServiceClient;
     
-    public CurrentAuthUser(GraphServiceClient graphServiceClient, IPersonRepository personRepository, IPersonService personService)
+    public CurrentAuthUser(GraphServiceClient graphServiceClient, IPersonService personService)
     {
-        _graphServiceClient = graphServiceClient;
-        _personRepository = personRepository;
         _personService = personService;
         User = graphServiceClient.Me.Request().GetAsync().ConfigureAwait(true).GetAwaiter().GetResult();
     }

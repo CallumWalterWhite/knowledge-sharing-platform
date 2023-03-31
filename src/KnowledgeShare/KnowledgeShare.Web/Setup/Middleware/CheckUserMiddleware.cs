@@ -1,7 +1,7 @@
 ﻿using KnowledgeShare.Core.Authentication;
-using KnowledgeShare.Core.Persons;
+using KnowledgeShare.Core.People;
 using Microsoft.Graph;
-using Person = KnowledgeShare.Core.Persons.Person;
+using Person = KnowledgeShare.Core.People.Person;
 
 namespace KnowledgeShare.Web.Setup.Middleware;
 

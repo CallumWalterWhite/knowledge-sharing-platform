@@ -1,11 +1,11 @@
 ﻿using System.Reflection;
 using KnowledgeShare.Core.Authentication;
-using KnowledgeShare.Core.Persons;
+using KnowledgeShare.Core.People;
 using KnowledgeShare.Core.Posts;
 using KnowledgeShare.Core.Posts.Types;
 using KnowledgeShare.Core.Tags;
 using KnowledgeShare.Persistence;
-using KnowledgeShare.Persistence.Persons;
+using KnowledgeShare.Persistence.People;
 using KnowledgeShare.Persistence.Posts;
 using KnowledgeShare.Persistence.Tags;
 using Radzen;

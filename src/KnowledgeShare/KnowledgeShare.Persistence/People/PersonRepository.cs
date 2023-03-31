@@ -1,7 +1,7 @@
-﻿using KnowledgeShare.Core.Persons;
+﻿using KnowledgeShare.Core.People;
 using Neo4j.Driver;
 
-namespace KnowledgeShare.Persistence.Persons;
+namespace KnowledgeShare.Persistence.People;
 
 public class PersonRepository : IPersonRepository
 {

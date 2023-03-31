@@ -1,4 +1,4 @@
-﻿namespace KnowledgeShare.Core.Persons;
+﻿namespace KnowledgeShare.Core.People;
 
 public class PersonService : IPersonService
 {

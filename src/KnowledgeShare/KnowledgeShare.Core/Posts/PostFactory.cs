@@ -1,5 +1,5 @@
 ﻿using KnowledgeShare.Core.Authentication;
-using KnowledgeShare.Core.Persons;
+using KnowledgeShare.Core.People;
 using KnowledgeShare.Core.Posts.Types;
 
 namespace KnowledgeShare.Core.Posts;

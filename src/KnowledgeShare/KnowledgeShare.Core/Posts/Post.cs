@@ -1,4 +1,4 @@
-﻿using KnowledgeShare.Core.Persons;
+﻿using KnowledgeShare.Core.People;
 using KnowledgeShare.Core.Tags;
 
 namespace KnowledgeShare.Core.Posts;

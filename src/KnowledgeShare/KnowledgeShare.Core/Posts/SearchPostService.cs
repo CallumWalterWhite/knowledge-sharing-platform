@@ -1,5 +1,5 @@
 ﻿using KnowledgeShare.Core.Authentication;
-using KnowledgeShare.Core.Persons;
+using KnowledgeShare.Core.People;
 using KnowledgeShare.Core.Tags;
 
 namespace KnowledgeShare.Core.Posts;
@@ -34,7 +34,23 @@ public class SearchPostService : ISearchPostService
         }
 
         IList<SearchPostResultDto> searchPostResultDtos = (await _searchPostQuery.RecommendAsync(person.Id)).ToList();
+        return await HydrateTags(searchPostResultDtos);
+    }
+
+    public async Task<IEnumerable<SearchPostResultDto>> GetPostsByCurrentPersonAsync()
+    {
+        Person? person = await _currentAuthUser.GetPersonAsync();
+        if (person is null)
+        {
+            return new List<SearchPostResultDto>();
+        }
         
+        IList<SearchPostResultDto> searchPostResultDtos = (await _searchPostQuery.GetPostsAsync(person.Id)).ToList();
+        return await HydrateTags(searchPostResultDtos);
+    }
+
+    private async Task<IList<SearchPostResultDto>> HydrateTags(IList<SearchPostResultDto> searchPostResultDtos)
+    {
         foreach (SearchPostResultDto searchPostResultDto in searchPostResultDtos)
         {
             if (searchPostResultDto.Summary.Length > MaxCharacterLength)

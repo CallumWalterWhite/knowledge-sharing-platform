@@ -1,3 +1,3 @@
-﻿namespace KnowledgeShare.Core.Persons;
+﻿namespace KnowledgeShare.Core.People;
 
 public record CreatePersonDto(string UserId, string Name);

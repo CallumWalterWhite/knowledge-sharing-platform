@@ -71,4 +71,34 @@ public class SearchPostQuery : ISearchPostQuery
 
         return results;
     }
+
+    public async Task<IEnumerable<SearchPostResultDto>> GetPostsAsync(Guid personId)
+    {
+        List<SearchPostResultDto> results = new List<SearchPostResultDto>();
+        Dictionary<string, object> statementParameters = new Dictionary<string, object>
+        {
+            {"person_id", personId.ToString() },
+        };
+        IResultCursor cursor = await _session.RunAsync(
+            "MATCH (p:Person)-[:WROTE]->(post:Post) " +
+            "WHERE p.id = $person_id "  +
+            "RETURN post.id, post.summary, post.title, post.type", statementParameters);
+        while (await cursor.FetchAsync())
+        {
+            if (cursor.Current is not null)
+            {
+                results.Add(
+                    new SearchPostResultDto()
+                    {
+                        Id = Guid.Parse(cursor.Current["post.id"].ToString()),
+                        Title = cursor.Current["post.title"].ToString(),
+                        Summary = cursor.Current["post.summary"].ToString(),
+                        Type = cursor.Current["post.type"].ToString()
+                    }
+                );
+            }
+        }
+
+        return results;
+    }
 }

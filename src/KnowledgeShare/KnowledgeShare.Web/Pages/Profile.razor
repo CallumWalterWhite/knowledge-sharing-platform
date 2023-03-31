@@ -2,8 +2,13 @@
 
 @using Microsoft.Identity.Web
 @using Microsoft.Graph
+@using KnowledgeShare.Core.Posts
+@using KnowledgeShare.Web.Shared.Posts.Article
+@using KnowledgeShare.Web.Shared.Posts.Book
+@using KnowledgeShare.Web.Shared.Posts.FreeForm
 @inject GraphServiceClient GraphServiceClient
 @inject MicrosoftIdentityConsentAndConditionalAccessHandler ConsentHandler
+@inject ISearchPostService SearchPostService;
 @if (user == null)
 {
     <p><em>Loading...</em></p>
@@ -27,7 +32,7 @@ else
             <RadzenRow RowGap="0">
                 <RadzenColumn SizeSM="4">
                     <RadzenText TextStyle="TextStyle.Overline" class="rz-color-primary-light rz-display-flex rz-mt-4 rz-mb-0">Posts</RadzenText>
-                    <RadzenText TextStyle="TextStyle.Body1"><b>0</b></RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1"><b>@Posts.Count()</b></RadzenText>
                     <RadzenText TextStyle="TextStyle.Overline" class="rz-color-primary-light rz-display-flex rz-mt-4 rz-mb-0">Likes</RadzenText>
                     <RadzenText TextStyle="TextStyle.Body1"><b>0</b></RadzenText>
                 </RadzenColumn>
@@ -38,10 +43,33 @@ else
             </RadzenRow>
         </RadzenCard>
     </RadzenCard>   
+     
+     
+    <div class="row justify-content-center">
+        <RadzenText TextStyle="TextStyle.H6" class="rz-color-primary-light"><strong>Posts</strong></RadzenText>
+        @foreach (var postResult in Posts)
+        {
+            @switch (postResult.Type)
+            {
+                case "ArticlePost":
+                    <ArticlePostSocialFeedDisplay Id=@postResult.Id/>
+                    break;
+                case "BookPost":
+                    <BookPostSocialFeedDisplay Id=@postResult.Id/>
+                    break;
+                case "FreeFormPost":
+                    <FreeFormSocialFeedDisplay Id=@postResult.Id/>
+                    break;
+
+            }
+        }
+    </div>
 }
 
 @code {
     User user;
+    
+    private IEnumerable<SearchPostResultDto> Posts = new List<SearchPostResultDto>();
     
     string UserPhotoPath = "/Images/avatardefault.png";
     
@@ -50,6 +78,7 @@ else
         try
         {
             user = await GraphServiceClient.Me.Request().GetAsync();
+            Posts = await SearchPostService.GetPostsByCurrentPersonAsync();
         }
         catch (Exception ex)
         {
@@ -74,5 +103,6 @@ else
                 }
             }
         }
+        await InvokeAsync(StateHasChanged);
     }
 }
