@@ -60,7 +60,7 @@
         Task t = Task.Run(async () =>
         {
             contextPosts = await SearchPostService.SearchAsync(args.Filter.ToLower());
-            posts = contextPosts;
+            posts = contextPosts.Distinct();
         });
         Task.WaitAll(t);
         await InvokeAsync(StateHasChanged);
