@@ -1,22 +1,23 @@
 ﻿@using KnowledgeShare.Core.Posts.Types
+@using KnowledgeShare.Core.Posts
 @inject IGetArticlePostService GetArticlePostService;
 @inject NavigationManager NavigationManager;
 
 
-@if (ArticlePost is not null)
+@if (SearchPostResultDto is not null)
 {
     <div class="container">
-        <h1 class="title">@ArticlePost.Title</h1>
-        <p class="summary">@ArticlePost.GetSummary()</p>
+        <h1 class="title">@SearchPostResultDto.Title</h1>
+        <p class="summary">@SearchPostResultDto.Summary</p>
         <div class="row" style="margin-top: 20px;">
-            @foreach (var tag in ArticlePost.Tags)
+            @foreach (var tag in SearchPostResultDto.Tags)
             {
-                <RadzenBadge Text=@tag.Value Style="max-width: 90px; margin-right: 5px;"></RadzenBadge>
+                <RadzenBadge Text=@tag Style="max-width: 90px; margin-right: 5px;"></RadzenBadge>
             }
         </div>
         <div class="info">
-            <p class="author">Created by: @ArticlePost.GetAuthor().Name</p>
-            <p class="date">Created on: @ArticlePost.GetDateTimeCreated().ToShortDateString()</p>
+            <p class="author">Created by: @SearchPostResultDto.UserCreatedName</p>
+            <p class="date">Created on: @SearchPostResultDto.CreatedDate</p>
         </div>
 
         <RadzenRow Gap="0.5rem" RowGap="0.5rem">
@@ -77,21 +78,10 @@
 
 @code {
     [Parameter]  
-    public Guid Id { get; set; }
+    public SearchPostResultDto SearchPostResultDto { get; set; }
 
-    public ArticlePost? ArticlePost = null;
-
-    protected override void OnInitialized()
-    {
-        Task t = Task.Run(async () =>
-        {
-            ArticlePost = await GetArticlePostService.GetArticlePostAsync(Id);
-        });
-        Task.WaitAll(t);
-    }
-    
     private void GoToPost()
     {
-        NavigationManager.NavigateTo($"/articlepost/{ArticlePost.Id}");
+        NavigationManager.NavigateTo($"/articlepost/{SearchPostResultDto.Id}");
     }
 }

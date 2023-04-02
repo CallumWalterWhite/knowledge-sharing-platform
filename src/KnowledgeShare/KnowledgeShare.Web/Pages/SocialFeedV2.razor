@@ -17,10 +17,10 @@
                     @switch (postResult.Type)
                     {
                         case "ArticlePost":
-                            <ArticlePostSocialFeedDisplay Id=@postResult.Id/>
+                            <ArticlePostSocialFeedDisplay SearchPostResultDto=@postResult/>
                             break;
                         case "BookPost":
-                            <BookPostSocialFeedDisplay Id=@postResult.Id/>
+                            <BookPostSocialFeedDisplay SearchPostResultDto=@postResult/>
                             break;
                         case "FreeFormPost":
                             <FreeFormSocialFeedDisplay Id=@postResult.Id/>

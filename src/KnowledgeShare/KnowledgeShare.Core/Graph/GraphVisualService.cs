@@ -30,7 +30,7 @@ public class GraphVisualService : IGraphVisualService
 
         List<GraphNode> graphNodes = new List<GraphNode>();
         graphNodes.AddRange(tags.Select(x => new GraphNode(x.Id, x.Value, 1)));
-        graphNodes.AddRange(posts.Select(x => new GraphNode(x.Id, x.Title, 2)));
+        graphNodes.AddRange(posts.Select(x => new GraphNode(x.Id, x.Title, TypeResolver(x))));
         graphNodes = graphNodes.DistinctBy(x => x.Id).ToList();
         
         int minX = 0;
@@ -109,5 +109,20 @@ public class GraphVisualService : IGraphVisualService
         int dx = x2 - x1;
         int dy = y2 - y1;
         return Math.Sqrt(dx * dx + dy * dy);
+    }
+
+    private int TypeResolver(SearchPostResultDto searchPostResultDto)
+    {
+        switch (searchPostResultDto.Type)
+        {
+            case TypeConstant.ArticlePost:
+                return 2;
+            case TypeConstant.BookPost:
+                return 3;
+            case TypeConstant.FreeFormPost:
+                return 4;
+            default:
+                return 10;
+        }
     }
 }

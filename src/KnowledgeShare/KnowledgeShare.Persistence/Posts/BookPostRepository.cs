@@ -22,7 +22,7 @@ public class BookPostRepository : PostBaseRepository, IPostRepository<BookPost>
             {"title", post.GetTitle() },
             {"type", "BookPost" },
             {"summary", post.GetSummary() },
-            {"author", post.GetAuthor() },
+            {"author", post.GetBookAuthor() },
             {"createdDateTime", post.GetDateTimeCreated() },
             {"id", post.Id.ToString() }
         };

@@ -17,4 +17,9 @@ public class SearchPostResultDto
     public int Distance { get; set; }
     
     public string? Type { get; set; }
+
+    public string? GetSummary()
+    {
+        return Summary;
+    }
 }

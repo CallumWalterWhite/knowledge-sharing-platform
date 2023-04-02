@@ -32,6 +32,7 @@ public class CreatePostService : ICreatePostService
     
     public async Task<Guid> Create(CreatePostDto createPostDto)
     {
+        createPostDto.Tags = createPostDto.Tags.Select(x => x.ToLower());
         Post post = await _postFactory.Create(createPostDto);
         post.Tags = await CreateTags(createPostDto.Tags);
         if (post is ArticlePost articlePost)

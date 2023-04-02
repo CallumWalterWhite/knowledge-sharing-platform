@@ -38,6 +38,7 @@
                 nodes = Nodes.Select(x => new Node()
                 {
                     id = x.Label,
+                    postIdentifer = x.Id.ToString(),
                     type = x.Type
                 }).ToList(),
                 links = Edges.Select(x => new Link()

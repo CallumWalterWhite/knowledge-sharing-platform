@@ -52,7 +52,8 @@ public class SearchPostQuery : ISearchPostQuery
         };
         IResultCursor cursor = await _session.RunAsync(
             "MATCH (n) WHERE (n:Post) " +
-            "RETURN n.id, n.summary, n.title, n.type " +
+            "MATCH (n)-[r:WROTE]-(person) " + 
+            "RETURN n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name " +
             "ORDER BY n.createdDateTime DESC", statementParameters);
         while (await cursor.FetchAsync())
         {
@@ -64,6 +65,8 @@ public class SearchPostQuery : ISearchPostQuery
                         Id = Guid.Parse(cursor.Current["n.id"].ToString()),
                         Title = cursor.Current["n.title"].ToString(),
                         Summary = cursor.Current["n.summary"].ToString(),
+                        CreatedDate = cursor.Current["n.createdDateTime"].ToString(),
+                        UserCreatedName = cursor.Current["person.name"].ToString(),
                         Type = cursor.Current["n.type"].ToString()
                     }
                 );

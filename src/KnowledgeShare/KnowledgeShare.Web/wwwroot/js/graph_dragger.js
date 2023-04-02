@@ -1,6 +1,6 @@
 ﻿function drawGraph(data) {
     var svg = d3.select("#graph");
-
+    
     var width = svg.attr("width");
     var height = svg.attr("height");
 
@@ -57,8 +57,25 @@
             .text(function(d) { return d.id; });
 
         node.on("click",function(d){
+            if (d.type == 2) {
+                load_post("/articlepost/" + d.postIdentifer + "");
+            }
+            else if (d.type == 3) {
+                load_post("/bookpost/" + d.postIdentifer + "");
+            }
+            else if (d.type == 4) {
+                load_post("/freeformpost/" + d.postIdentifer + "");
+            }
+            console.log(d);
             console.log("clicked", d.id);
         });
+        
+        function load_post(url){
+            if (!window["loading_page"]){
+                window["loading_page"] = true;
+                window.location = url;   
+            }
+        }
 
 
         node.append("title")
