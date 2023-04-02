@@ -31,7 +31,8 @@ public class GraphVisualService : IGraphVisualService
         List<GraphNode> graphNodes = new List<GraphNode>();
         graphNodes.AddRange(tags.Select(x => new GraphNode(x.Id, x.Value, 1)));
         graphNodes.AddRange(posts.Select(x => new GraphNode(x.Id, x.Title, 2)));
-
+        graphNodes = graphNodes.DistinctBy(x => x.Id).ToList();
+        
         int minX = 0;
         int maxX = 1000;
         int minY = 0;
@@ -88,10 +89,10 @@ public class GraphVisualService : IGraphVisualService
         List<GraphEdge> graphEdges = new List<GraphEdge>();
         foreach (var tagR in tagRelationship)
         {
-            GraphNode graphNodeSource = graphNodes.Single(x => x.Id == tagR.Item1.Id);
+            GraphNode graphNodeSource = graphNodes.First(x => x.Id == tagR.Item1.Id);
             foreach (SearchPostResultDto post in tagR.Item2)
             {
-                GraphNode graphNodeTarget = graphNodes.Single(x => x.Id == post.Id);
+                GraphNode graphNodeTarget = graphNodes.First(x => x.Id == post.Id);
                 graphEdges.Add(new GraphEdge()
                 {
                     SourceNode = graphNodeSource,

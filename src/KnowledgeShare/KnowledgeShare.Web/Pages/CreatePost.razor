@@ -115,6 +115,8 @@
 
 @code {
     string freeFormValue = @"";
+
+    bool creating = false;
     
     private CreatePostDto post = new CreatePostDto()
     {
@@ -125,25 +127,25 @@
 
     private async Task Create()
     {
-        post.Body = freeFormValue;
-        post.Tags = Tags;
-        Guid id = await CreatePostService.Create(post);
-        switch (post.Discriminator)
+        if (!creating)
         {
-            case PostTypeDiscriminator.Article:
-                NavigationManager.NavigateTo($"/articlepost/{id}");
-                break;
-            case PostTypeDiscriminator.Book:
-                NavigationManager.NavigateTo($"/bookpost/{id}");
-                break;
-            case PostTypeDiscriminator.Free:
-                NavigationManager.NavigateTo($"/freeformpost/{id}");
-                break;
+            creating = true;
+            post.Body = freeFormValue;
+            post.Tags = Tags;
+            Guid id = await CreatePostService.Create(post);
+            switch (post.Discriminator)
+            {
+                case PostTypeDiscriminator.Article:
+                    NavigationManager.NavigateTo($"/articlepost/{id}");
+                    break;
+                case PostTypeDiscriminator.Book:
+                    NavigationManager.NavigateTo($"/bookpost/{id}");
+                    break;
+                case PostTypeDiscriminator.Free:
+                    NavigationManager.NavigateTo($"/freeformpost/{id}");
+                    break;
+            }
         }
-    }
-    
-    protected override async Task OnInitializedAsync()
-    {
     }
     
     private string searchQuery;

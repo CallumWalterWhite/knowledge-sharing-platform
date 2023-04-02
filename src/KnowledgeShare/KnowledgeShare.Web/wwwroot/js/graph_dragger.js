@@ -1,5 +1,4 @@
 ﻿function drawGraph(data) {
-    console.log(data);
     var svg = d3.select("#graph");
 
     var width = svg.attr("width");
@@ -22,11 +21,8 @@
 
     var simulation = d3.forceSimulation()
         .force("link", d3.forceLink().id(function(d) { return d.id; }))
-        .force("charge", d3.forceManyBody())
+        .force("charge", d3.forceManyBody().strength(-1500))
         .force("center", d3.forceCenter(width / 2, height / 2));
-
-//d3.json("data.json", createGraph );
-
     function createGraph (error, graph) {
         if (error) throw error;
 
@@ -37,8 +33,6 @@
             .enter().append("line")
             .attr("stroke", function(d) { return color(d.type); })
             .attr("marker-end", "url(#arrow)");
-
-
         var node = svg.append("g")
             .attr("class", "nodes")
             .selectAll("circle")
@@ -69,7 +63,7 @@
 
         node.append("title")
             .text(function(d) { return d.id; });
-
+        
         simulation
             .nodes(graph.nodes)
             .on("tick", ticked);
@@ -113,7 +107,6 @@
         d.fx = null;
         d.fy = null;
     }
-
     function zoomed() {
         svg.attr("transform", "translate(" + d3.event.transform.x + "," + d3.event.transform.y + ")" + " scale(" + d3.event.transform.k + ")");
     }
