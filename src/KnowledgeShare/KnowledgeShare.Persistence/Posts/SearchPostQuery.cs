@@ -23,7 +23,7 @@ public class SearchPostQuery : ISearchPostQuery
             "MATCH (n) WHERE (n:Post)" +
             "MATCH (n)-[r:HAS_TAG]->(t)" +
             "WHERE toLower(n.title) CONTAINS toLower($searchTerm) OR toLower(t.value) CONTAINS toLower($searchTerm)" +
-            "RETURN n.id, n.title, n.type", statementParameters);
+            "RETURN n.id, n.summary, n.title, n.type", statementParameters);
         while (await cursor.FetchAsync())
         {
             if (cursor.Current is not null)
@@ -33,6 +33,7 @@ public class SearchPostQuery : ISearchPostQuery
                     {
                         Id = Guid.Parse(cursor.Current["n.id"].ToString()),
                         Title = cursor.Current["n.title"].ToString(),
+                        Summary = cursor.Current["n.summary"].ToString(),
                         Type = cursor.Current["n.type"].ToString()
                     }
                 );
@@ -94,6 +95,37 @@ public class SearchPostQuery : ISearchPostQuery
                         Title = cursor.Current["post.title"].ToString(),
                         Summary = cursor.Current["post.summary"].ToString(),
                         Type = cursor.Current["post.type"].ToString()
+                    }
+                );
+            }
+        }
+
+        return results;
+    }
+
+    public async Task<IEnumerable<SearchPostResultDto>> GetPostsByTagAsync(Guid tagId)
+    {
+        List<SearchPostResultDto> results = new List<SearchPostResultDto>();
+        Dictionary<string, object> statementParameters = new Dictionary<string, object>
+        {
+            {"tagId", tagId.ToString() },
+        };
+        IResultCursor cursor = await _session.RunAsync(
+            "MATCH (n) WHERE (n:Post) " +
+            "MATCH (n)-[r:HAS_TAG]->(t) " +
+            "WHERE t.id = $tagId " +
+            "RETURN n.id, n.summary, n.title, n.type", statementParameters);
+        while (await cursor.FetchAsync())
+        {
+            if (cursor.Current is not null)
+            {
+                results.Add(
+                    new SearchPostResultDto()
+                    {
+                        Id = Guid.Parse(cursor.Current["n.id"].ToString()),
+                        Title = cursor.Current["n.title"].ToString(),
+                        Summary = cursor.Current["n.summary"].ToString(),
+                        Type = cursor.Current["n.type"].ToString()
                     }
                 );
             }

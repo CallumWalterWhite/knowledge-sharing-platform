@@ -1,0 +1,84 @@
+﻿@using KnowledgeShare.Core.Graph
+@inject IGraphVisualService GraphVisualService
+@page "/graphvisual"
+
+<svg class="graph-container" viewBox="0 0 @ViewBoxWidth @ViewBoxHeight" @onclick="OnGraphClick" @onmousemove="OnGraphMouseMove" @onmouseup="OnGraphMouseUp" @onmouseleave="OnGraphMouseLeave">
+    @foreach (var edge in Edges)
+    {
+        <line class="edge" x1="@edge.SourceNode.X" y1="@edge.SourceNode.Y" x2="@edge.TargetNode.X" y2="@edge.TargetNode.Y" />
+    }
+
+    @foreach (var node in Nodes)
+    {
+        <g class="node" transform="translate(@node.X, @node.Y)" @onclick="() => OnNodeClick(node.Id)">
+            <circle r="25" fill="@(node.Type == "tag" ? "#007bff" : "#c3362b")" />
+            <text text-anchor="middle" fill="#fff" font-size="14" font-weight="bold" dy="8">@node.Label</text>
+        </g>
+    }
+</svg>
+
+<style>
+    .graph-container {
+        width: 100%;
+        height: 500px;
+        border: 1px solid #ccc;
+        background-color: #f8f8f8;
+    }
+
+    .node {
+        cursor: pointer;
+    }
+
+    .edge {
+        stroke: #007bff;
+        stroke-width: 2;
+        fill: none;
+    }
+</style>
+
+
+@code {
+    public List<GraphNode> Nodes = new List<GraphNode>();
+
+    public List<GraphEdge> Edges = new List<GraphEdge>();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        (IEnumerable<GraphNode>, IEnumerable<GraphEdge>) graph = await GraphVisualService.GetGraphDisplayAsync();
+        Nodes = graph.Item1.ToList();
+        Edges = graph.Item2.ToList();
+    }
+    
+    private int ViewBoxWidth => Nodes.Count > 0 ? Nodes.Max(node => node.X) + 100 : 0;
+    private int ViewBoxHeight => Nodes.Count > 0 ? Nodes.Max(node => node.Y) + 100 : 0;
+    
+    private bool isDragging;
+    private int draggedNodeId;
+    private int dragStartX;
+    private int dragStartY;
+
+    private void OnNodeClick(Guid nodeId)
+    {
+        // Handle node click event
+    }
+
+    private void OnGraphClick(MouseEventArgs e)
+    {
+        // Handle graph click event
+    }
+
+    private void OnGraphMouseMove(MouseEventArgs e)
+    {
+        // Handle graph mouse move event
+    }
+
+    private void OnGraphMouseUp(MouseEventArgs e)
+    {
+        // Handle graph mouse up event
+    }
+
+    private void OnGraphMouseLeave(MouseEventArgs e)
+    {
+        // Handle graph mouse leave event
+    }
+}
