@@ -1,84 +1,63 @@
 ﻿@using KnowledgeShare.Core.Graph
+@using System.Linq;
+@using System.Text.Json
 @inject IGraphVisualService GraphVisualService
+@inject IJSRuntime JS
 @page "/graphvisual"
-
-<svg class="graph-container" viewBox="0 0 @ViewBoxWidth @ViewBoxHeight" @onclick="OnGraphClick" @onmousemove="OnGraphMouseMove" @onmouseup="OnGraphMouseUp" @onmouseleave="OnGraphMouseLeave">
-    @foreach (var edge in Edges)
-    {
-        <line class="edge" x1="@edge.SourceNode.X" y1="@edge.SourceNode.Y" x2="@edge.TargetNode.X" y2="@edge.TargetNode.Y" />
-    }
-
-    @foreach (var node in Nodes)
-    {
-        <g class="node" transform="translate(@node.X, @node.Y)" @onclick="() => OnNodeClick(node.Id)">
-            <circle r="25" fill="@(node.Type == "tag" ? "#007bff" : "#c3362b")" />
-            <text text-anchor="middle" fill="#fff" font-size="14" font-weight="bold" dy="8">@node.Label</text>
-        </g>
-    }
-</svg>
+<svg id="graph" width="800" height="800"></svg>
 
 <style>
-    .graph-container {
-        width: 100%;
-        height: 500px;
-        border: 1px solid #ccc;
-        background-color: #f8f8f8;
+    .links line {
+      stroke-opacity: 0.6;
+      stroke-width: 1px;
+      fill: none;
     }
-
-    .node {
-        cursor: pointer;
-    }
-
-    .edge {
-        stroke: #007bff;
-        stroke-width: 2;
-        fill: none;
+    
+    .nodes circle {
+      stroke: #333;
+      stroke-width: 1.5px;
     }
 </style>
-
-
 @code {
     public List<GraphNode> Nodes = new List<GraphNode>();
 
     public List<GraphEdge> Edges = new List<GraphEdge>();
     
-    protected override async Task OnInitializedAsync()
+    public Graph Graph { get; set; }
+    
+    protected override void OnInitialized()
     {
-        (IEnumerable<GraphNode>, IEnumerable<GraphEdge>) graph = await GraphVisualService.GetGraphDisplayAsync();
-        Nodes = graph.Item1.ToList();
-        Edges = graph.Item2.ToList();
+        Task t = Task.Run(async () =>
+        {
+            (IEnumerable<GraphNode>, IEnumerable<GraphEdge>) graph = await GraphVisualService.GetGraphDisplayAsync();
+            Nodes = graph.Item1.ToList();
+            Edges = graph.Item2.ToList();
+            Graph = new Graph()
+            {
+                nodes = Nodes.Select(x => new Node()
+                {
+                    id = x.Label,
+                    type = x.Type
+                }).ToList(),
+                links = Edges.Select(x => new Link()
+                {
+                    source = x.SourceNode.Label,
+                    target = x.TargetNode.Label
+                }).ToList()
+            };
+        });
+        Task.WaitAll(t);
     }
     
-    private int ViewBoxWidth => Nodes.Count > 0 ? Nodes.Max(node => node.X) + 100 : 0;
-    private int ViewBoxHeight => Nodes.Count > 0 ? Nodes.Max(node => node.Y) + 100 : 0;
-    
-    private bool isDragging;
-    private int draggedNodeId;
-    private int dragStartX;
-    private int dragStartY;
-
-    private void OnNodeClick(Guid nodeId)
-    {
-        // Handle node click event
+    protected override async Task OnAfterRenderAsync(bool firstRender) {
+        if (firstRender)
+        {
+            await JS.InvokeVoidAsync("drawGraph", JsonSerializer.Serialize(Graph));
+        }
     }
 
-    private void OnGraphClick(MouseEventArgs e)
-    {
-        // Handle graph click event
-    }
-
-    private void OnGraphMouseMove(MouseEventArgs e)
-    {
-        // Handle graph mouse move event
-    }
-
-    private void OnGraphMouseUp(MouseEventArgs e)
-    {
-        // Handle graph mouse up event
-    }
-
-    private void OnGraphMouseLeave(MouseEventArgs e)
-    {
-        // Handle graph mouse leave event
+    [JSInvokable]
+    public void NodeClicked(string nodeId) {
+        // handle node clicked event
     }
 }

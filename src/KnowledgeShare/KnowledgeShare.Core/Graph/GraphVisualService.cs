@@ -29,13 +29,13 @@ public class GraphVisualService : IGraphVisualService
         }
 
         List<GraphNode> graphNodes = new List<GraphNode>();
-        graphNodes.AddRange(tags.Select(x => new GraphNode(x.Id, x.Value, "tag")));
-        graphNodes.AddRange(posts.Select(x => new GraphNode(x.Id, x.Title, "post")));
+        graphNodes.AddRange(tags.Select(x => new GraphNode(x.Id, x.Value, 1)));
+        graphNodes.AddRange(posts.Select(x => new GraphNode(x.Id, x.Title, 2)));
 
         int minX = 0;
-        int maxX = 2000;
+        int maxX = 1000;
         int minY = 0;
-        int maxY = 2000;
+        int maxY = 1000;
         int minDistance = 100;
         int maxDistance = 500;
         int numPoints = graphNodes.Count;
