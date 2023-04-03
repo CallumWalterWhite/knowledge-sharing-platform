@@ -1,6 +1,7 @@
 ﻿@page "/admin-posts"
 @using KnowledgeShare.Core.Posts
 @inject ISearchPostService SearchPostService;
+<PageTitle>MHR Knowledge sharing platform - Admin</PageTitle>
 <div style="display: flex; align-items: center; margin-bottom: 16px">
     <RadzenButton Click="@ClearSelection" Text="Clear Selection" />
     @if (selectedPosts?.Any() == true)

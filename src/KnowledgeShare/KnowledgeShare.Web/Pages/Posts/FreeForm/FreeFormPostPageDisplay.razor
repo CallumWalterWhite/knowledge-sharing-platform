@@ -5,6 +5,7 @@
 
 @if (FreeFormPost is not null)
 {
+    <PageTitle>MHR Knowledge sharing platform - @FreeFormPost.Title</PageTitle>
     <div class="container">
         <h1 class="title">@FreeFormPost.Title</h1>
          <div>@((MarkupString)@FreeFormPost.GetBody())</div>
