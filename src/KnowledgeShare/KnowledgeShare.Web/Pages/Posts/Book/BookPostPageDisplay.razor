@@ -5,6 +5,7 @@
 
 @if (BookPost is not null)
 {
+    <PageTitle>MHR Knowledge sharing platform - @BookPost.Title</PageTitle>
     <div class="container">
         <h1 class="title">@BookPost.Title</h1>
         <p class="author">Author: @BookPost.GetBookAuthor()</p>

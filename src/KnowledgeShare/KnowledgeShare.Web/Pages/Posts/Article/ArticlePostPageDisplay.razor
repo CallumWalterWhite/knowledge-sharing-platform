@@ -5,6 +5,7 @@
 
 @if (ArticlePost is not null)
 {
+    <PageTitle>MHR Knowledge sharing platform - @ArticlePost.Title</PageTitle>
     <div class="container">
         <h1 class="title">@ArticlePost.Title</h1>
         <p class="summary">@ArticlePost.GetSummary()</p>
