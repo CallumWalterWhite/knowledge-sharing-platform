@@ -50,4 +50,17 @@ public class PostBaseRepository
             });
         }
     }
+    
+    public async Task DeleteAsync(Guid postId)
+    {
+        Dictionary<string, object> statementParameters = new Dictionary<string, object>
+        {
+            {"id", postId.ToString() }
+        };
+        await _session.ExecuteWriteAsync(async tx =>
+        {
+            await tx.RunAsync("MATCH (n:Post) WHERE n.id = $id DETACH DELETE n",
+                statementParameters);
+        });
+    }
 }

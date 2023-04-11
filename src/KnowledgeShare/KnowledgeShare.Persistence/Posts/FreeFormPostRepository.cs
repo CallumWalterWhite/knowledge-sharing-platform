@@ -36,9 +36,9 @@ public class FreeFormPostRepository : PostBaseRepository, IPostRepository<FreeFo
         await AddAuthorAsync(post);
     }
 
-    public Task DeleteAsync(FreeFormPost post)
+    public new async Task DeleteAsync(Guid id)
     {
-        throw new NotImplementedException();
+        await base.DeleteAsync(id);
     }
     
     public async Task<IEnumerable<FreeFormPost>> GetAllAsync()

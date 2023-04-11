@@ -36,9 +36,9 @@ public class ArticlePostRepository : PostBaseRepository, IPostRepository<Article
         await AddAuthorAsync(post);
     }
 
-    public Task DeleteAsync(ArticlePost post)
+    public new async Task DeleteAsync(Guid id)
     {
-        throw new NotImplementedException();
+        await base.DeleteAsync(id);
     }
     
     public async Task<IEnumerable<ArticlePost>> GetAllAsync()

@@ -6,6 +6,8 @@
 @inject IGetFreeFormPostService GetFreeFormPostService;
 @inject ICreateLikeRelationshipService CreateLikeRelationshipService;
 @inject ICurrentAuthUser CurrentAuthUser;
+@inject ICreatePostCommentService CreatePostCommentService;
+@inject IGetPostCommentService GetPostCommentService;
 
 
 @if (FreeFormPost is not null)
@@ -13,7 +15,7 @@
     <PageTitle>MHR Knowledge sharing platform - @FreeFormPost.Title</PageTitle>
     <div class="container">
         <h1 class="title">@FreeFormPost.Title</h1>
-         <div>@((MarkupString)@FreeFormPost.GetBody())</div>
+        <div>@((MarkupString)@FreeFormPost.GetBody())</div>
 
         <div class="row" style="margin-top: 20px;">
             @foreach (var tag in FreeFormPost.Tags)
@@ -31,6 +33,29 @@
             <p class="likes">Likes: @likeCount</p>
         </div>
     </div>
+    
+    @if (comments.Count == 0)
+    {
+        <p>No comments yet.</p>
+    }
+    else
+    {
+        @foreach (var comment in comments)
+        {
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">@comment.personName</h5>
+                    <p class="card-text">@comment.comment</p>
+                </div>
+            </div>
+        }
+    }
+    <div class="form-group">
+        <label for="commentText">Comment:</label>
+        <InputTextArea id="commentText" class="form-control" @bind-Value="PostComment" />
+    </div>
+    <button onclick="@HandleSubmit" type="submit" class="btn btn-primary">Submit</button>
+
 }
 
 <style>
@@ -113,10 +138,17 @@
     public Guid Id { get; set; }
 
     public FreeFormPost? FreeFormPost = null;
+    
+    public List<PostCommentDto> comments = new List<PostCommentDto>();
+
+    private string CurrentPersonName = string.Empty;
+    
+    private string PostComment = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         FreeFormPost = await GetFreeFormPostService.GetFreeFormPostAsync(Id);
+        comments = (await GetPostCommentService.GetPostCommentsAsync(Id)).ToList();
         IList<Guid> peopleLiked = FreeFormPost.PeopleLiked.ToList();
         Person person = (await CurrentAuthUser.GetPersonAsync())!;
         likeCount = peopleLiked.Count;
@@ -132,6 +164,13 @@
         await CreateLikeRelationshipService.CreateLike(FreeFormPost!.Id);
         hasLiked = true;
         likeCount++;
+    }
+    
+    private async Task HandleSubmit()
+    {
+        await CreatePostCommentService.CreatePostCommentAsync(PostComment, Id);
+        comments.Add(new PostCommentDto(CurrentPersonName, PostComment, DateTime.Now));
+        PostComment = string.Empty;
     }
 
 }
