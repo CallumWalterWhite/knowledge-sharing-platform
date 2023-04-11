@@ -3,10 +3,12 @@ using KnowledgeShare.Core.Authentication;
 using KnowledgeShare.Core.People;
 using KnowledgeShare.Core.Posts;
 using KnowledgeShare.Core.Posts.Types;
+using KnowledgeShare.Core.Social;
 using KnowledgeShare.Core.Tags;
 using KnowledgeShare.Persistence;
 using KnowledgeShare.Persistence.People;
 using KnowledgeShare.Persistence.Posts;
+using KnowledgeShare.Persistence.Social;
 using KnowledgeShare.Persistence.Tags;
 using Radzen;
 
@@ -37,6 +39,8 @@ public class CoreInstaller
         services.AddScoped(typeof(IPostRepository<ArticlePost>), typeof(ArticlePostRepository));
         services.AddScoped(typeof(IPostRepository<BookPost>), typeof(BookPostRepository));
         services.AddScoped(typeof(IPostRepository<FreeFormPost>), typeof(FreeFormPostRepository));
+        services.AddScoped(typeof(ILikeRepository), typeof(LikeRepository));
+        services.AddScoped(typeof(IPostCommentRepository), typeof(PostCommentRepository));
         var assembly = typeof(IGetArticlePostService).Assembly;
         AddScopedByConvention(services, assembly, x => x.Name.EndsWith("Service"));
     }

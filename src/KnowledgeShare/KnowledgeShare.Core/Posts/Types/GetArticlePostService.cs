@@ -1,4 +1,5 @@
-﻿using KnowledgeShare.Core.Tags;
+﻿using KnowledgeShare.Core.Social;
+using KnowledgeShare.Core.Tags;
 
 namespace KnowledgeShare.Core.Posts.Types;
 
@@ -8,10 +9,16 @@ public class GetArticlePostService : IGetArticlePostService
 
     private readonly ITagRepository _tagRepository;
 
-    public GetArticlePostService(IPostRepository<ArticlePost> articlePostRepository, ITagRepository tagRepository)
+    private readonly ILikeRepository _likeRepository;
+
+    public GetArticlePostService(
+        IPostRepository<ArticlePost> articlePostRepository, 
+        ITagRepository tagRepository, 
+        ILikeRepository likeRepository)
     {
         _articlePostRepository = articlePostRepository;
         _tagRepository = tagRepository;
+        _likeRepository = likeRepository;
     }
 
     public async Task<ArticlePost> GetArticlePostAsync(Guid id)
@@ -24,6 +31,7 @@ public class GetArticlePostService : IGetArticlePostService
         }
         
         articlePost.Tags = await _tagRepository.GetAllTagsByPostId(articlePost.Id);
+        articlePost.PeopleLiked = await _likeRepository.GetPeopleIdsByPostIdAsync(articlePost.Id);
         return articlePost;
     }
 }

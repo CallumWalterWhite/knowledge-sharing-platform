@@ -1,6 +1,11 @@
 ﻿@page "/freeformpost/{Id:guid}"
 @using KnowledgeShare.Core.Posts.Types
-@inject IGetFreeFormPostService GetFreeFormPostService
+@using KnowledgeShare.Core.Social
+@using KnowledgeShare.Core.Authentication
+@using KnowledgeShare.Core.People
+@inject IGetFreeFormPostService GetFreeFormPostService;
+@inject ICreateLikeRelationshipService CreateLikeRelationshipService;
+@inject ICurrentAuthUser CurrentAuthUser;
 
 
 @if (FreeFormPost is not null)
@@ -103,20 +108,30 @@
 </style>
 
 @code {
-    [Parameter]  
+
+    [Parameter]
     public Guid Id { get; set; }
 
     public FreeFormPost? FreeFormPost = null;
-    
+
     protected override async Task OnInitializedAsync()
     {
         FreeFormPost = await GetFreeFormPostService.GetFreeFormPostAsync(Id);
+        IList<Guid> peopleLiked = FreeFormPost.PeopleLiked.ToList();
+        Person person = (await CurrentAuthUser.GetPersonAsync())!;
+        likeCount = peopleLiked.Count;
+        hasLiked = peopleLiked.Contains(person.Id);
     }
-    
+
     private int likeCount = 0;
 
-    private void Like()
+    private bool hasLiked = false;
+
+    private async Task Like()
     {
+        await CreateLikeRelationshipService.CreateLike(FreeFormPost!.Id);
+        hasLiked = true;
         likeCount++;
     }
+
 }

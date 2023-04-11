@@ -1,6 +1,11 @@
 ﻿@page "/bookpost/{Id:guid}"
 @using KnowledgeShare.Core.Posts.Types
-@inject IGetBookPostService GetBookPostService
+@using KnowledgeShare.Core.Social
+@using KnowledgeShare.Core.Authentication
+@using KnowledgeShare.Core.People
+@inject IGetBookPostService GetBookPostService;
+@inject ICreateLikeRelationshipService CreateLikeRelationshipService;
+@inject ICurrentAuthUser CurrentAuthUser;
 
 
 @if (BookPost is not null)
@@ -111,12 +116,20 @@
     protected override async Task OnInitializedAsync()
     {
         BookPost = await GetBookPostService.GetBookPostAsync(Id);
+        IList<Guid> peopleLiked = BookPost.PeopleLiked.ToList();
+        Person person = (await CurrentAuthUser.GetPersonAsync())!;
+        likeCount = peopleLiked.Count;
+        hasLiked = peopleLiked.Contains(person.Id);
     }
     
     private int likeCount = 0;
 
-    private void Like()
+    private bool hasLiked = false;
+
+    private async Task Like()
     {
+        await CreateLikeRelationshipService.CreateLike(BookPost!.Id);
+        hasLiked = true;
         likeCount++;
     }
 }

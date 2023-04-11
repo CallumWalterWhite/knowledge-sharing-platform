@@ -22,6 +22,8 @@ public class Post
     
     public IEnumerable<Tag> Tags { get; set; }
 
+    public IEnumerable<Guid> PeopleLiked { get; set; }
+
     public DateTime GetDateTimeCreated() => DateTimeCreated;
     
     public Person GetAuthor() => Author;

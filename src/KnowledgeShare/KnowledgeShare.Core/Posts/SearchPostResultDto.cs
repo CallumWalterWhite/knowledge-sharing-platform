@@ -18,6 +18,12 @@ public class SearchPostResultDto
     
     public string? Type { get; set; }
 
+    public int TagCount => Tags?.Count ?? 0;
+    
+    public int Likes { get; set; }
+    
+    public int Comments { get; set; }
+
     public string? GetSummary()
     {
         return Summary;

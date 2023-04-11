@@ -3,12 +3,11 @@
 @using Microsoft.Identity.Web
 @using Microsoft.Graph
 @using KnowledgeShare.Core.Posts
-@using KnowledgeShare.Web.Shared.Posts.Article
-@using KnowledgeShare.Web.Shared.Posts.Book
-@using KnowledgeShare.Web.Shared.Posts.FreeForm
 @inject GraphServiceClient GraphServiceClient
 @inject MicrosoftIdentityConsentAndConditionalAccessHandler ConsentHandler
 @inject ISearchPostService SearchPostService;
+@inject NavigationManager NavigationManager;
+@inject ContextMenuService ContextMenuService
 <PageTitle>MHR Knowledge sharing platform - Profile</PageTitle>
 @if (user == null)
 {
@@ -35,7 +34,7 @@ else
                     <RadzenText TextStyle="TextStyle.Overline" class="rz-color-primary-light rz-display-flex rz-mt-4 rz-mb-0">Posts</RadzenText>
                     <RadzenText TextStyle="TextStyle.Body1"><b>@Posts.Count()</b></RadzenText>
                     <RadzenText TextStyle="TextStyle.Overline" class="rz-color-primary-light rz-display-flex rz-mt-4 rz-mb-0">Likes</RadzenText>
-                    <RadzenText TextStyle="TextStyle.Body1"><b>0</b></RadzenText>
+                    <RadzenText TextStyle="TextStyle.Body1"><b>@totalLikes.ToString()</b></RadzenText>
                 </RadzenColumn>
                 <RadzenColumn SizeSM="8">
                     <RadzenText TextStyle="TextStyle.Overline" class="rz-color-primary-light rz-display-flex rz-mt-4 rz-mb-0">Comments</RadzenText>
@@ -43,41 +42,64 @@ else
                 </RadzenColumn>
             </RadzenRow>
         </RadzenCard>
-    </RadzenCard>   
-     
-    <RadzenText TextStyle="TextStyle.H6" class="rz-color-primary-light"><strong>Your Posts</strong></RadzenText>
-    <div style="display: flex; align-items: center; margin-bottom: 16px">
-        <RadzenButton Click="@ClearSelection" Text="Clear Selection" />
-        @if (selectedPosts?.Any() == true)
-        {
-            <div style="margin-left: 16px">
-                Selected Employee: @selectedPosts[0].Title @selectedPosts[0].UserCreatedName
-            </div>
-        }
-    </div>
-
+    </RadzenCard>
+    <p>Right click on a table cell to open the context menu.</p>
     <RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
                     AllowSorting="true" Data="@Posts" TItem="SearchPostResultDto" ColumnWidth="200px"
-                    SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedPosts>
+                    SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedPosts CellContextMenu="@OnCellContextMenu">
         <Columns>
             <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Title" Title="Title" />
-            <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Id" Title="ID" />
-            <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Summary" Title="Summary" />
+            <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Summary" Title="Summary" Sortable="false" Filterable="false" />
+            <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Type" Title="Type" />
+            <RadzenDataGridColumn TItem="SearchPostResultDto" Property="TagCount" Title="Amount of Tags" Filterable="false" />
+            <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Likes" Title="Likes" Filterable="false" />
+            <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Comments" Title="Comments" Filterable="false" />
         </Columns>
     </RadzenDataGrid>
 }
 
 @code {
     User user;
+
+    int totalLikes = 0;
     
     private IEnumerable<SearchPostResultDto> Posts = new List<SearchPostResultDto>();
     IList<SearchPostResultDto> selectedPosts;
     
     string UserPhotoPath = "/Images/avatardefault.png";
-    
-    void ClearSelection()
+
+    void OnCellContextMenu(DataGridCellMouseEventArgs<SearchPostResultDto> args)
     {
-        selectedPosts = null;
+        selectedPosts = new List<SearchPostResultDto>() { args.Data };
+
+        ContextMenuService.Open(args,
+            new List<ContextMenuItem> {
+                new ContextMenuItem(){ Text = "View", Value = 1, },
+                new ContextMenuItem(){ Text = "Edit", Value = 2, },
+                new ContextMenuItem(){ Text = "Delete", Value = 3, },
+            }, 
+            (e) => {
+                       if (int.Parse(e.Value.ToString() ?? string.Empty) == 1)
+                       {
+                           SearchPostResultDto searchPostResultDto = selectedPosts.First();
+                           switch (searchPostResultDto.Type)
+                           {
+                               case TypeConstant.ArticlePost:
+                                   ContextMenuService.Close();
+                                   NavigationManager.NavigateTo($"/articlepost/{selectedPosts.First().Id}");
+                                   break;
+                               case TypeConstant.BookPost:
+                                   ContextMenuService.Close();
+                                   NavigationManager.NavigateTo($"/bookpost/{selectedPosts.First().Id}");
+                                   break;
+                               case TypeConstant.FreeFormPost:
+                                   ContextMenuService.Close();
+                                   NavigationManager.NavigateTo($"/freeformpost/{selectedPosts.First().Id}");
+                                   break;
+                           }
+                       }
+            }
+            );
     }
     
     protected override async Task OnInitializedAsync()
@@ -86,15 +108,8 @@ else
         {
             user = await GraphServiceClient.Me.Request().GetAsync();
             Posts = await SearchPostService.GetPostsByCurrentPersonAsync();
-        }
-        catch (Exception ex)
-        {
-            ConsentHandler.HandleException(ex);
-        }
-
-        if (user is not null)
-        {
-            if (user.Photo != null)
+            totalLikes = Posts.Sum(x => x.Likes);
+            if (user is not null)
             {
                 Stream photoStream = await GraphServiceClient.Me.Photo.Content.Request().GetAsync();
                 byte[] buffer = new byte[16*1024];
@@ -110,6 +125,12 @@ else
                 }
             }
         }
+        catch (Exception ex)
+        {
+            ConsentHandler.HandleException(ex);
+        }
+        await base.OnInitializedAsync();
+        selectedPosts = Posts.Take(1).ToList();
         await InvokeAsync(StateHasChanged);
     }
 }

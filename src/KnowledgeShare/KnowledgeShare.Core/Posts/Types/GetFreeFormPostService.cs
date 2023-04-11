@@ -1,4 +1,5 @@
-﻿using KnowledgeShare.Core.Tags;
+﻿using KnowledgeShare.Core.Social;
+using KnowledgeShare.Core.Tags;
 
 namespace KnowledgeShare.Core.Posts.Types;
 
@@ -8,10 +9,13 @@ public class GetFreeFormPostService : IGetFreeFormPostService
 
     private readonly ITagRepository _tagRepository;
 
-    public GetFreeFormPostService(IPostRepository<FreeFormPost> freeFormPostRepository, ITagRepository tagRepository)
+    private readonly ILikeRepository _likeRepository;
+
+    public GetFreeFormPostService(IPostRepository<FreeFormPost> freeFormPostRepository, ITagRepository tagRepository, ILikeRepository likeRepository)
     {
         _freeFormPostRepository = freeFormPostRepository;
         _tagRepository = tagRepository;
+        _likeRepository = likeRepository;
     }
 
     public async Task<FreeFormPost> GetFreeFormPostAsync(Guid id)
@@ -24,6 +28,7 @@ public class GetFreeFormPostService : IGetFreeFormPostService
         }
         
         freeFormPost.Tags = await _tagRepository.GetAllTagsByPostId(freeFormPost.Id);
+        freeFormPost.PeopleLiked = await _likeRepository.GetPeopleIdsByPostIdAsync(freeFormPost.Id);
         return freeFormPost;
     }
 }

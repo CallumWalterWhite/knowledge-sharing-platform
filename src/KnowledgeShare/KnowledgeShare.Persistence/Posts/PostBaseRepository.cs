@@ -38,12 +38,12 @@ public class PostBaseRepository
             Dictionary<string, object?> statementParameters = new Dictionary<string, object?>
             {
                 {"postId", post.Id.ToString() },
-                {"value", tag.Value }
+                {"tagId", tag.Id.ToString() }
             };
 
             await _session.ExecuteWriteAsync(async tx =>
             {
-                string query = "MATCH (a:Post { id: $postId }), (t:Tag { value: $value }) " +
+                string query = "MATCH (a:Post { id: $postId }), (t:Tag { id: $tagId }) " +
                                "MERGE (a)-[:HAS_TAG]->(t)";
                 await tx.RunAsync(query,
                     statementParameters);
