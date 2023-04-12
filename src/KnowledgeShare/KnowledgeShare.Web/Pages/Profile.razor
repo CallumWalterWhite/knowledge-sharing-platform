@@ -8,6 +8,8 @@
 @inject ISearchPostService SearchPostService;
 @inject NavigationManager NavigationManager;
 @inject ContextMenuService ContextMenuService
+@inject DialogService DialogService
+@inject IDeletePostService DeletePostService;
 <PageTitle>MHR Knowledge sharing platform - Profile</PageTitle>
 @if (user == null)
 {
@@ -71,6 +73,7 @@ else
     void OnCellContextMenu(DataGridCellMouseEventArgs<SearchPostResultDto> args)
     {
         selectedPosts = new List<SearchPostResultDto>() { args.Data };
+        SearchPostResultDto resultDto = selectedPosts.First();
 
         ContextMenuService.Open(args,
             new List<ContextMenuItem> {
@@ -78,24 +81,58 @@ else
                 new ContextMenuItem(){ Text = "Edit", Value = 2, },
                 new ContextMenuItem(){ Text = "Delete", Value = 3, },
             }, 
-            (e) => {
+            async (e) => {
                        if (int.Parse(e.Value.ToString() ?? string.Empty) == 1)
                        {
-                           SearchPostResultDto searchPostResultDto = selectedPosts.First();
-                           switch (searchPostResultDto.Type)
+                           switch (resultDto.Type)
                            {
                                case TypeConstant.ArticlePost:
                                    ContextMenuService.Close();
-                                   NavigationManager.NavigateTo($"/articlepost/{selectedPosts.First().Id}");
+                                   NavigationManager.NavigateTo($"/articlepost/{resultDto.Id}");
                                    break;
                                case TypeConstant.BookPost:
                                    ContextMenuService.Close();
-                                   NavigationManager.NavigateTo($"/bookpost/{selectedPosts.First().Id}");
+                                   NavigationManager.NavigateTo($"/bookpost/{resultDto.Id}");
                                    break;
                                case TypeConstant.FreeFormPost:
                                    ContextMenuService.Close();
-                                   NavigationManager.NavigateTo($"/freeformpost/{selectedPosts.First().Id}");
+                                   NavigationManager.NavigateTo($"/freeformpost/{resultDto.Id}");
                                    break;
+                           }
+                       }
+                       else if (int.Parse(e.Value.ToString() ?? string.Empty) == 2)
+                       {
+                           switch (resultDto.Type)
+                           {
+                               case TypeConstant.ArticlePost:
+                                   ContextMenuService.Close();
+                                   NavigationManager.NavigateTo($"/articlepost/{resultDto.Id}");
+                                   break;
+                               case TypeConstant.BookPost:
+                                   ContextMenuService.Close();
+                                   NavigationManager.NavigateTo($"/bookpost/{resultDto.Id}");
+                                   break;
+                               case TypeConstant.FreeFormPost:
+                                   ContextMenuService.Close();
+                                   NavigationManager.NavigateTo($"/freeformpost/{resultDto.Id}");
+                                   break;
+                           }
+                       }
+                       else if (int.Parse(e.Value.ToString() ?? string.Empty) == 3)
+                       {
+                           bool? result = await DialogService.Confirm($"Are you sure you want to delete {resultDto.Title}?", "Delete post", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+                           if (result is not null)
+                           {
+                               if (result.Value)
+                               {
+                                   await DeletePostService.DeletePostAsync(resultDto.Id);
+                                   await DialogService.Alert("Post Deleted!", $"{resultDto.Title} has been deleted", new AlertOptions() { OkButtonText = "Ok" });
+                                   Posts = await SearchPostService.GetPostsByCurrentPersonAsync();
+                                   
+                                   await base.OnInitializedAsync();
+                                   selectedPosts = Posts.Take(1).ToList();
+                                   await InvokeAsync(StateHasChanged);
+                               }
                            }
                        }
             }

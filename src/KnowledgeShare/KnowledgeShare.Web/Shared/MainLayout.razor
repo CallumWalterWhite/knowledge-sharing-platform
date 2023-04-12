@@ -34,7 +34,6 @@
                 </div>
             </div>
         </div>
-        <RadzenContextMenu />
     </RadzenBody>
     <RadzenSidebar Expanded="@sidebarExpanded" style="z-index: 2">
         <div class="py-3 py-lg-4" style="padding: var(--rz-panel-menu-item-padding); border-bottom: var(--rz-panel-menu-item-border); display: flex; flex-direction: column; gap: 1rem; align-items: center;">
@@ -47,6 +46,8 @@
             <RadzenText Text="Copyright Ⓒ 2023" TextStyle="Radzen.Blazor.TextStyle.Caption" class="mb-0" style="color: var(--rz-text-disabled-color);" TagName="Radzen.Blazor.TagName.P" TextAlign="Radzen.TextAlign.Center" />
         </div>
     </RadzenSidebar>
+    <RadzenContextMenu />
+    <RadzenDialog />
 </RadzenLayout>
 @code {
     bool sidebar4Expanded = false;

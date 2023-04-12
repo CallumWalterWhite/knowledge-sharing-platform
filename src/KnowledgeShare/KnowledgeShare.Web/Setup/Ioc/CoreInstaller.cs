@@ -39,6 +39,7 @@ public class CoreInstaller
         services.AddScoped(typeof(IPostRepository<ArticlePost>), typeof(ArticlePostRepository));
         services.AddScoped(typeof(IPostRepository<BookPost>), typeof(BookPostRepository));
         services.AddScoped(typeof(IPostRepository<FreeFormPost>), typeof(FreeFormPostRepository));
+        services.AddScoped(typeof(IPostRepository<Post>), typeof(PostRepository));
         services.AddScoped(typeof(ILikeRepository), typeof(LikeRepository));
         services.AddScoped(typeof(IPostCommentRepository), typeof(PostCommentRepository));
         var assembly = typeof(IGetArticlePostService).Assembly;

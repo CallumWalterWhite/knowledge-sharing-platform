@@ -2,8 +2,15 @@
 
 public class DeletePostService : IDeletePostService
 {
-    public Task DeletePostAsync(Guid postId)
+    private readonly IPostRepository<Post> _postRepository;
+
+    public DeletePostService(IPostRepository<Post> postRepository)
     {
-        throw new NotImplementedException();
+        _postRepository = postRepository;
+    }
+
+    public async Task DeletePostAsync(Guid postId)
+    {
+        await _postRepository.DeleteAsync(postId);
     }
 }
