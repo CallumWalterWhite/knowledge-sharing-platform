@@ -1,6 +1,10 @@
 ﻿@page "/admin-posts"
 @using KnowledgeShare.Core.Posts
 @inject ISearchPostService SearchPostService;
+@inject NavigationManager NavigationManager;
+@inject ContextMenuService ContextMenuService
+@inject DialogService DialogService
+@inject IDeletePostService DeletePostService;
 <PageTitle>MHR Knowledge sharing platform - Admin</PageTitle>
 <div style="display: flex; align-items: center; margin-bottom: 16px">
     <RadzenButton Click="@ClearSelection" Text="Clear Selection" />
@@ -24,6 +28,20 @@
     </Columns>
 </RadzenDataGrid>
 
+<p>Right click on a table cell to open the context menu.</p>
+<RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+                AllowSorting="true" Data="@AllPosts" TItem="SearchPostResultDto" ColumnWidth="200px"
+                SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedPosts CellContextMenu="@OnCellContextMenu">
+    <Columns>
+        <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Title" Title="Title" />
+        <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Summary" Title="Summary" Sortable="false" Filterable="false" />
+        <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Type" Title="Type" />
+        <RadzenDataGridColumn TItem="SearchPostResultDto" Property="TagCount" Title="Amount of Tags" Filterable="false" />
+        <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Likes" Title="Likes" Filterable="false" />
+        <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Comments" Title="Comments" Filterable="false" />
+    </Columns>
+</RadzenDataGrid>
+
 @code {
     private IEnumerable<SearchPostResultDto> AllPosts = new List<SearchPostResultDto>();
     IList<SearchPostResultDto> selectedPosts;
@@ -31,6 +49,55 @@
     void ClearSelection()
     {
         selectedPosts = null;
+    }
+    
+    void OnCellContextMenu(DataGridCellMouseEventArgs<SearchPostResultDto> args)
+    {
+        selectedPosts = new List<SearchPostResultDto>() { args.Data };
+        SearchPostResultDto resultDto = selectedPosts.First();
+
+        ContextMenuService.Open(args,
+            new List<ContextMenuItem> {
+                new ContextMenuItem(){ Text = "View", Value = 1, },
+                new ContextMenuItem(){ Text = "Delete", Value = 3, },
+            }, 
+            async (e) => {
+                       if (int.Parse(e.Value.ToString() ?? string.Empty) == 1)
+                       {
+                           switch (resultDto.Type)
+                           {
+                               case TypeConstant.ArticlePost:
+                                   ContextMenuService.Close();
+                                   NavigationManager.NavigateTo($"/articlepost/{resultDto.Id}");
+                                   break;
+                               case TypeConstant.BookPost:
+                                   ContextMenuService.Close();
+                                   NavigationManager.NavigateTo($"/bookpost/{resultDto.Id}");
+                                   break;
+                               case TypeConstant.FreeFormPost:
+                                   ContextMenuService.Close();
+                                   NavigationManager.NavigateTo($"/freeformpost/{resultDto.Id}");
+                                   break;
+                           }
+                       }
+                       else if (int.Parse(e.Value.ToString() ?? string.Empty) == 3)
+                       {
+                           bool? result = await DialogService.Confirm($"Are you sure you want to delete {resultDto.Title}?", "Delete post", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+                           if (result is not null)
+                           {
+                               if (result.Value)
+                               {
+                                   await DeletePostService.DeletePostAsync(resultDto.Id);
+                                   await DialogService.Alert("Post Deleted!", $"{resultDto.Title} has been deleted", new AlertOptions() { OkButtonText = "Ok" });
+                                   AllPosts = await SearchPostService.GetAllAsync();
+                                   await base.OnInitializedAsync();
+                                   selectedPosts = AllPosts.Take(1).ToList();
+                                   await InvokeAsync(StateHasChanged);
+                               }
+                           }
+                       }
+            }
+            );
     }
 
     protected override async Task OnInitializedAsync()
