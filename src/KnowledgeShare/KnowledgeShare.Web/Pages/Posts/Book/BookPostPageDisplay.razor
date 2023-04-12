@@ -29,7 +29,7 @@
         </div>
 
         <div class="actions">
-            <button class="like-button" @onclick="Like"><i class="fas fa-heart"></i> Like</button>
+            <button disabled="@hasLiked" class="like-button" @onclick="Like"><i class="fas fa-heart"></i> Like</button>
             <p class="likes">Likes: @likeCount</p>
         </div>
     </div>
