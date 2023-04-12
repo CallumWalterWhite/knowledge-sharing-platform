@@ -15,19 +15,6 @@
         </div>
     }
 </div>
-
-<RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
-                AllowSorting="true" Data="@AllPosts" TItem="SearchPostResultDto" ColumnWidth="200px"
-                SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedPosts>
-    <Columns>
-        <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Title" Title="Title" />
-        <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Id" Title="ID" />
-        <RadzenDataGridColumn TItem="SearchPostResultDto" Property="CreatedDate" Title="Created Date" FormatString="{0:d}" />
-        <RadzenDataGridColumn TItem="SearchPostResultDto" Property="UserCreatedName" Title="User Created Name" />
-        <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Summary" Title="Summary" />
-    </Columns>
-</RadzenDataGrid>
-
 <p>Right click on a table cell to open the context menu.</p>
 <RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
                 AllowSorting="true" Data="@AllPosts" TItem="SearchPostResultDto" ColumnWidth="200px"
