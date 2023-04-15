@@ -44,7 +44,7 @@ public class ArticlePostRepository : PostBaseRepository, IPostRepository<Article
     public async Task<IEnumerable<ArticlePost>> GetAllAsync()
     {
         List<ArticlePost> articleSummaries = new List<ArticlePost>();
-        IResultCursor cursor = await _session.RunAsync("MATCH (post:Post) MATCH (post)-[r:WROTE]-(person) RETURN post.id, post.createdDateTime, post.title, post.summary, post.link, person.id, person.userid, person.name WHERE type='ArticlePost'");
+        IResultCursor cursor = await _session.RunAsync("MATCH (post:Post) MATCH (post)-[r:WROTE]-(person) RETURN post.id, post.createdDateTime, post.title, post.summary, post.link, person.id, person.userid, person.name, person.picture WHERE type='ArticlePost'");
         while (await cursor.FetchAsync())
         {
             articleSummaries.Add(CreateArticlePostFromResult(cursor.Current));
@@ -60,7 +60,7 @@ public class ArticlePostRepository : PostBaseRepository, IPostRepository<Article
         {
             {"value", id.ToString() }
         };
-        IResultCursor cursor = await _session.RunAsync("MATCH (post:Post WHERE post.id = $value) MATCH (post)-[r:WROTE]-(person) RETURN post.id, post.createdDateTime, post.title, post.summary, post.link, person.id, person.userId, person.name", statementParameters);
+        IResultCursor cursor = await _session.RunAsync("MATCH (post:Post WHERE post.id = $value) MATCH (post)-[r:WROTE]-(person) RETURN post.id, post.createdDateTime, post.title, post.summary, post.link, person.id, person.userId, person.name, person.picture", statementParameters);
         while (await cursor.FetchAsync())
         {
             post = CreateArticlePostFromResult(cursor.Current);
@@ -79,9 +79,10 @@ public class ArticlePostRepository : PostBaseRepository, IPostRepository<Article
         object? personId = record["person.id"];
         object? userId = record["person.userId"];
         object? name = record["person.name"];
+        object? picture = record["person.picture"];
         return new ArticlePost(
             Guid.Parse(id.ToString()),
-            new Person(Guid.Parse(personId.ToString()), userId.ToString(), name.ToString()),
+            new Person(Guid.Parse(personId.ToString()), userId.ToString(), name.ToString(), picture.ToString()),
             DateTime.Parse(createdDateTime.ToString()),
             title?.ToString() ?? string.Empty,
             link?.ToString() ?? string.Empty,

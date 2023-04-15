@@ -34,31 +34,59 @@
         </div>
     </div>
     
-    @if (comments.Count == 0)
-    {
-        <p>No comments yet.</p>
-    }
-    else
-    {
-        @foreach (var comment in comments)
+    
+    <div class="container justify-content-center mt-5 border-left border-right">
+        <div class="d-flex justify-content-center pt-3 pb-2"> <InputText type="text"  @onkeydown="@HandleSubmit" @bind-Value="PostComment" name="text" placeholder="+ Add a Comment" class="form-control addtxt" /> </div>
+        @if (comments.Count == 0)
         {
-            <div class="card">
-                <div class="card-body">
-                    <h5 class="card-title">@comment.personName</h5>
-                    <p class="card-text">@comment.comment</p>
-                </div>
-            </div>
+            <p>No comments yet.</p>
         }
-    }
-    <div class="form-group">
-        <label for="commentText">Comment:</label>
-        <InputTextArea id="commentText" class="form-control" @bind-Value="PostComment" />
+        else
+        {
+            @foreach (var comment in comments)
+            {
+                <div class="d-flex justify-content-center py-2">
+                    <div class="second py-2 px-2"> <span class="text1">@comment.comment</span>
+                        <div class="d-flex justify-content-between py-1 pt-2">
+                            <div><img src="@comment.personPicture" style="border: 1px solid #fff; border-radius: 20px;" width="18"><span class="text2">@comment.personName</span></div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
     </div>
-    <button onclick="@HandleSubmit" type="submit" class="btn btn-primary">Submit</button>
 
 }
 
 <style>
+    .addtxt{
+    	padding-top: 10px;
+    	padding-bottom: 10px;
+    	text-align: center;
+    	font-size: 13px;
+    	width: 350px;
+    	background-color: #e5e8ed;
+    	font-weight: 500;
+    }
+    
+    .second{
+    	width: 350px;
+    	background-color: white;
+    	border-radius: 4px;
+    	box-shadow: 10px 10px 5px #aaaaaa;
+    }
+    .text1{
+    	font-size: 13px;
+        font-weight: 500;
+        color: #56575b;
+    }
+    .text2{
+    	font-size: 13px;
+        font-weight: 500;
+        margin-left: 6px;
+        color: #56575b;
+    }
+
     .container {
         margin: 0 auto;
         padding: 20px;
@@ -73,15 +101,6 @@
     .summary {
         font-size: 18px;
         line-height: 1.5;
-        margin: 0 0 20px;
-    }
-
-    .link {
-        display: inline-block;
-        font-size: 18px;
-        color: #06c;
-        text-decoration: none;
-        border-bottom: 2px solid #06c;
         margin: 0 0 20px;
     }
 
@@ -141,7 +160,7 @@
     
     public List<PostCommentDto> comments = new List<PostCommentDto>();
 
-    private string CurrentPersonName = string.Empty;
+    private Person CurrentPerson;
     
     private string PostComment = string.Empty;
 
@@ -150,9 +169,9 @@
         FreeFormPost = await GetFreeFormPostService.GetFreeFormPostAsync(Id);
         comments = (await GetPostCommentService.GetPostCommentsAsync(Id)).ToList();
         IList<Guid> peopleLiked = FreeFormPost.PeopleLiked.ToList();
-        Person person = (await CurrentAuthUser.GetPersonAsync())!;
+        CurrentPerson = (await CurrentAuthUser.GetPersonAsync())!;
         likeCount = peopleLiked.Count;
-        hasLiked = peopleLiked.Contains(person.Id);
+        hasLiked = peopleLiked.Contains(CurrentPerson.Id);
     }
 
     private int likeCount = 0;
@@ -166,11 +185,14 @@
         likeCount++;
     }
     
-    private async Task HandleSubmit()
+    private async Task HandleSubmit(KeyboardEventArgs e)
     {
-        await CreatePostCommentService.CreatePostCommentAsync(PostComment, Id);
-        comments.Add(new PostCommentDto(CurrentPersonName, PostComment, DateTime.Now));
-        PostComment = string.Empty;
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            await CreatePostCommentService.CreatePostCommentAsync(PostComment, Id);
+            comments.Add(new PostCommentDto(CurrentPerson.Name, CurrentPerson.Picture, PostComment, DateTime.Now));
+            PostComment = string.Empty;
+        }
     }
 
 }

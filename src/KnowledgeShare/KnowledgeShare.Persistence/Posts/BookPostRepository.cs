@@ -60,7 +60,7 @@ public class BookPostRepository : PostBaseRepository, IPostRepository<BookPost>
         {
             {"value", id.ToString() }
         };
-        IResultCursor cursor = await _session.RunAsync("MATCH (post:Post WHERE post.id = $value) MATCH (post)-[r:WROTE]-(person) RETURN post.id, post.createdDateTime, post.title, post.author, post.summary, person.id, person.userId, person.name", statementParameters);
+        IResultCursor cursor = await _session.RunAsync("MATCH (post:Post WHERE post.id = $value) MATCH (post)-[r:WROTE]-(person) RETURN post.id, post.createdDateTime, post.title, post.author, post.summary, person.id, person.userId, person.name, person.picture", statementParameters);
         while (await cursor.FetchAsync())
         {
             post = CreateBookPostFromResult(cursor.Current);
@@ -79,9 +79,10 @@ public class BookPostRepository : PostBaseRepository, IPostRepository<BookPost>
         object? personId = record["person.id"];
         object? userId = record["person.userId"];
         object? name = record["person.name"];
+        object? picture = record["person.picture"];
         return new BookPost(
             Guid.Parse(id.ToString() ?? string.Empty),
-            new Person(Guid.Parse(personId?.ToString() ?? string.Empty), userId.ToString() ?? string.Empty, name.ToString() ?? string.Empty),
+            new Person(Guid.Parse(personId?.ToString() ?? string.Empty), userId.ToString() ?? string.Empty, name.ToString() ?? string.Empty, picture.ToString() ?? string.Empty),
             DateTime.Parse(createdDateTime.ToString() ?? string.Empty),
             title?.ToString() ?? string.Empty,
             author?.ToString() ?? string.Empty,

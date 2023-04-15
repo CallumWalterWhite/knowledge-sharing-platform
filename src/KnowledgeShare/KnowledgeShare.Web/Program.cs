@@ -25,6 +25,7 @@ builder.Services.AddAuthorization(options =>
 GraphInstaller.Install(builder.Services);
 CoreInstaller.Install(builder.Services);
 // Add services to the container.
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddRazorPages();
 builder.Services.AddServerSideBlazor()
     .AddMicrosoftIdentityConsentHandler();

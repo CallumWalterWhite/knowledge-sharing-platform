@@ -17,7 +17,7 @@ public class PersonService : IPersonService
 
     public async Task CreatePersonAsync(CreatePersonDto createPersonDto)
     {
-        Person person = Person.Create(createPersonDto.UserId, createPersonDto.Name);
+        Person person = Person.Create(createPersonDto.UserId, createPersonDto.Name, createPersonDto.DataImage);
         await _personRepository.AddAsync(person);
     }
 }

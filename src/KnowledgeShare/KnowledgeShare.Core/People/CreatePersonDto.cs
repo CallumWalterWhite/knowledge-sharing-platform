@@ -1,3 +1,3 @@
 ﻿namespace KnowledgeShare.Core.People;
 
-public record CreatePersonDto(string UserId, string Name);
+public record CreatePersonDto(string UserId, string Name, string DataImage);

@@ -1,3 +1,3 @@
 ﻿namespace KnowledgeShare.Core.Social;
 
-public record PostCommentDto(string personName, string comment, DateTime dateTimeCreated);
+public record PostCommentDto(string personName, string personPicture, string comment, DateTime dateTimeCreated);

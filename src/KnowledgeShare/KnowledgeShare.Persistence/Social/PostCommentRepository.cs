@@ -63,15 +63,16 @@ public class PostCommentRepository : IPostCommentRepository
         IResultCursor cursor = await _asyncSession.RunAsync(
             "MATCH (p:Post)-[:HAS_COMMENT]->(c:Comment)<-[:WROTE_COMMENT]-(a:Person) " +
             "WHERE p.id = $postId " + 
-            "RETURN c.value, c.createdDateTime, a.name", statementParameters);
+            "RETURN c.value, c.createdDateTime, a.name, a.picture", statementParameters);
         while (await cursor.FetchAsync())
         {
             object? comment = cursor.Current["c.value"];
             object? personName = cursor.Current["a.name"];
+            object? picture = cursor.Current["a.picture"];
             object? createdDateTime = cursor.Current["c.createdDateTime"];
             if (comment is not null)
             {
-                results.Add(new PostCommentDto(personName.ToString()!, comment.ToString()!, DateTime.Parse(createdDateTime.ToString()!)));   
+                results.Add(new PostCommentDto(personName.ToString()!, picture.ToString()!, comment.ToString()!, DateTime.Parse(createdDateTime.ToString()!)));   
             }
         }
 
