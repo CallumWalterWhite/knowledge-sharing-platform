@@ -67,6 +67,11 @@
         Task.WaitAll(t);
         await InvokeAsync(StateHasChanged);
     }
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
 
     async Task HandleSelection()
     {
@@ -76,13 +81,13 @@
             switch (selectPost.Type)
             {
                 case "ArticlePost":
-                    NavigationManager.NavigateTo($"/articlepost/{selectPost.Id}", true);
+                    NavigationManager.NavigateTo($"/articlepost/{selectPost.Id}");
                     break;
                 case "BookPost":
-                    NavigationManager.NavigateTo($"/bookpost/{selectPost.Id}", true);
+                    NavigationManager.NavigateTo($"/bookpost/{selectPost.Id}");
                     break;
                 case "FreeFormPost":
-                    NavigationManager.NavigateTo($"/freeformpost/{selectPost.Id}", true);
+                    NavigationManager.NavigateTo($"/freeformpost/{selectPost.Id}");
                     break;
             }   
         }

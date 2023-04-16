@@ -172,6 +172,11 @@
         hasLiked = peopleLiked.Contains(CurrentPerson.Id);
     }
     
+    protected override async Task OnParametersSetAsync()
+    {
+        await OnInitializedAsync();
+    }
+    
     private int likeCount = 0;
 
     private bool hasLiked = false;
