@@ -7,7 +7,7 @@
 {
     <div class="container">
         <h1 class="title">@FreeFormPost.Title</h1>
-        <div>@((MarkupString)@FreeFormPost.GetSummary())</div>
+        <div style="max-height: 300px; overflow-y: clip;">@((MarkupString)@FreeFormPost.GetSummary())</div>
 
         <div class="row" style="margin-top: 20px;">
             @foreach (var tag in FreeFormPost.Tags)

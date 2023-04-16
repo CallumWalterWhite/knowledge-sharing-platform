@@ -13,12 +13,13 @@ public class Person
         PersonTags = new List<Tag>();
     }
 
-    public Person(Guid id, string userId, string name, string picture)
+    public Person(Guid id, string userId, string name, string picture, bool isAdmin = false)
     {
         Id = id;
         UserId = userId;
         Name = name;
         Picture = picture;
+        IsAdmin = isAdmin;
     }
     
     public Guid Id { get; set; }
@@ -28,6 +29,8 @@ public class Person
     public string Name { get; set; }
     
     public string Picture { get; set; }
+    
+    public bool IsAdmin { get; set; }
     
     public IList<Tag> PersonTags { get; set; }
 

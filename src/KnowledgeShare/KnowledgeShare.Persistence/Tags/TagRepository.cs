@@ -31,7 +31,7 @@ namespace KnowledgeShare.Persistence.Tags
             bool matched = false;
             Dictionary<string, object> statementParameters = new Dictionary<string, object>
             {
-                {"value", value }
+                {"value", value.ToLower() }
             };
             IResultCursor cursor = await _session.RunAsync("MATCH (tag:Tag WHERE tag.value = $value) RETURN tag.value", statementParameters);
             while (await cursor.FetchAsync())
@@ -47,7 +47,7 @@ namespace KnowledgeShare.Persistence.Tags
         {
             Dictionary<string, object> statementParameters = new Dictionary<string, object>
             {
-                {"value", tagValue }
+                {"value", tagValue.ToLower() }
             };
             Tag? tag = null;
             IResultCursor cursor = await _session.RunAsync("MATCH (tag:Tag WHERE tag.value = $value) RETURN tag.id, tag.value", statementParameters);
@@ -114,6 +114,64 @@ namespace KnowledgeShare.Persistence.Tags
             }
 
             return results;
+        }
+
+        public async Task AddPersonLikeTagRelationship(Guid personId, Tag tag)
+        {
+            Dictionary<string, object?> statementParameters = new Dictionary<string, object?>
+            {
+                {"tagId", tag.Id.ToString() },
+                {"personId", personId.ToString() }
+            };
+
+            await _session.ExecuteWriteAsync(async tx =>
+            {
+                string query = "MATCH (a:Person), (b:Tag) " +
+                               "WHERE a.id = $personId AND b.id = $tagId " +
+                               "CREATE (a)-[:LIKES]->(b)";
+                await tx.RunAsync(query,
+                    statementParameters);
+            });
+        }
+
+        public async Task DeletePersonLikeTagRelationship(Guid personId, Tag tag)
+        {
+            Dictionary<string, object?> statementParameters = new Dictionary<string, object?>
+            {
+                {"tagId", tag.Id.ToString() },
+                {"personId", personId.ToString() }
+            };
+
+            await _session.ExecuteWriteAsync(async tx =>
+            {
+                string query = "MATCH (a:Person), (b:Tag) " +
+                               "WHERE a.id = $personId AND b.id = $tagId " +
+                               "DETACH (a)-[:LIKES]->(b)";
+                await tx.RunAsync(query,
+                    statementParameters);
+            });
+        }
+
+        public async Task<IEnumerable<Tag>> GetTagsLikedByPersonId(Guid personId)
+        {
+            List<Tag> tags = new List<Tag>();
+            Dictionary<string, object> statementParameters = new Dictionary<string, object>
+            {
+                {"person_id", personId.ToString() },
+            };
+            IResultCursor cursor = await _session.RunAsync(
+                "MATCH (p:Person)-[:LIKES]->(a:Tag) " +
+                "WHERE p.id = $person_id "  +
+                "RETURN a.id, a.value", statementParameters);
+            while (await cursor.FetchAsync())
+            {
+                if (cursor.Current is not null)
+                {
+                    tags.Add(new Tag(Guid.Parse(cursor.Current["a.id"].ToString()), cursor.Current["a.value"].ToString()));
+                }
+            }
+
+            return tags;
         }
 
         public async Task<IEnumerable<Tag>> GetAllTags()

@@ -3,6 +3,7 @@
 @using Microsoft.Identity.Web
 @using Microsoft.Graph
 @using KnowledgeShare.Core.Posts
+@using KnowledgeShare.Core.Tags
 @inject GraphServiceClient GraphServiceClient
 @inject MicrosoftIdentityConsentAndConditionalAccessHandler ConsentHandler
 @inject ISearchPostService SearchPostService;
@@ -10,6 +11,8 @@
 @inject ContextMenuService ContextMenuService
 @inject DialogService DialogService
 @inject IDeletePostService DeletePostService;
+@inject ITagService TagService;
+@inject IGetAllTagsService GetAllTagsService;
 <PageTitle>MHR Knowledge sharing platform - Profile</PageTitle>
 @if (user == null)
 {
@@ -17,7 +20,7 @@
 }
 else
 {
-     <RadzenCard Class="rz-my-12 rz-mx-auto" Style="max-width: 420px">
+    <RadzenCard Class="rz-my-12 rz-mx-auto" Style="max-width: 420px">
         <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" Class="rz-p-4">
             <RadzenImage Path="@UserPhotoPath" Style="width: 100px; height: 100px; border-radius: 50%;" />
             <RadzenStack Gap="0">
@@ -45,6 +48,40 @@ else
             </RadzenRow>
         </RadzenCard>
     </RadzenCard>
+    <h4>
+        Liked tags
+    </h4>
+    <div class="form-group">
+        <label for="tagSearchInput">Search for a tag:</label>
+        <div class="input-group">
+            <input type="text" class="form-control" id="tagSearchInput" @bind-value="@searchQuery" @bind-value:event="oninput" placeholder="Enter a tag name..." />
+            <div class="input-group-append">
+                <button type="button" class="btn btn-primary" @onclick="AddTag">Add</button>
+            </div>
+        </div>
+    </div>
+    @if (Tags.Any())
+    {
+        <div class="form-group">
+            <label>Selected tags:</label>
+            <ul class="list-group">
+                @foreach (var tag in Tags)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>@tag</span>
+                        <button type="button" class="btn btn-danger btn-sm" @onclick="() => RemoveTag(tag)">
+                            <RadzenIcon Icon="delete" />
+                        </button>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+    else
+    {
+        <p>No tags selected.</p>
+    }
+    
     <p>Right click on a table cell to open the context menu.</p>
     <RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
                     AllowSorting="true" Data="@Posts" TItem="SearchPostResultDto" ColumnWidth="200px"
@@ -61,6 +98,9 @@ else
 }
 
 @code {
+    
+    private List<string> Tags { get; set; } = new List<string>();
+    
     User user;
 
     int totalLikes = 0;
@@ -138,6 +178,24 @@ else
             }
             );
     }
+
+    private string searchQuery;
+
+    private async Task AddTag()
+    {
+        if (!string.IsNullOrWhiteSpace(searchQuery) && !Tags.Contains(searchQuery))
+        {
+            await TagService.CreateTagForPersonAsync(searchQuery);
+            Tags.Add(searchQuery);
+            searchQuery = string.Empty;
+        }
+    }
+
+    private async Task RemoveTag(string tag)
+    {
+        await TagService.DeleteTagForPersonAsync(searchQuery);
+        Tags.Remove(tag);
+    }
     
     protected override async Task OnInitializedAsync()
     {
@@ -145,6 +203,8 @@ else
         {
             user = await GraphServiceClient.Me.Request().GetAsync();
             Posts = await SearchPostService.GetPostsByCurrentPersonAsync();
+            IList<Tag> tags = (await GetAllTagsService.GetLikedTagsAsync()).ToList();
+            Tags = tags.Select(x => x.Value).ToList();
             totalLikes = Posts.Sum(x => x.Likes);
             if (user is not null)
             {

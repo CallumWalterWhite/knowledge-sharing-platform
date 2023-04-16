@@ -15,5 +15,11 @@ namespace KnowledgeShare.Core.Tags
         Task<IEnumerable<Tag>> GetAllTagsByValue(string value);
         
         Task<IEnumerable<Tag>> GetAllTagsByPostId(Guid postId);
+
+        Task AddPersonLikeTagRelationship(Guid personId, Tag tag);
+        
+        Task DeletePersonLikeTagRelationship(Guid personId, Tag tag);
+        
+        Task<IEnumerable<Tag>> GetTagsLikedByPersonId(Guid personId);
     }
 }
