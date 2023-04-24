@@ -11,14 +11,14 @@
                     <RadzenSidebarToggle Click="@SidebarToggleClick"></RadzenSidebarToggle>
                 </div>
                 <div class="col-3 d-flex align-items-center justify-content-start pr-0 pe-0">
-                    <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" AlignItems="AlignItems.Center">
+                    @*<RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" AlignItems="AlignItems.Center">
                         <div class="rz-text-align-center">
-                            @*<RadzenAutoComplete @bind-Value=@selected_post TextProperty="Title" Data=@posts onchange=@OnChange LoadData=@OnLoadData Style="width: 24rem; float: left; visibility: visible" />*@
+                            $1$<RadzenAutoComplete @bind-Value=@selected_post TextProperty="Title" Data=@posts onchange=@OnChange LoadData=@OnLoadData Style="width: 24rem; float: left; visibility: visible" />#1#
                             <RadzenDropDown AllowClear="true" @bind-Value=@selected_post
                                                 LoadData=@OnLoadData AllowFiltering="true"
                                                 Data=@posts TextProperty="Title" ValueProperty="Id" Change="@HandleSelection" Style="width: 24rem; float: left; visibility: visible" />
                         </div>
-                    </RadzenStack>
+                    </RadzenStack>*@
                 </div>
                 <div class="col-3 d-flex align-items-center justify-content-end pr-0 pe-0">
                     <LoginDisplay></LoginDisplay>

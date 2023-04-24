@@ -12,93 +12,136 @@
 
 @page "/discovery"
 
-<div class="filter">
-    <h2>Filter by Tag:</h2>
-    @foreach (var tag in Tags)
-    {
-        <label><input type="checkbox" checked="@selectedTags.Contains(tag)" @onchange="@(e => FilterByTag(tag, e))" />@tag.Value</label>
-    }
-</div>
 
-<div style="height: 100vh; overflow-y: scroll;margin-top: -50px;" class="scrollable-content" @onscroll="@OnScroll">
-    <div style="height: @contentHeight px;">
-        <div class="row justify-content-center">
-            @foreach (var postResult in filteredPosts)
+<div class="row">
+    <div class="col-md-3">
+        <h4 class="mb-4">Tags</h4>
+        <ul class="list-group">
+            @foreach (var tag in Tags)
             {
-                @switch (postResult.Type)
+                <label class="ch-container">@tag.Value
+                    <input type="checkbox" checked="@selectedTags.Any(x => x.Value == tag.Value)" @onchange="@(e => FilterByTag(tag, e))">
+                    <span class="checkmark"></span>
+                </label>
+            }
+        </ul>
+    </div>
+    <div class="col-md-9 scrollable-content" style="height: 100vh; overflow-y: scroll;margin-top: -50px;" @onscroll="@OnScroll">
+        <input type="text" class="form-control mb-3" placeholder="Search by title" @bind="searchTerm" @onkeyup="FilterBySearchTerm" />
+        <div class="card-deck">
+            @foreach (var post in PostsToShow)
+            {
+                @switch (post.Type)
                 {
                     case "ArticlePost":
-                        <ArticlePostSocialFeedDisplay SearchPostResultDto=@postResult/>
+                        <ArticlePostSocialFeedDisplay SearchPostResultDto=@post/>
                         break;
                     case "BookPost":
-                        <BookPostSocialFeedDisplay SearchPostResultDto=@postResult/>
+                        <BookPostSocialFeedDisplay SearchPostResultDto=@post/>
                         break;
                     case "FreeFormPost":
-                        <FreeFormSocialFeedDisplay Id=@postResult.Id/>
+                        <FreeFormSocialFeedDisplay Id=@post.Id/>
                         break;
-                            
+
                 }
             }
         </div>
     </div>
 </div>
-
 <style>
-    .filter {
-        margin-bottom: 20px;
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: flex-start;
-        align-items: center;
+    .btn-link {
+        color: #6c757d;
+        text-decoration: none;
     }
     
-    .filter h2 {
-        margin-right: 10px;
-        font-size: 20px;
+    .btn-link:hover {
+        text-decoration: underline;
     }
     
-    .filter label {
-        margin-right: 10px;
-        font-size: 16px;
+    .list-group-item {
+        border: 0;
     }
     
-    .posts {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        align-items: flex-start;
+    .list-group-item:hover {
+        background-color: #f8f9fa;
     }
     
-    .post {
-        width: 45%;
-        padding: 20px;
-        margin-bottom: 20px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
+    .form-control {
+        border-radius: 20px;
+        border: 0;
+        box-shadow: 0px 4px 20px rgba(0, 0, 0, 0.1);
+    }
+    /* Customize the label (the container) */
+    .ch-container {
+      display: block;
+      position: relative;
+      padding-left: 35px;
+      margin-bottom: 12px;
+      cursor: pointer;
+      font-size: 22px;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
     }
     
-    .post h2 {
-        font-size: 24px;
-        margin-bottom: 10px;
+    /* Hide the browser's default checkbox */
+    .ch-container input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
     }
     
-    .post .tags {
-        margin-bottom: 10px;
+    /* Create a custom checkbox */
+    .checkmark {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 25px;
+      width: 25px;
+      background-color: #eee;
     }
     
-    .post .tag {
-        display: inline-block;
-        padding: 5px 10px;
-        margin-right: 5px;
-        margin-bottom: 5px;
-        background-color: #f2f2f2;
-        border-radius: 5px;
-        font-size: 14px;
-        font-weight: bold;
+    /* On mouse-over, add a grey background color */
+    .ch-container:hover input ~ .checkmark {
+      background-color: #ccc;
+    }
+    
+    /* When the checkbox is checked, add a blue background */
+    .ch-container input:checked ~ .checkmark {
+      background-color: #2196F3;
+    }
+    
+    /* Create the checkmark/indicator (hidden when not checked) */
+    .checkmark:after {
+      content: "";
+      position: absolute;
+      display: none;
+    }
+    
+    /* Show the checkmark when checked */
+    .ch-container input:checked ~ .checkmark:after {
+      display: block;
+    }
+    
+    /* Style the checkmark/indicator */
+    .ch-container .checkmark:after {
+      left: 9px;
+      top: 5px;
+      width: 5px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 3px 3px 0;
+      -webkit-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+      transform: rotate(45deg);
     }
 </style>
 
 @code {
+    private string searchTerm;
     private IEnumerable<SearchPostResultDto> AllPosts = new List<SearchPostResultDto>();
     private List<SearchPostResultDto> filteredPosts = new List<SearchPostResultDto>();
     private List<SearchPostResultDto> PostsToShow = new List<SearchPostResultDto>();
@@ -107,9 +150,11 @@
     
     private void FilterByTag(Tag tag, ChangeEventArgs e)
     {
+        searchTerm = "";
         if ((bool)e.Value)
         {
-            selectedTags.Add(tag);
+            if (selectedTags.All(x => x.Value != tag.Value))
+                selectedTags.Add(tag);
         }
         else
         {
@@ -127,6 +172,34 @@
             PostsToShow = filteredPosts.Take(10).ToList();
         }
     }
+    
+    private void FilterBySearchTerm()
+    {
+        if (string.IsNullOrEmpty(searchTerm))
+        {
+            PostsToShow = filteredPosts.Take(10).ToList();
+        }
+        else
+        {
+            PostsToShow = filteredPosts.Where(p => p.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();   
+        }
+    }
+    
+    private void GoToPost(SearchPostResultDto searchPostResultDto)
+    {
+        switch (searchPostResultDto.Type)
+        {
+            case TypeConstant.ArticlePost:
+                NavigationManager.NavigateTo($"/articlepost/{searchPostResultDto.Id}");
+                break;
+            case TypeConstant.BookPost:
+                NavigationManager.NavigateTo($"/bookpost/{searchPostResultDto.Id}");
+                break;
+            case TypeConstant.FreeFormPost:
+                NavigationManager.NavigateTo($"/freeformpost/{searchPostResultDto.Id}");
+                break;
+        }
+    }
 
     private int contentHeight;
     
@@ -136,24 +209,35 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
-        {
-            await UpdateContentHeight();
-        }
     }
 
     protected override void OnInitialized()
     {
         Task t = Task.Run(async () =>
         {
+            IList<Tag> user_tags = (await GetAllTagsService.GetLikedTagsAsync()).ToList();
             AllPosts = await SearchPostService.RecommendAsync();
             Tags = await GetAllTagsService.GetAllAsync();
+            
+            foreach (Tag tag in Tags.Where(x => user_tags.Select(y => y.Value).Contains(x.Value)).ToList())
+            {
+                selectedTags.Add(tag);
+            }
         });
         Task.WaitAll(t);
         filteredPosts = AllPosts.ToList();
-        PostsToShow = filteredPosts.Take(10).ToList();
+        if (selectedTags.Any())
+        {
+            filteredPosts = AllPosts.Where(p => p.Tags.Any(t => selectedTags.Select(y => y.Value).Contains(t))).ToList();
+            PostsToShow = filteredPosts.Take(10).ToList();
+        }
+        else
+        {
+            filteredPosts = AllPosts.ToList();
+            PostsToShow = filteredPosts.Take(10).ToList();
+        }
     }
-
+    
     [JSInvokable]
     public async Task OnResize()
     {
@@ -183,7 +267,7 @@
                 isLoading = true;
                 page++;
                 var nextPage = (int)Math.Truncate(100 * ((double)PostsToShow.Count / 10) + page) / 100;
-                var newPosts = filteredPosts.Skip(nextPage * 10).Take(10).Where(x => PostsToShow.Contains(x) is false).ToList();
+                var newPosts = AllPosts.Skip(nextPage * 10).Take(10).Where(x => PostsToShow.Contains(x) is false).ToList();
                 PostsToShow.AddRange(newPosts);
                 isLoading = false;
                 await UpdateContentHeight();
@@ -191,7 +275,7 @@
         }
         catch (Exception ex)
         {
-            //IGNORE
+    //IGNORE
         }
     }
 }
