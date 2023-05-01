@@ -11,6 +11,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KnowledgeShare.Persistence"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnowledgeShare.Web", "KnowledgeShare.Web\KnowledgeShare.Web.csproj", "{D9479131-F046-4957-BD9D-B5945BB026CF}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B9F0354A-B63A-4DB3-A68C-B00C84AACD5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnowledgeShare.IntegrationTests", "Tests\KnowledgeShare.IntegrationTests\KnowledgeShare.IntegrationTests.csproj", "{F49CA796-FE37-4D1C-BFBD-2EB898E657A2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -29,6 +33,10 @@ Global
 		{D9479131-F046-4957-BD9D-B5945BB026CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D9479131-F046-4957-BD9D-B5945BB026CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D9479131-F046-4957-BD9D-B5945BB026CF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F49CA796-FE37-4D1C-BFBD-2EB898E657A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F49CA796-FE37-4D1C-BFBD-2EB898E657A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F49CA796-FE37-4D1C-BFBD-2EB898E657A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F49CA796-FE37-4D1C-BFBD-2EB898E657A2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -36,6 +44,7 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{459F4178-C90B-429D-A0ED-C22CCBF6B84D} = {EC3E7EA4-AD1A-4598-8268-E2478ED02BFC}
 		{9B1439B4-7C32-4CDD-89E6-911BB7F653DA} = {EC3E7EA4-AD1A-4598-8268-E2478ED02BFC}
+		{F49CA796-FE37-4D1C-BFBD-2EB898E657A2} = {B9F0354A-B63A-4DB3-A68C-B00C84AACD5B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {8D5A7034-9B82-4272-A7A2-CF6A4AB6A01A}
