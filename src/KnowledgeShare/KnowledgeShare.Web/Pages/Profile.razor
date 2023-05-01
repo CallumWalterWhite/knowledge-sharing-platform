@@ -193,7 +193,7 @@ else
 
     private async Task RemoveTag(string tag)
     {
-        await TagService.DeleteTagForPersonAsync(searchQuery);
+        await TagService.DeleteTagForPersonAsync(tag);
         Tags.Remove(tag);
     }
     

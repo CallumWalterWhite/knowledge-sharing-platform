@@ -50,7 +50,7 @@ namespace KnowledgeShare.Persistence.Tags
                 {"value", tagValue.ToLower() }
             };
             Tag? tag = null;
-            IResultCursor cursor = await _session.RunAsync("MATCH (tag:Tag WHERE tag.value = $value) RETURN tag.id, tag.value", statementParameters);
+            IResultCursor cursor = await _session.RunAsync("MATCH (tag:Tag WHERE toLower(tag.value) = toLower($value)) RETURN tag.id, tag.value", statementParameters);
             while (await cursor.FetchAsync())
             {
                 object? value = cursor.Current["tag.value"];
@@ -144,9 +144,8 @@ namespace KnowledgeShare.Persistence.Tags
 
             await _session.ExecuteWriteAsync(async tx =>
             {
-                string query = "MATCH (a:Person), (b:Tag) " +
-                               "WHERE a.id = $personId AND b.id = $tagId " +
-                               "DETACH (a)-[:LIKES]->(b)";
+                string query = "MATCH (a:Person { id: $personId})-[t:LIKES]->(m:Tag { id: $tagId}) " +
+                               "DELETE t";
                 await tx.RunAsync(query,
                     statementParameters);
             });
