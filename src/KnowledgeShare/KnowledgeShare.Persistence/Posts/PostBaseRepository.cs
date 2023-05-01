@@ -51,6 +51,26 @@ public class PostBaseRepository
         }
     }
     
+    public async Task RemoveTagsAsync(Post post)
+    {
+        foreach(Tag tag in post.Tags)
+        {
+            Dictionary<string, object?> statementParameters = new Dictionary<string, object?>
+            {
+                {"postId", post.Id.ToString() },
+                {"tagId", tag.Id.ToString() }
+            };
+
+            await _session.ExecuteWriteAsync(async tx =>
+            {
+                string query = "MATCH (a:Post { id: $postId })-[t:HAS_TAG]->()" +
+                               "DELETE t";
+                await tx.RunAsync(query,
+                    statementParameters);
+            });
+        }
+    }
+    
     public async Task DeleteAsync(Guid postId)
     {
         Dictionary<string, object> statementParameters = new Dictionary<string, object>

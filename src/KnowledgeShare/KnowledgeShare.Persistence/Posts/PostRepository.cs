@@ -15,6 +15,11 @@ public class PostRepository : PostBaseRepository, IPostRepository<Post>
         throw new NotImplementedException();
     }
 
+    public Task UpdateAsync(Post post)
+    {
+        throw new NotImplementedException();
+    }
+
     public new async Task DeleteAsync(Guid id)
     {
         await base.DeleteAsync(id);

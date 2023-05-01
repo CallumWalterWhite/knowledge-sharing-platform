@@ -5,6 +5,8 @@ public interface IPostRepository<T>
 {
     Task CreateAsync(T post);
     
+    Task UpdateAsync(T post);
+    
     Task DeleteAsync(Guid id);
     
     Task<IEnumerable<T>> GetAllAsync();

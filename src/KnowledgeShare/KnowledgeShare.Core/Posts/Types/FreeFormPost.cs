@@ -20,7 +20,7 @@ public class FreeFormPost : Post
         Body = body;
         Summary = summary;
     }
-    private string Body { get; }
+    private string Body { get; set; }
     
     private string Summary { get; set; }
     
@@ -39,5 +39,12 @@ public class FreeFormPost : Post
     public static FreeFormPost Create(Person person, string title, string body)
     {
         return new FreeFormPost(person, DateTime.Now, title, body);
+    }
+    
+    public void Change(string title, string body)
+    {
+        Title = title;
+        Body = body;
+        CreateSummary();
     }
 }

@@ -33,4 +33,11 @@ public class BookPost : Post
     {
         return new BookPost(person, DateTime.Now, title, author, summary);
     }
+
+    public void Change(string title, string author, string summary)
+    {
+        Title = title;
+        BookAuthor = author;
+        Summary = summary;
+    }
 }

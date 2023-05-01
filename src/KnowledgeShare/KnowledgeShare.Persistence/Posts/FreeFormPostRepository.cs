@@ -35,6 +35,28 @@ public class FreeFormPostRepository : PostBaseRepository, IPostRepository<FreeFo
         await AddTagsAsync(post);
         await AddAuthorAsync(post);
     }
+    
+    public async Task UpdateAsync(FreeFormPost post)
+    {
+        Dictionary<string, object> statementParameters = new Dictionary<string, object>
+        {
+            {"title", post.GetTitle() },
+            {"type", "FreeFormPost" },
+            {"summary", post.GetSummary() },
+            {"body", post.GetBody() },
+            {"createdDateTime", post.GetDateTimeCreated() },
+            {"id", post.Id.ToString() }
+        };
+        await _session.ExecuteWriteAsync(async tx =>
+        {
+            await tx.RunAsync("" +
+                              "MATCH (post:Post WHERE post.id = $id) " +
+                              "SET post += {title: $title, summary: $summary, body: $body, type: $type, createdDateTime: $createdDateTime}",
+                statementParameters);
+        });
+        await RemoveTagsAsync(post);
+        await AddTagsAsync(post);
+    }
 
     public new async Task DeleteAsync(Guid id)
     {

@@ -34,4 +34,11 @@ public class ArticlePost : Post
     {
         return new ArticlePost(person, DateTime.Now, title, link, summary);
     }
+
+    public void Change(string title, string link, string summary)
+    {
+        Title = title;
+        Link = link;
+        Summary = summary;
+    }
 }

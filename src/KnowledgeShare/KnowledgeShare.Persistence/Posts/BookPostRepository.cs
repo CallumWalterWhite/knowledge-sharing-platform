@@ -35,6 +35,28 @@ public class BookPostRepository : PostBaseRepository, IPostRepository<BookPost>
         await AddTagsAsync(post);
         await AddAuthorAsync(post);
     }
+    
+    public async Task UpdateAsync(BookPost post)
+    {
+        Dictionary<string, object> statementParameters = new Dictionary<string, object>
+        {
+            {"title", post.GetTitle() },
+            {"type", "BookPost" },
+            {"summary", post.GetSummary() },
+            {"author", post.GetBookAuthor() },
+            {"createdDateTime", post.GetDateTimeCreated() },
+            {"id", post.Id.ToString() }
+        };
+        await _session.ExecuteWriteAsync(async tx =>
+        {
+            await tx.RunAsync("" +
+                              "MATCH (post:Post WHERE post.id = $id) " +
+                              "SET post += {title: $title, summary: $summary, author: $author, type: $type, createdDateTime: $createdDateTime}",
+                statementParameters);
+        });
+        await RemoveTagsAsync(post);
+        await AddTagsAsync(post);
+    }
 
     public new async Task DeleteAsync(Guid id)
     {

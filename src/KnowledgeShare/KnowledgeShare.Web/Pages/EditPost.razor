@@ -1,0 +1,172 @@
+﻿@page "/edit-post/{posttype}/{Id:guid}"
+@using KnowledgeShare.Core.Posts
+@using Microsoft.AspNetCore.Components
+@using KnowledgeShare.Core.Tags
+@inject IChangePostService ChangePostService;
+@inject IGetAllTagsService GetAllTagsService;
+@inject NavigationManager NavigationManager;
+
+<h1>Edit Post</h1>
+
+<PageTitle>MHR Knowledge sharing platform - Edit post</PageTitle>
+<EditForm Model="@post" OnValidSubmit="@Create">
+    <ValidationSummary />
+    @if (post.Discriminator == PostTypeDiscriminator.Article)
+    {
+        <div class="form-group">
+            <label for="title">Title</label>
+            <InputText class="form-control" id="title" @bind-Value="@(post.Title)" />
+            <ValidationMessage For="@(() => (post).Title)" />
+        </div>
+
+        <div class="form-group">
+            <label for="link">Link</label>
+            <InputText class="form-control" id="link" @bind-Value="@(post.Link)" />
+            <ValidationMessage For="@(() => (post).Link)" />
+        </div>
+
+        <div class="form-group">
+            <label for="summary">Summary</label>
+            <RadzenTextArea class="form-control" id="summary" @bind-Value="@(post.Summary)" />
+            <ValidationMessage For="@(() => (post).Summary)" />
+        </div>
+    }
+
+    @if (post.Discriminator == PostTypeDiscriminator.Book)
+    {
+        <div class="form-group">
+            <label for="title">Title</label>
+            <InputText class="form-control" id="title" @bind-Value="@(post.Title)" />
+            <ValidationMessage For="@(() => (post).Title)" />
+        </div>
+        
+        <div class="form-group">
+            <label for="author">Author</label>
+            <InputText class="form-control" id="author" @bind-Value="@(post.Author)" />
+            <ValidationMessage For="@(() => (post).Author)" />
+        </div>
+        
+        <div class="form-group">
+            <label for="summary">Summary</label>
+            <RadzenTextArea class="form-control text-body" id="summary" @bind-Value="@(post.Summary)" />
+            <ValidationMessage For="@(() => (post).Summary)" />
+        </div>
+    }
+    
+
+    @if (post.Discriminator == PostTypeDiscriminator.Free)
+    {
+        <div class="form-group">
+            <label for="title">Title</label>
+            <InputText class="form-control" id="title" @bind-Value="@(post.Title)" />
+            <ValidationMessage For="@(() => (post).Title)" />
+        </div>
+        
+        <div class="form-group">
+            <label for="title">Body</label>
+            <RadzenHtmlEditor @bind-Value=@freeFormValue style="height: 500px;" UploadUrl="upload/image">
+            </RadzenHtmlEditor>
+        </div>
+    }
+    
+    <div class="form-group">
+        <label for="tagSearchInput">Search for a tag:</label>
+        <div class="input-group">
+            <input type="text" class="form-control" id="tagSearchInput" @bind-value="@searchQuery" @bind-value:event="oninput" placeholder="Enter a tag name..." />
+            <div class="input-group-append">
+                <button type="button" class="btn btn-primary" @onclick="AddTag">Add</button>
+            </div>
+        </div>
+    </div>
+    @if (Tags.Any())
+    {
+        <div class="form-group">
+            <label>Selected tags:</label>
+            <ul class="list-group">
+                @foreach (var tag in Tags)
+                {
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>@tag</span>
+                        <button type="button" class="btn btn-danger btn-sm" @onclick="() => RemoveTag(tag)">
+                            <RadzenIcon Icon="delete" />
+                        </button>
+                    </li>
+                }
+            </ul>
+        </div>
+    }
+    else
+    {
+        <p>No tags selected.</p>
+    }
+    
+
+    <button type="submit" class="btn btn-primary">Save Post</button>
+</EditForm>
+
+@code {
+    [Parameter]  
+    public Guid Id { get; set; }
+    
+    [Parameter]  
+    public string posttype { get; set; }
+    
+    string freeFormValue = @"";
+
+    bool creating = false;
+    
+    private ChangePostDto post = new ChangePostDto()
+    {
+        Discriminator = PostTypeDiscriminator.Article,
+        Tags = new List<string>()
+    };
+    private List<string> Tags { get; set; } = new List<string>();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        PostTypeDiscriminator postTypeDiscriminator = posttype == "a" ? PostTypeDiscriminator.Article : posttype == "b" ? PostTypeDiscriminator.Book : PostTypeDiscriminator.Free;
+        post = await ChangePostService.GetChangePostDto(Id, postTypeDiscriminator);
+        post.Discriminator = postTypeDiscriminator;
+        freeFormValue = post.Body;
+        Tags = post.Tags.ToList();
+    }
+
+    private async Task Create()
+    {
+        if (!creating)
+        {
+            creating = true;
+            post.Body = freeFormValue;
+            post.Tags = Tags;
+            await ChangePostService.ChangeAsync(post);
+            switch (post.Discriminator)
+            {
+                case PostTypeDiscriminator.Article:
+                    NavigationManager.NavigateTo($"/articlepost/{Id}");
+                    break;
+                case PostTypeDiscriminator.Book:
+                    NavigationManager.NavigateTo($"/bookpost/{Id}");
+                    break;
+                case PostTypeDiscriminator.Free:
+                    NavigationManager.NavigateTo($"/freeformpost/{Id}");
+                    break;
+            }
+        }
+    }
+    
+    private string searchQuery;
+
+    private async Task AddTag()
+    {
+        if (!string.IsNullOrWhiteSpace(searchQuery) && !Tags.Contains(searchQuery))
+        {
+            Tags.Add(searchQuery);
+            searchQuery = string.Empty;
+        }
+    }
+
+    private async Task RemoveTag(string tag)
+    {
+        Tags.Remove(tag);
+    }
+}

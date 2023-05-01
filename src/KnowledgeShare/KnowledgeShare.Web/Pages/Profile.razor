@@ -146,15 +146,15 @@ else
                            {
                                case TypeConstant.ArticlePost:
                                    ContextMenuService.Close();
-                                   NavigationManager.NavigateTo($"/articlepost/{resultDto.Id}");
+                                   NavigationManager.NavigateTo($"/edit-post/a/{resultDto.Id}");
                                    break;
                                case TypeConstant.BookPost:
                                    ContextMenuService.Close();
-                                   NavigationManager.NavigateTo($"/bookpost/{resultDto.Id}");
+                                   NavigationManager.NavigateTo($"/edit-post/b/{resultDto.Id}");
                                    break;
                                case TypeConstant.FreeFormPost:
                                    ContextMenuService.Close();
-                                   NavigationManager.NavigateTo($"/freeformpost/{resultDto.Id}");
+                                   NavigationManager.NavigateTo($"/edit-post/f/{resultDto.Id}");
                                    break;
                            }
                        }
