@@ -1,6 +1,6 @@
 ﻿@using KnowledgeShare.Core.Posts.Types
 @using KnowledgeShare.Core.Posts
-@inject IGetBookPostService GetBookPostService;
+@inject IGetArticlePostService GetArticlePostService;
 @inject NavigationManager NavigationManager;
 
 
@@ -9,7 +9,6 @@
     <div class="container">
         <h1 class="title">@SearchPostResultDto.Title</h1>
         <p class="summary">@SearchPostResultDto.Summary</p>
-
         <div class="row" style="margin-top: 20px;">
             @foreach (var tag in SearchPostResultDto.Tags)
             {
@@ -43,6 +42,7 @@
         border-radius: 5px;
         box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
         margin-bottom: 20px;
+        overflow: auto;
     }
 
     .title {
@@ -80,9 +80,9 @@
 @code {
     [Parameter]  
     public SearchPostResultDto SearchPostResultDto { get; set; }
-    
+
     private void GoToPost()
     {
-        NavigationManager.NavigateTo($"/bookpost/{SearchPostResultDto.Id}");
+        NavigationManager.NavigateTo($"/articlepost/{SearchPostResultDto.Id}");
     }
 }

@@ -5,5 +5,7 @@ namespace KnowledgeShare.Core.Authentication;
 
 public interface ICurrentAuthUser
 {
+    void SetCurrentAuthUser(Person person);
+    
     Task<Person?> GetPersonAsync();
 }

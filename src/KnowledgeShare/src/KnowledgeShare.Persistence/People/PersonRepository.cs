@@ -17,7 +17,7 @@ public class PersonRepository : IPersonRepository
 
     public async Task<Person?> GetPersonByUserIdAsync(string userId)
     {
-        string query = @"MATCH (p:Person WHERE p.userId = $userId) RETURN p{ id: p.id, userId: p.userId, name: p.name, picture: p.picture }";
+        string query = @"MATCH (p:Person WHERE p.userId = $userId) RETURN p{ id: p.id, userId: p.userId, name: p.name, picture: p.picture, isadmin: p.isadmin }";
 
         IDictionary<string, object> parameters = new Dictionary<string, object> { { "userId", userId } };
 
@@ -56,7 +56,7 @@ public class PersonRepository : IPersonRepository
     /// </summary>
     public async Task<Person?> GetAsync(Guid id)
     {
-        string query = @"MATCH (p:Person WHERE p.id = $id) RETURN p{ id: p.id, userId: p.userId, name: p.name, picture: p.picture }";
+        string query = @"MATCH (p:Person WHERE p.id = $id) RETURN p{ id: p.id, userId: p.userId, name: p.name, picture: p.picture, isadmin: p.isadmin }";
 
         IDictionary<string, object> parameters = new Dictionary<string, object> { { "id", id.ToString() } };
 
@@ -78,7 +78,8 @@ public class PersonRepository : IPersonRepository
             Guid.Parse(dict["id"].ToString()),
             dict["userId"].ToString(),
             dict["name"].ToString(),
-            dict["picture"].ToString()
+            dict["picture"].ToString(),
+                 bool.Parse(dict["isadmin"]?.ToString() ?? "false")
         );
     }
 }

@@ -37,6 +37,8 @@
     <ItemGroup>
       <ProjectReference Include="..\..\KnowledgeShare.Core\KnowledgeShare.Core.csproj" />
       <ProjectReference Include="..\..\KnowledgeShare.Persistence\KnowledgeShare.Persistence.csproj" />
+      <ProjectReference Include="..\..\src\KnowledgeShare.Core\KnowledgeShare.Core.csproj" />
+      <ProjectReference Include="..\..\src\KnowledgeShare.Persistence\KnowledgeShare.Persistence.csproj" />
     </ItemGroup>
 
 </Project>

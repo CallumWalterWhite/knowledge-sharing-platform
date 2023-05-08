@@ -1,10 +1,19 @@
 ﻿@page "/admin-posts"
 @using KnowledgeShare.Core.Posts
+@using KnowledgeShare.Core.Authentication
 @inject ISearchPostService SearchPostService;
 @inject NavigationManager NavigationManager;
 @inject ContextMenuService ContextMenuService
 @inject DialogService DialogService
 @inject IDeletePostService DeletePostService;
+@inject ICurrentAuthUser CurrentAuthUser;
+@{
+    if (!CurrentAuthUser.GetPersonAsync().GetAwaiter().GetResult()!.IsAdmin)
+    {
+        NavigationManager.NavigateTo("/");
+    }
+}
+
 <PageTitle>MHR Knowledge sharing platform - Admin</PageTitle>
 <div style="display: flex; align-items: center; margin-bottom: 16px">
     <RadzenButton Click="@ClearSelection" Text="Clear Selection" />

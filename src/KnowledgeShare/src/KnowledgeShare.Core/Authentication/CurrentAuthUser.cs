@@ -21,6 +21,12 @@ public class CurrentAuthUser : ICurrentAuthUser
         _personService = personService;
     }
     
+    public void SetCurrentAuthUser(Person person)
+    {
+        _person = person;
+        _isPersonCreated = true;
+    }
+
     public async Task<Person?> GetPersonAsync()
     {
         if (_isPersonCreated) return _person;

@@ -1,0 +1,309 @@
+﻿@page "/articlepost/{Id:guid}"
+@using KnowledgeShare.Core.Posts.Types
+@using KnowledgeShare.Core.Social
+@using KnowledgeShare.Core.Authentication
+@using KnowledgeShare.Core.People
+@using KnowledgeShare.Core
+@inject IGetArticlePostService GetArticlePostService;
+@inject ICreateLikeRelationshipService CreateLikeRelationshipService;
+@inject ICurrentAuthUser CurrentAuthUser;
+@inject ICreatePostCommentService CreatePostCommentService;
+@inject IGetPostCommentService GetPostCommentService;
+
+@if (ArticlePost is not null)
+{
+    <PageTitle>MHR Knowledge sharing platform - @ArticlePost.Title</PageTitle>
+    <div class="container">
+        <h1 class="title">@ArticlePost.Title</h1>
+        <p class="summary">@ArticlePost.GetSummary()</p>
+        <LinkPreview Link="@ArticlePost.GetLink()" />
+
+        <div class="row" style="margin-top: 20px;">
+            @foreach (var tag in ArticlePost.Tags)
+            {
+                <RadzenBadge Text=@tag.Value Style="max-width: 90px; margin-right: 5px;"></RadzenBadge>
+            }
+        </div>
+        <div class="info">
+            <p class="author">Created by: @ArticlePost.GetAuthor().Name</p>
+            <p class="date">Created on: @ArticlePost.GetDateTimeCreated().ToShortDateString()</p>
+        </div>
+
+        <div class="actions">
+            <button disabled="@hasLiked" class="like-button" @onclick="Like"><i class="fas fa-heart"></i> Like</button>
+            <p class="likes">Likes: @likeCount</p>
+        </div>
+    </div>
+    
+    <div class="container justify-content-center mt-5 border-left border-right">
+        <div class="d-flex justify-content-center pt-3 pb-2">
+            <form class="reply-form" id="comment-2-reply-form">
+                <InputText type="text" @bind-Value="PostComment" name="text" placeholder="+ Add a Comment" class="form-control addtxt" />
+                <RadzenButton Click="() => HandleSubmit()" Text="Submit"></RadzenButton>
+            </form>
+        </div>
+          @if (comments.Count == 0)
+          {
+                <p>No comments yet.</p>
+          }
+          else
+          {
+              @foreach (var comment in comments)
+              {
+                  <div class="comment-thread">
+                      <details open class="comment" id="comment-1">
+                          <a href="#comment-1" class="comment-border-link">
+                              <span class="sr-only">Jump to comment-1</span>
+                          </a>
+                          <summary>
+                              <div class="comment-heading">
+                                  <div class="comment-info">
+                                      <a href="#" class="comment-author">@comment.personName</a>
+                                      <p class="m-0">
+                                          @DateHelper.GetCommentDate(comment.dateTimeCreated)
+                                      </p>
+                                  </div>
+                              </div>
+                          </summary>
+                  
+                          <div class="comment-body">
+                              <p>
+                                  @comment.comment
+                              </p>
+                          </div>
+                  
+                      </details>
+                      <!-- Comment 1 end -->
+                  </div>
+              }
+          }
+    </div>
+}
+
+
+<style>
+    .addtxt{
+    	padding-top: 10px;
+    	padding-bottom: 10px;
+    	text-align: center;
+    	font-size: 13px;
+    	width: 350px;
+    	background-color: #e5e8ed;
+    	font-weight: 500;
+    }
+    
+    .comment-thread {
+        width: 700px;
+        max-width: 100%;
+        margin: auto;
+        padding: 0 30px;
+        background-color: #fff;
+        border: 1px solid transparent; /* Removes margin collapse */
+    }
+    .m-0 {
+        margin: 0;
+    }
+    .sr-only {
+        position: absolute;
+        left: -10000px;
+        top: auto;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+    }
+    
+    /* Comment */
+    
+    .comment {
+        position: relative;
+        margin: 20px auto;
+    }
+    .comment-heading {
+        display: flex;
+        align-items: center;
+        height: 50px;
+        font-size: 14px;
+    }
+    .comment-voting {
+        width: 20px;
+        height: 32px;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+    }
+    .comment-voting button {
+        display: block;
+        width: 100%;
+        height: 50%;
+        padding: 0;
+        border: 0;
+        font-size: 10px;
+    }
+    .comment-info {
+        color: rgba(0, 0, 0, 0.5);
+        margin-left: 10px;
+    }
+    .comment-author {
+        color: rgba(0, 0, 0, 0.85);
+        font-weight: bold;
+        text-decoration: none;
+    }
+    .comment-author:hover {
+        text-decoration: underline;
+    }
+    .replies {
+        margin-left: 20px;
+    }
+    
+    /* Adjustments for the comment border links */
+    
+    .comment-border-link {
+        display: block;
+        position: absolute;
+        top: 50px;
+        left: 0;
+        width: 12px;
+        height: calc(100% - 50px);
+        border-left: 4px solid transparent;
+        border-right: 4px solid transparent;
+        background-color: rgba(0, 0, 0, 0.1);
+        background-clip: padding-box;
+    }
+    .comment-border-link:hover {
+        background-color: rgba(0, 0, 0, 0.3);
+    }
+    .comment-body {
+        padding: 0 20px;
+        padding-left: 28px;
+    }
+    .replies {
+        margin-left: 28px;
+    }
+    
+    /* Adjustments for toggleable comments */
+    
+    details.comment summary {
+        position: relative;
+        list-style: none;
+        cursor: pointer;
+    }
+    details.comment:not([open]) .comment-heading {
+        border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    }
+    .comment-heading::after {
+        display: inline-block;
+        position: absolute;
+        right: 5px;
+        align-self: center;
+        font-size: 12px;
+        color: rgba(0, 0, 0, 0.55);
+    }
+
+    .container {
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .title {
+        font-size: 32px;
+        font-weight: bold;
+        margin: 0 0 10px;
+    }
+
+    .summary {
+        font-size: 18px;
+        line-height: 1.5;
+        margin: 0 0 20px;
+    }
+
+    .info {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 0 0 20px;
+    }
+
+    .author {
+        font-size: 14px;
+        color: #888;
+        margin: 0;
+    }
+
+    .date {
+        font-size: 14px;
+        color: #888;
+        margin: 0;
+    }
+
+    .actions {
+        display: flex;
+        align-items: center;
+    }
+
+    .like-button {
+        display: flex;
+        align-items: center;
+        font-size: 16px;
+        color: #06c;
+        background-color: transparent;
+        border: none;
+        cursor: pointer;
+        margin: 0;
+        padding: 0;
+    }
+
+    .like-button:hover {
+        text-decoration: underline;
+    }
+
+    .likes {
+        font-size: 14px;
+        color: #888;
+        margin: 0 0 0 10px;
+    }
+</style>
+
+@code {
+    [Parameter]  
+    public Guid Id { get; set; }
+
+    public ArticlePost? ArticlePost = null;
+
+    public List<PostCommentDto> comments = new List<PostCommentDto>();
+
+    private Person CurrentPerson;
+    
+    private string PostComment = string.Empty;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        ArticlePost = await GetArticlePostService.GetArticlePostAsync(Id);
+        comments = (await GetPostCommentService.GetPostCommentsAsync(Id)).ToList();
+        IList<Guid> peopleLiked = ArticlePost.PeopleLiked.ToList();
+        CurrentPerson = (await CurrentAuthUser.GetPersonAsync())!;
+        likeCount = peopleLiked.Count;
+        hasLiked = peopleLiked.Contains(CurrentPerson.Id);
+    }
+    
+    protected override async Task OnParametersSetAsync()
+    {
+        await OnInitializedAsync();
+    }
+    
+    private int likeCount = 0;
+
+    private bool hasLiked = false;
+
+    private async Task Like()
+    {
+        await CreateLikeRelationshipService.CreateLike(ArticlePost!.Id);
+        hasLiked = true;
+        likeCount++;
+    }
+    
+    private async Task HandleSubmit()
+    {
+        await CreatePostCommentService.CreatePostCommentAsync(PostComment, Id);
+        comments.Insert(0, new PostCommentDto(CurrentPerson.Name, CurrentPerson.Picture, PostComment, DateTime.Now));
+        PostComment = string.Empty;
+    }
+}

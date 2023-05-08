@@ -5,11 +5,11 @@ VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{EC3E7EA4-AD1A-4598-8268-E2478ED02BFC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KnowledgeShare.Core", "KnowledgeShare.Core\KnowledgeShare.Core.csproj", "{459F4178-C90B-429D-A0ED-C22CCBF6B84D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KnowledgeShare.Core", "src\KnowledgeShare.Core\KnowledgeShare.Core.csproj", "{459F4178-C90B-429D-A0ED-C22CCBF6B84D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KnowledgeShare.Persistence", "KnowledgeShare.Persistence\KnowledgeShare.Persistence.csproj", "{9B1439B4-7C32-4CDD-89E6-911BB7F653DA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "KnowledgeShare.Persistence", "src\KnowledgeShare.Persistence\KnowledgeShare.Persistence.csproj", "{9B1439B4-7C32-4CDD-89E6-911BB7F653DA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnowledgeShare.Web", "KnowledgeShare.Web\KnowledgeShare.Web.csproj", "{D9479131-F046-4957-BD9D-B5945BB026CF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KnowledgeShare.Web", "src\KnowledgeShare.Web\KnowledgeShare.Web.csproj", "{D9479131-F046-4957-BD9D-B5945BB026CF}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B9F0354A-B63A-4DB3-A68C-B00C84AACD5B}"
 EndProject
