@@ -4,7 +4,7 @@ EXPOSE 80
 EXPOSE 443
 
 # Copy everything
-COPY . ./src
+COPY . ./
 # Restore as distinct layers
 RUN dotnet restore
 # Build and publish a release
