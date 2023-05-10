@@ -26,9 +26,9 @@
             }
         </ul>
     </div>
-    <div class="col-md-9 scrollable-content" style="height: 100vh; overflow-y: scroll;margin-top: -50px;" @onscroll="@OnScroll">
-        <input type="text" class="form-control mb-3" placeholder="Search by title" @bind="searchTerm" @onkeyup="FilterBySearchTerm" />
-        <div class="card-deck">
+    <div class="col-md-9 scrollable-content" style="height: 100vh; overflow-y: scroll;" @onscroll="@OnScroll">
+        <input type="text" class="form-control mb-3 nm mt-3" placeholder="Search by title" @bind="searchTerm" @onkeyup="FilterBySearchTerm" />
+        <div class="card-deck" style="padding-bottom: 200px;">
             @foreach (var post in PostsToShow)
             {
                 @switch (post.Type)

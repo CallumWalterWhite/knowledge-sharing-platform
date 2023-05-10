@@ -9,7 +9,7 @@
 @inject NavigationManager NavigationManager;
 
 
-<div style="height: 100vh; overflow-y: scroll;margin-top: -50px;" class="scrollable-content" @onscroll="@OnScroll">
+<div style="height: 100vh; overflow-y: scroll;" class="scrollable-content" @onscroll="@OnScroll">
     <div style="height: @contentHeight px;">
             <div class="row justify-content-center">
                 @foreach (var postResult in PostsToShow)

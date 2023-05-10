@@ -83,7 +83,7 @@ else
     }
     
     <p>Right click on a table cell to open the context menu.</p>
-    <RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="4"
+    <RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
                     AllowSorting="true" Data="@Posts" TItem="SearchPostResultDto" ColumnWidth="200px"
                     SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedPosts CellContextMenu="@OnCellContextMenu">
         <Columns>
