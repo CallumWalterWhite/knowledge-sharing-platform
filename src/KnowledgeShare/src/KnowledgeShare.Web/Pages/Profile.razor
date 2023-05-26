@@ -4,6 +4,9 @@
 @using Microsoft.Graph
 @using KnowledgeShare.Core.Posts
 @using KnowledgeShare.Core.Tags
+@using KnowledgeShare.Core.People
+@using KnowledgeShare.Core.Authentication
+@using Person = KnowledgeShare.Core.People.Person
 @inject GraphServiceClient GraphServiceClient
 @inject MicrosoftIdentityConsentAndConditionalAccessHandler ConsentHandler
 @inject ISearchPostService SearchPostService;
@@ -13,6 +16,7 @@
 @inject IDeletePostService DeletePostService;
 @inject ITagService TagService;
 @inject IGetAllTagsService GetAllTagsService;
+@inject ICurrentAuthUser CurrentAuthUser;
 <PageTitle>MHR Knowledge sharing platform - Profile</PageTitle>
 @if (user == null)
 {
@@ -201,26 +205,13 @@ else
     {
         try
         {
+            Person? person = await CurrentAuthUser.GetPersonAsync();
             user = await GraphServiceClient.Me.Request().GetAsync();
             Posts = await SearchPostService.GetPostsByCurrentPersonAsync();
             IList<Tag> tags = (await GetAllTagsService.GetLikedTagsAsync()).ToList();
             Tags = tags.Select(x => x.Value).ToList();
             totalLikes = Posts.Sum(x => x.Likes);
-            if (user is not null)
-            {
-                Stream photoStream = await GraphServiceClient.Me.Photo.Content.Request().GetAsync();
-                byte[] buffer = new byte[16*1024];
-                using (MemoryStream ms = new MemoryStream())
-                {
-                    int read;
-                    while ((read = await photoStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
-                    {
-                        ms.Write(buffer, 0, read);
-                    }
-                    byte[] data = ms.ToArray();
-                    UserPhotoPath = $"data:image/jpeg;base64,{Convert.ToBase64String(data)}";
-                }
-            }
+            UserPhotoPath = person.Picture;
         }
         catch (Exception ex)
         {

@@ -7,9 +7,18 @@ public class SearchPostResultDto
     public string? Title { get; set; }
     
     public string? Summary { get; set; }
+
+    public string? CreatedDate
+    {
+        get => _createdDate?.Substring(0, 10);
+        set
+        {
+            _createdDate = value;
+        }
+    }
     
-    public string? CreatedDate { get; set; }
-    
+    private string? _createdDate { get; set; }
+
     public string? UserCreatedName { get; set; }
     
     public IList<string>? Tags { get; set; }

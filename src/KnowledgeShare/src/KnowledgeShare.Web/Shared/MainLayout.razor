@@ -53,44 +53,9 @@
     bool sidebar4Expanded = false;
     Guid? selected_post;
 
-    IEnumerable<SearchPostResultDto> posts;
-
-    IEnumerable<SearchPostResultDto> contextPosts = new List<SearchPostResultDto>();
-
-    async void OnLoadData(LoadDataArgs args)
-    {
-        Task t = Task.Run(async () =>
-        {
-            contextPosts = await SearchPostService.SearchAsync(args.Filter.ToLower());
-            posts = contextPosts.DistinctBy(x => x.Id);
-        });
-        Task.WaitAll(t);
-        await InvokeAsync(StateHasChanged);
-    }
-    
     protected override async Task OnParametersSetAsync()
     {
         await InvokeAsync(StateHasChanged);
-    }
-
-    async Task HandleSelection()
-    {
-        if (selected_post is not null)
-        {
-            SearchPostResultDto selectPost = contextPosts.First(x => x.Id == selected_post);
-            switch (selectPost.Type)
-            {
-                case "ArticlePost":
-                    NavigationManager.NavigateTo($"/articlepost/{selectPost.Id}");
-                    break;
-                case "BookPost":
-                    NavigationManager.NavigateTo($"/bookpost/{selectPost.Id}");
-                    break;
-                case "FreeFormPost":
-                    NavigationManager.NavigateTo($"/freeformpost/{selectPost.Id}");
-                    break;
-            }   
-        }
     }
     
     private bool sidebarExpanded = true;

@@ -1,0 +1,83 @@
+﻿@using KnowledgeShare.Core.Posts.Types
+@using KnowledgeShare.Core.Posts
+@inject IGetFreeFormPostService GetFreeFormPostService;
+@inject NavigationManager NavigationManager;
+
+
+@if (SearchPostResultDto is not null)
+{
+    <div class="container">
+        <h1 class="title">@SearchPostResultDto.Title</h1>
+        <div style="max-height: 300px; overflow-y: clip;">@((MarkupString)@SearchPostResultDto.GetSummary())</div>
+
+        <div class="row" style="margin-top: 20px;">
+            @foreach (var tag in SearchPostResultDto.Tags)
+            {
+                <RadzenBadge Text=@tag Style="max-width: 90px; margin-right: 5px;"></RadzenBadge>
+            }
+        </div>
+        <div class="info">
+            <p class="author">Created by: @SearchPostResultDto.UserCreatedName</p>
+            <p class="date">Created on: @SearchPostResultDto.CreatedDate</p>
+        </div>
+
+        <RadzenRow Gap="0.5rem" RowGap="0.5rem">
+            <RadzenColumn Size="6" class="rz-justify-content-left rz-p-5">
+                <RadzenButton ButtonStyle="ButtonStyle.Primary">
+                        Likes
+                    <RadzenBadge Variant="Variant.Outlined" disabled="True" BadgeStyle="BadgeStyle.Light" Text="@SearchPostResultDto.Likes.ToString()" class="rz-ml-2"/>
+                </RadzenButton>
+            </RadzenColumn>
+            <RadzenColumn Size="6" class="rz-justify-content-right rz-p-5">
+                <RadzenButton Click="() => GoToPost()" Style="width: 72px; height: 26px; float: right;" Text="View"></RadzenButton>
+            </RadzenColumn>
+        </RadzenRow>
+    </div>
+}
+
+<style>
+    .container {
+        max-width: 800px;
+        padding: 20px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        margin-bottom: 20px;
+        overflow: auto;
+    }
+
+    .title {
+        font-size: 32px;
+        font-weight: bold;
+        margin: 0 0 10px;
+    }
+
+    .info {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 0 0 20px;
+    }
+
+    .author {
+        font-size: 14px;
+        color: #888;
+        margin: 0;
+    }
+
+    .date {
+        font-size: 14px;
+        color: #888;
+        margin: 0;
+    }
+</style>
+
+@code {
+    [Parameter]  
+    public SearchPostResultDto SearchPostResultDto { get; set; }
+    
+    private void GoToPost()
+    {
+        NavigationManager.NavigateTo($"/freeformpost/{SearchPostResultDto.Id}");
+    }
+}

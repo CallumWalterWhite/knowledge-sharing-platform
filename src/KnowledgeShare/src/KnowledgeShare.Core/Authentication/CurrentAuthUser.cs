@@ -33,7 +33,7 @@ public class CurrentAuthUser : ICurrentAuthUser
         Person? person = await _personService.GetPersonByUserIdAsync(_userName);
         if (person == null)
         {
-            User user = _graphServiceClient.Me.Request().GetAsync().ConfigureAwait(true).GetAwaiter().GetResult();
+            User user = await _graphServiceClient.Me.Request().GetAsync();
             if (user is not null)
             {
                 Stream photoStream = await _graphServiceClient.Me.Photo.Content.Request().GetAsync();

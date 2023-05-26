@@ -1,6 +1,6 @@
 ﻿function drawGraph(data) {
+    document.getElementById("graph").innerHTML = "";
     var svg = d3.select("#graph");
-    
     var width = svg.attr("width");
     var height = svg.attr("height");
 
@@ -69,6 +69,28 @@
             console.log(d);
             console.log("clicked", d.id);
         });
+            
+        var firstsearch = true;
+        function search(){
+            var txtName = d3.select("#txtName").node().value;
+            if (txtName.length > 0) {
+                node.style("fill", function(d) {
+                    if (!isStringLike(txtName, d.id)) {
+                        return "white";
+                    }
+                })
+            }
+        }
+        d3.select("#tryit").on("click", function() {
+            if (!firstsearch){
+                drawGraph(data);
+                setTimeout(search, 1000);
+            }
+            else{
+                search();
+                firstsearch = false;
+            }
+        })
         
         function load_post(url){
             if (!window["loading_page"]){
@@ -106,8 +128,7 @@
 
         }
     }
-
-
+    
     function dragstarted(d) {
         if (!d3.event.active) simulation.alphaTarget(0.3).restart();
         d.fx = d.x;
@@ -129,4 +150,15 @@
     }
 
     createGraph(false, JSON.parse(data));
+}
+
+function isStringLike(str, pattern) {
+    // Escape special characters in the pattern
+    const escapedPattern = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+    // Convert pattern to regular expression
+    const regex = new RegExp(`^${escapedPattern.replace(/%/g, '.*').replace(/_/g, '.')}$`, 'i');
+
+    // Test if the string matches the pattern
+    return regex.test(str);
 }
