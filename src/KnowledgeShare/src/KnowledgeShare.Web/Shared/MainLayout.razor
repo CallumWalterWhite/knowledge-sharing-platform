@@ -30,7 +30,9 @@
         <div class="container-fluid pt-2 pt-md-3 pt-lg-4 pt-xl-5 pb-2 pb-lg-5" style="max-width: 1440px;background: transparent;">
             <div class="row">
                 <div class="col">
-                    @Body
+                    <ErrorBoundary>
+                        @Body
+                    </ErrorBoundary>
                 </div>
             </div>
         </div>

@@ -32,7 +32,7 @@ public class CreatePostService : ICreatePostService
     
     public async Task<Guid> Create(CreatePostDto createPostDto)
     {
-        createPostDto.Tags = createPostDto.Tags.Select(x => x.ToLower());
+        createPostDto.Tags = createPostDto.Tags.Select(x => x.ToLower()).ToList();
         Post post = await _postFactory.Create(createPostDto);
         post.Tags = await CreateTags(createPostDto.Tags);
         if (post is ArticlePost articlePost)
@@ -69,5 +69,16 @@ public class CreatePostService : ICreatePostService
         }
 
         return tagEntities;
+    }
+
+    private IEnumerable<string> TagValidator(IEnumerable<string> tags)
+    {
+        List<string> vtags = new List<string>();
+        foreach (string tag in tags)
+        {
+            vtags.Add(tag.ToLower());
+        }
+
+        return vtags;
     }
 }

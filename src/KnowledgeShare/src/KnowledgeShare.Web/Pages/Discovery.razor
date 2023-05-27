@@ -18,7 +18,7 @@
     <div class="col-md-3">
         <h4 class="mb-4">Tags</h4>
         <input type="text" class="form-control mb-3 nm mt-3" placeholder="Search for tag" @bind="tagSearchTerm" @onkeyup="FilterTagsBySearchTerm"/>
-        <ul class="list-group overflow-scroll" style="max-height: 300px;">
+        <ul class="list-group overflow-scroll" style="max-height: 500px;">
             @foreach (var tag in Tags)
             {
                 <label class="ch-container">@tag.Value

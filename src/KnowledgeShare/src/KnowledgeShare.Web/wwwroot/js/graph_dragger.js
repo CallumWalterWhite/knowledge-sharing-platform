@@ -154,11 +154,6 @@
 
 function isStringLike(str, pattern) {
     // Escape special characters in the pattern
-    const escapedPattern = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
-    // Convert pattern to regular expression
-    const regex = new RegExp(`^${escapedPattern.replace(/%/g, '.*').replace(/_/g, '.')}$`, 'i');
-
-    // Test if the string matches the pattern
-    return regex.test(str);
+    const escapedPattern = pattern.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    return escapedPattern.includes(str.toLowerCase());
 }

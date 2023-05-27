@@ -1,6 +1,7 @@
 ﻿using KnowledgeShare.Core.Authentication;
 using KnowledgeShare.Core.People;
 using KnowledgeShare.Core.Posts.Types;
+using KnowledgeShare.Core.Posts.Validator;
 
 namespace KnowledgeShare.Core.Posts;
 
@@ -21,6 +22,7 @@ public class PostFactory : IPostFactory
             //TODO: Raise exception
             throw new ArgumentException();
         }
+        CreatePostDtoValidator.Validate(createPostDto);
         switch (createPostDto.Discriminator)
         {
             case PostTypeDiscriminator.Article:

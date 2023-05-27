@@ -2,6 +2,7 @@
 @using KnowledgeShare.Core.Posts
 @using Microsoft.AspNetCore.Components
 @using KnowledgeShare.Core.Tags
+@using MissingFieldException = System.MissingFieldException
 @inject ICreatePostService CreatePostService;
 @inject IGetAllTagsService GetAllTagsService;
 @inject NavigationManager NavigationManager;
@@ -9,7 +10,8 @@
 <h1>Create Post</h1>
 
 <PageTitle>MHR Knowledge sharing platform - Create post</PageTitle>
-<EditForm Model="@post" OnValidSubmit="@Create">
+<EditForm Model="@post" OnValidSubmit="@Create" >
+    <DataAnnotationsValidator />
     <ValidationSummary />
 
     <div class="form-group">
@@ -88,12 +90,12 @@
             </div>
         </div>
     </div>
-    @if (Tags.Any())
+    @if (post.Tags.Any())
     {
         <div class="form-group">
             <label>Selected tags:</label>
             <ul class="list-group">
-                @foreach (var tag in Tags)
+                @foreach (var tag in post.Tags)
                 {
                     <li class="list-group-item d-flex justify-content-between align-items-center">
                         <span>@tag</span>
@@ -124,7 +126,6 @@
         Discriminator = PostTypeDiscriminator.Article,
         Tags = new List<string>()
     };
-    private List<string> Tags { get; set; } = new List<string>();
 
     private async Task Create()
     {
@@ -132,7 +133,6 @@
         {
             creating = true;
             post.Body = freeFormValue;
-            post.Tags = Tags;
             Guid id = await CreatePostService.Create(post);
             switch (post.Discriminator)
             {
@@ -153,15 +153,15 @@
 
     private async Task AddTag()
     {
-        if (!string.IsNullOrWhiteSpace(searchQuery) && !Tags.Contains(searchQuery))
+        if (!string.IsNullOrWhiteSpace(searchQuery) && !post.Tags.Contains(searchQuery))
         {
-            Tags.Add(searchQuery);
+            post.Tags.Add(searchQuery);
             searchQuery = string.Empty;
         }
     }
 
     private async Task RemoveTag(string tag)
     {
-        Tags.Remove(tag);
+        post.Tags.Remove(tag);
     }
 }
