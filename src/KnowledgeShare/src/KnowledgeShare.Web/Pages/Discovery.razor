@@ -14,9 +14,11 @@
 
 
 <div class="row">
+    <input type="text" class="form-control mb-3 nm mt-3" placeholder="Search by title" @bind="searchTerm" @onkeyup="FilterBySearchTerm" />
     <div class="col-md-3">
         <h4 class="mb-4">Tags</h4>
-        <ul class="list-group">
+        <input type="text" class="form-control mb-3 nm mt-3" placeholder="Search for tag" @bind="tagSearchTerm" @onkeyup="FilterTagsBySearchTerm"/>
+        <ul class="list-group overflow-scroll" style="max-height: 300px;">
             @foreach (var tag in Tags)
             {
                 <label class="ch-container">@tag.Value
@@ -27,7 +29,6 @@
         </ul>
     </div>
     <div class="col-md-9 scrollable-content" style="height: 100vh; overflow-y: scroll;" @onscroll="@OnScroll">
-        <input type="text" class="form-control mb-3 nm mt-3" placeholder="Search by title" @bind="searchTerm" @onkeyup="FilterBySearchTerm" />
         <div class="card-deck" style="padding-bottom: 200px;">
             @foreach (var post in PostsToShow)
             {
@@ -125,11 +126,13 @@
 
 @code {
     private string searchTerm;
+    private string tagSearchTerm;
     private IEnumerable<SearchPostResultDto> AllPosts = new List<SearchPostResultDto>();
-    private List<SearchPostResultDto> filteredPosts = new List<SearchPostResultDto>();
-    private List<SearchPostResultDto> PostsToShow = new List<SearchPostResultDto>();
+    private List<SearchPostResultDto> filteredPosts = new();
+    private List<SearchPostResultDto> PostsToShow = new();
     private IEnumerable<Tag> Tags = new List<Tag>();
-    private List<Tag> selectedTags = new List<Tag>();
+    private IEnumerable<Tag> AllTags = new List<Tag>();
+    private List<Tag> selectedTags = new();
     
     private void FilterByTag(Tag tag, ChangeEventArgs e)
     {
@@ -168,6 +171,19 @@
         }
     }
     
+    private void FilterTagsBySearchTerm()
+    {
+        if (string.IsNullOrEmpty(tagSearchTerm))
+        {
+            Tags = AllTags.Take(10).ToList();
+        }
+        else
+        {
+            Tags = AllTags.Where(p => p.Value.Contains(tagSearchTerm, StringComparison.OrdinalIgnoreCase)).ToList();   
+        }
+    }
+    
+    
     private void GoToPost(SearchPostResultDto searchPostResultDto)
     {
         switch (searchPostResultDto.Type)
@@ -200,9 +216,10 @@
         {
             IList<Tag> user_tags = (await GetAllTagsService.GetLikedTagsAsync()).ToList();
             AllPosts = await SearchPostService.RecommendAsync();
-            Tags = await GetAllTagsService.GetAllAsync();
+            AllTags = await GetAllTagsService.GetAllAsync();
+            Tags = AllTags;
             
-            foreach (Tag tag in Tags.Where(x => user_tags.Select(y => y.Value).Contains(x.Value)).ToList())
+            foreach (Tag tag in AllTags.Where(x => user_tags.Select(y => y.Value).Contains(x.Value)).ToList())
             {
                 selectedTags.Add(tag);
             }
@@ -250,7 +267,11 @@
                 isLoading = true;
                 page++;
                 var nextPage = (int)Math.Truncate(100 * ((double)PostsToShow.Count / 10) + page) / 100;
-                var newPosts = AllPosts.Skip(nextPage * 10).Take(10).Where(x => PostsToShow.Contains(x) is false).ToList();
+                var newPosts = filteredPosts.Skip(nextPage * 10).Take(10).Where(x => PostsToShow.Contains(x) is false).ToList();
+                if (!string.IsNullOrEmpty(searchTerm))
+                {
+                    newPosts = newPosts.Where(p => p.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();   
+                }
                 PostsToShow.AddRange(newPosts);
                 isLoading = false;
                 await UpdateContentHeight();

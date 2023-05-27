@@ -15,15 +15,6 @@
 }
 
 <PageTitle>MHR Knowledge sharing platform - Admin</PageTitle>
-<div style="display: flex; align-items: center; margin-bottom: 16px">
-    <RadzenButton Click="@ClearSelection" Text="Clear Selection" />
-    @if (selectedPosts?.Any() == true)
-    {
-        <div style="margin-left: 16px">
-            Selected Employee: @selectedPosts[0].Title @selectedPosts[0].UserCreatedName
-        </div>
-    }
-</div>
 <p>Right click on a table cell to open the context menu.</p>
 <RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
                 AllowSorting="true" Data="@AllPosts" TItem="SearchPostResultDto" ColumnWidth="200px"
