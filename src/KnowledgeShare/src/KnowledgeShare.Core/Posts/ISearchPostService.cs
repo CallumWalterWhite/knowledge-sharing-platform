@@ -4,7 +4,7 @@ namespace KnowledgeShare.Core.Posts;
 
 public interface ISearchPostService
 {
-    Task<IEnumerable<SearchPostResultDto>> SearchAsync(string search);
+    Task<IEnumerable<SearchPostResultDto>> SearchAsync(SearchPostDto searchPostDto);
     
     Task<IEnumerable<SearchPostResultDto>> RecommendAsync();
     

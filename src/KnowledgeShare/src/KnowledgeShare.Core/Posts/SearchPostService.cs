@@ -26,8 +26,12 @@ public class SearchPostService : ISearchPostService
         _likeRepository = likeRepository;
     }
 
-    public async Task<IEnumerable<SearchPostResultDto>> SearchAsync(string search)
-        => await _searchPostQuery.SearchAsync(search);
+    public async Task<IEnumerable<SearchPostResultDto>> SearchAsync(SearchPostDto searchPostDto)
+    {
+        searchPostDto.Tags = searchPostDto.Tags.Select(x => x.ToLower()).ToList();
+        IList<SearchPostResultDto> searchPostResultDtos = (await _searchPostQuery.SearchAsync(searchPostDto)).ToList();
+        return await Hydrate(searchPostResultDtos);
+    }
 
     public async Task<IEnumerable<SearchPostResultDto>> RecommendAsync()
     {

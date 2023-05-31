@@ -2,7 +2,7 @@
 
 public interface ISearchPostQuery
 {
-       Task<IEnumerable<SearchPostResultDto>> SearchAsync(string searchQuery);
+       Task<IEnumerable<SearchPostResultDto>> SearchAsync(SearchPostDto searchPostDto);
        
        Task<IEnumerable<SearchPostResultDto>> RecommendAsync(Guid personId);
 

@@ -12,18 +12,22 @@ public class SearchPostQuery : ISearchPostQuery
         _session = session;
     }
 
-    public async Task<IEnumerable<SearchPostResultDto>> SearchAsync(string searchQuery)
+    public async Task<IEnumerable<SearchPostResultDto>> SearchAsync(SearchPostDto searchPostDto)
     {
         List<SearchPostResultDto> results = new List<SearchPostResultDto>();
         Dictionary<string, object> statementParameters = new Dictionary<string, object>
         {
-            {"searchTerm", searchQuery },
+            {"searchTerm", searchPostDto.Title },
+            {"tags", searchPostDto.Tags.ToArray() },
+            {"skip", searchPostDto.Skip },
         };
         IResultCursor cursor = await _session.RunAsync(
             "MATCH (n) WHERE (n:Post)" +
             "MATCH (n)-[r:HAS_TAG]->(t)" +
-            "WHERE toLower(n.title) CONTAINS toLower($searchTerm) OR toLower(t.value) CONTAINS toLower($searchTerm)" +
-            "RETURN n.id, n.summary, n.title, n.type", statementParameters);
+            "WHERE toLower(n.title) CONTAINS toLower($searchTerm) OR toLower(t.value) IN $tags" +
+            "RETURN n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name " +
+            "ORDER BY n.createdDateTime DESC " +
+            "SKIP $skip", statementParameters);
         while (await cursor.FetchAsync())
         {
             if (cursor.Current is not null)
@@ -34,6 +38,8 @@ public class SearchPostQuery : ISearchPostQuery
                         Id = Guid.Parse(cursor.Current["n.id"].ToString()),
                         Title = cursor.Current["n.title"].ToString(),
                         Summary = cursor.Current["n.summary"].ToString(),
+                        CreatedDate = cursor.Current["n.createdDateTime"].ToString(),
+                        UserCreatedName = cursor.Current["person.name"].ToString(),
                         Type = cursor.Current["n.type"].ToString()
                     }
                 );
