@@ -21,30 +21,67 @@ public class SearchPostQuery : ISearchPostQuery
             {"tags", searchPostDto.Tags.ToArray() },
             {"skip", searchPostDto.Skip },
         };
-        IResultCursor cursor = await _session.RunAsync(
-            "MATCH (n) WHERE (n:Post)" +
-            "MATCH (n)-[r:HAS_TAG]->(t)" +
-            "WHERE toLower(n.title) CONTAINS toLower($searchTerm) OR toLower(t.value) IN $tags" +
-            "RETURN n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name " +
-            "ORDER BY n.createdDateTime DESC " +
-            "SKIP $skip", statementParameters);
-        while (await cursor.FetchAsync())
+        string query = "MATCH (n) WHERE (n:Post) " +
+                       "MATCH (n)-[w:WROTE]-(person) " + 
+                       "MATCH (n)-[r:HAS_TAG]->(t) " +
+                       "RETURN n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name " +
+                       "ORDER BY n.createdDateTime DESC " +
+                       "SKIP $skip " +
+                       "LIMIT 10";
+        if (searchPostDto.Tags.Any() && string.IsNullOrWhiteSpace(searchPostDto.Title))
         {
-            if (cursor.Current is not null)
-            {
-                results.Add(
-                    new SearchPostResultDto()
-                    {
-                        Id = Guid.Parse(cursor.Current["n.id"].ToString()),
-                        Title = cursor.Current["n.title"].ToString(),
-                        Summary = cursor.Current["n.summary"].ToString(),
-                        CreatedDate = cursor.Current["n.createdDateTime"].ToString(),
-                        UserCreatedName = cursor.Current["person.name"].ToString(),
-                        Type = cursor.Current["n.type"].ToString()
-                    }
-                );
-            }
+            query = "MATCH (n) WHERE (n:Post)" +
+                    "MATCH (n)-[w:WROTE]-(person) " + 
+                    "MATCH (n)-[r:HAS_TAG]->(t)" +
+                    "WHERE toLower(t.value) IN $tags " +
+                    "RETURN n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name " +
+                    "ORDER BY n.createdDateTime DESC " +
+                    "SKIP $skip " +
+                    "LIMIT 10";
         }
+        else if (searchPostDto.Tags.Any() is false && string.IsNullOrWhiteSpace(searchPostDto.Title) is false)
+        {
+            query = "MATCH (n) WHERE (n:Post)" +
+                    "MATCH (n)-[w:WROTE]-(person) " + 
+                    "MATCH (n)-[r:HAS_TAG]->(t)" +
+                    "WHERE toLower(n.title) CONTAINS toLower($searchTerm) " +
+                    "RETURN n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name " +
+                    "ORDER BY n.createdDateTime DESC " +
+                    "SKIP $skip " +
+                    "LIMIT 10";
+        }
+        else if (searchPostDto.Tags.Any() || string.IsNullOrWhiteSpace(searchPostDto.Title) is false)
+        {
+            query = "MATCH (n) WHERE (n:Post)" +
+                    "MATCH (n)-[w:WROTE]-(person) " + 
+                    "MATCH (n)-[r:HAS_TAG]->(t)" +
+                    "WHERE toLower(n.title) CONTAINS toLower($searchTerm) AND toLower(t.value) IN $tags " +
+                    "RETURN n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name " +
+                    "ORDER BY n.createdDateTime DESC " +
+                    "SKIP $skip " +
+                    "LIMIT 10";
+        }
+        await _session.ExecuteReadAsync(async tx =>
+        {
+            IResultCursor cursor = await tx.RunAsync(query, statementParameters);
+            while (await cursor.FetchAsync())
+            {
+                if (cursor.Current is not null)
+                {
+                    results.Add(
+                        new SearchPostResultDto()
+                        {
+                            Id = Guid.Parse(cursor.Current["n.id"].ToString()),
+                            Title = cursor.Current["n.title"].ToString(),
+                            Summary = cursor.Current["n.summary"].ToString(),
+                            CreatedDate = cursor.Current["n.createdDateTime"].ToString(),
+                            UserCreatedName = cursor.Current["person.name"].ToString(),
+                            Type = cursor.Current["n.type"].ToString()
+                        }
+                    );
+                }
+            } 
+        });
 
         return results;
     }

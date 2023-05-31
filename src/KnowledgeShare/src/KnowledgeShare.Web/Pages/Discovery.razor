@@ -30,7 +30,7 @@
     </div>
     <div class="col-md-9 scrollable-content" style="height: 100vh; overflow-y: scroll;" @onscroll="@OnScroll">
         <div class="card-deck" style="padding-bottom: 200px;">
-            @foreach (var post in PostsToShow)
+            @foreach (var post in Posts)
             {
                 @switch (post.Type)
                 {
@@ -127,14 +127,13 @@
 @code {
     private string searchTerm;
     private string tagSearchTerm;
-    private IEnumerable<SearchPostResultDto> AllPosts = new List<SearchPostResultDto>();
-    private List<SearchPostResultDto> filteredPosts = new();
-    private List<SearchPostResultDto> PostsToShow = new();
+    private List<SearchPostResultDto> Posts = new List<SearchPostResultDto>();
     private IEnumerable<Tag> Tags = new List<Tag>();
     private IEnumerable<Tag> AllTags = new List<Tag>();
     private List<Tag> selectedTags = new();
+    private SearchPostDto _searchPostDto;
     
-    private void FilterByTag(Tag tag, ChangeEventArgs e)
+    private async Task FilterByTag(Tag tag, ChangeEventArgs e)
     {
         searchTerm = "";
         if ((bool)e.Value)
@@ -146,28 +145,20 @@
         {
             selectedTags.Remove(tag);
         }
-        
-        if (selectedTags.Any())
-        {
-            filteredPosts = AllPosts.Where(p => p.Tags.Any(t => selectedTags.Select(y => y.Value).Contains(t))).ToList();
-            PostsToShow = filteredPosts.Take(10).ToList();
-        }
-        else
-        {
-            filteredPosts = AllPosts.ToList();
-            PostsToShow = filteredPosts.Take(10).ToList();
-        }
+        _searchPostDto.Tags = selectedTags.Select(x => x.Value);
+        page = 1;
+        await LoadPosts();
     }
-    
-    private void FilterBySearchTerm()
+
+    private async Task FilterBySearchTerm(KeyboardEventArgs e)
     {
-        if (string.IsNullOrEmpty(searchTerm))
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
         {
-            PostsToShow = filteredPosts.Take(10).ToList();
-        }
-        else
-        {
-            PostsToShow = filteredPosts.Where(p => p.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();   
+            if (_searchPostDto.Title != searchTerm)
+            {
+                page = 1;
+                await LoadPosts();   
+            }
         }
     }
     
@@ -175,7 +166,7 @@
     {
         if (string.IsNullOrEmpty(tagSearchTerm))
         {
-            Tags = AllTags.Take(10).ToList();
+            Tags = AllTags.ToList();
         }
         else
         {
@@ -205,6 +196,7 @@
     int pageSize = 10; // number of items to load per page
     int page = 1; // current page
     bool isLoading = false; // flag to prevent multiple requests
+    bool initalizing = false;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -212,10 +204,16 @@
 
     protected override void OnInitialized()
     {
+        initalizing = true;
+        _searchPostDto = new SearchPostDto()
+        {
+            Tags = new List<string>(),
+            Title = string.Empty,
+            Skip = 0
+        };
         Task t = Task.Run(async () =>
         {
             IList<Tag> user_tags = (await GetAllTagsService.GetLikedTagsAsync()).ToList();
-            AllPosts = await SearchPostService.RecommendAsync();
             AllTags = await GetAllTagsService.GetAllAsync();
             Tags = AllTags;
             
@@ -223,19 +221,11 @@
             {
                 selectedTags.Add(tag);
             }
+            _searchPostDto.Tags = selectedTags.Select(x => x.Value);
+            await LoadPosts();
+            initalizing = false;
         });
         Task.WaitAll(t);
-        filteredPosts = AllPosts.ToList();
-        if (selectedTags.Any())
-        {
-            filteredPosts = AllPosts.Where(p => p.Tags.Any(t => selectedTags.Select(y => y.Value).Contains(t))).ToList();
-            PostsToShow = filteredPosts.Take(10).ToList();
-        }
-        else
-        {
-            filteredPosts = AllPosts.ToList();
-            PostsToShow = filteredPosts.Take(10).ToList();
-        }
     }
     
     [JSInvokable]
@@ -266,14 +256,13 @@
             {
                 isLoading = true;
                 page++;
-                var nextPage = (int)Math.Truncate(100 * ((double)PostsToShow.Count / 10) + page) / 100;
-                var newPosts = filteredPosts.Skip(nextPage * 10).Take(10).Where(x => PostsToShow.Contains(x) is false).ToList();
-                if (!string.IsNullOrEmpty(searchTerm))
+                if (isLoading && initalizing == false)
                 {
-                    newPosts = newPosts.Where(p => p.Title.Contains(searchTerm, StringComparison.OrdinalIgnoreCase)).ToList();   
+                    _searchPostDto.Title = searchTerm;
+                    _searchPostDto.Skip = (page - 1) * 10;
+                    Posts.AddRange((await SearchPostService.SearchAsync(_searchPostDto)).ToList());
                 }
-                PostsToShow.AddRange(newPosts);
-                isLoading = false;
+                isLoading = false;  
                 await UpdateContentHeight();
             }
         }
@@ -281,5 +270,17 @@
         {
     //IGNORE
         }
+    }
+
+    private async Task LoadPosts()
+    {
+        isLoading = true;
+        if (isLoading)
+        {
+            _searchPostDto.Title = searchTerm;
+            _searchPostDto.Skip = (page - 1) * 10;
+            Posts = (await SearchPostService.SearchAsync(_searchPostDto)).ToList();
+        }
+        isLoading = false;
     }
 }
