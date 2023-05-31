@@ -14,7 +14,7 @@ public class CreatePostDto
     [RequiredIf(nameof(Discriminator), PostTypeDiscriminator.Article)]
     public string Link { get; set; }
     
-    [Required]
+    [RequiredIf(nameof(Discriminator), PostTypeDiscriminator.Article)]
     public string Summary { get; set; }
     
     [RequiredIf(nameof(Discriminator), PostTypeDiscriminator.Free)]

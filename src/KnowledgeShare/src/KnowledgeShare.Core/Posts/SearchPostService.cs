@@ -75,7 +75,9 @@ public class SearchPostService : ISearchPostService
         {
             if (searchPostResultDto.Summary!.Length > MaxCharacterLength)
             {
-                searchPostResultDto.Summary = searchPostResultDto.Summary.Substring(0, MaxCharacterLength) + "...";   
+                searchPostResultDto.Summary = searchPostResultDto.Type == TypeConstant.FreeFormPost
+                    ? searchPostResultDto.Summary 
+                    : searchPostResultDto.Summary.Substring(0, MaxCharacterLength) + "...";   
             }
             IEnumerable<Tag> tags = await _tagRepository.GetAllTagsByPostId(searchPostResultDto.Id);
             searchPostResultDto.Tags = tags.Select(x => x.Value).ToList();

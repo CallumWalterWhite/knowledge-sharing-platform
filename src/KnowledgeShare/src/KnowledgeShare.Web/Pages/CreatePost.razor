@@ -76,7 +76,7 @@
         
         <div class="form-group">
             <label for="title">Body</label>
-            <RadzenHtmlEditor @bind-Value=@freeFormValue style="height: 500px;" UploadUrl="upload/image">
+            <RadzenHtmlEditor @bind-Value=@post.Body style="height: 500px;" UploadUrl="upload/image">
             </RadzenHtmlEditor>
         </div>
     }
@@ -117,8 +117,6 @@
 </EditForm>
 
 @code {
-    string freeFormValue = @"";
-
     bool creating = false;
     
     private CreatePostDto post = new CreatePostDto()
@@ -132,7 +130,6 @@
         if (!creating)
         {
             creating = true;
-            post.Body = freeFormValue;
             Guid id = await CreatePostService.Create(post);
             switch (post.Discriminator)
             {
