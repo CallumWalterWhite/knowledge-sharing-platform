@@ -24,7 +24,7 @@ public class SearchPostQuery : ISearchPostQuery
         string query = "MATCH (n) WHERE (n:Post) " +
                        "MATCH (n)-[w:WROTE]-(person) " + 
                        "MATCH (n)-[r:HAS_TAG]->(t) " +
-                       "RETURN n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name " +
+                       "RETURN distinct n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name " +
                        "ORDER BY n.createdDateTime DESC " +
                        "SKIP $skip " +
                        "LIMIT 10";
@@ -34,7 +34,7 @@ public class SearchPostQuery : ISearchPostQuery
                     "MATCH (n)-[w:WROTE]-(person) " + 
                     "MATCH (n)-[r:HAS_TAG]->(t)" +
                     "WHERE toLower(t.value) IN $tags " +
-                    "RETURN n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name " +
+                    "RETURN distinct n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name " +
                     "ORDER BY n.createdDateTime DESC " +
                     "SKIP $skip " +
                     "LIMIT 10";
@@ -44,8 +44,8 @@ public class SearchPostQuery : ISearchPostQuery
             query = "MATCH (n) WHERE (n:Post)" +
                     "MATCH (n)-[w:WROTE]-(person) " + 
                     "MATCH (n)-[r:HAS_TAG]->(t)" +
-                    "WHERE toLower(n.title) CONTAINS toLower($searchTerm) " +
-                    "RETURN n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name " +
+                    "WHERE toLower(n.title) CONTAINS toLower($searchTerm) OR toLower(n.summary) CONTAINS toLower($searchTerm) " +
+                    "RETURN distinct n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name " +
                     "ORDER BY n.createdDateTime DESC " +
                     "SKIP $skip " +
                     "LIMIT 10";
@@ -55,8 +55,8 @@ public class SearchPostQuery : ISearchPostQuery
             query = "MATCH (n) WHERE (n:Post)" +
                     "MATCH (n)-[w:WROTE]-(person) " + 
                     "MATCH (n)-[r:HAS_TAG]->(t)" +
-                    "WHERE toLower(n.title) CONTAINS toLower($searchTerm) AND toLower(t.value) IN $tags " +
-                    "RETURN n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name " +
+                    "WHERE (toLower(n.title) CONTAINS toLower($searchTerm) OR toLower(n.summary) CONTAINS toLower($searchTerm)) AND toLower(t.value) IN $tags " +
+                    "RETURN distinct n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name " +
                     "ORDER BY n.createdDateTime DESC " +
                     "SKIP $skip " +
                     "LIMIT 10";
