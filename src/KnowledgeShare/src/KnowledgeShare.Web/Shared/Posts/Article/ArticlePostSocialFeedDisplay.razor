@@ -15,22 +15,20 @@
                 <RadzenBadge Text=@tag Style="margin-left: 10px;width: auto;"></RadzenBadge>
             }
         </div>
-        <div class="info">
-            <p class="author">Created by: @SearchPostResultDto.UserCreatedName</p>
-            <p class="date">Created on: @SearchPostResultDto.CreatedDate</p>
-        </div>
 
         <RadzenRow Gap="0.5rem" RowGap="0.5rem">
             <RadzenColumn Size="6" class="rz-justify-content-left rz-p-5">
-                <RadzenButton ButtonStyle="ButtonStyle.Primary">
-                        Likes
-                    <RadzenBadge Variant="Variant.Outlined" disabled="True" BadgeStyle="BadgeStyle.Light" Text="@SearchPostResultDto.Likes.ToString()" class="rz-ml-2"/>
-                </RadzenButton>
+                <RadzenBadge Text=@LikeLabel Style="margin-left: 10px;width: auto;"></RadzenBadge>
             </RadzenColumn>
             <RadzenColumn Size="6" class="rz-justify-content-right rz-p-5">
                 <RadzenButton Click="() => GoToPost()" Style="width: 72px; height: 26px; float: right;" Text="View"></RadzenButton>
             </RadzenColumn>
         </RadzenRow>
+        
+        <div class="info">
+            <p class="author">Created by: @SearchPostResultDto.UserCreatedName</p>
+            <p class="date">Created on: @SearchPostResultDto.CreatedDate</p>
+        </div>
     </div>
 }
 
@@ -80,6 +78,8 @@
 @code {
     [Parameter]  
     public SearchPostResultDto SearchPostResultDto { get; set; }
+
+    private string LikeLabel => $"Likes {SearchPostResultDto.Likes}";
 
     private void GoToPost()
     {
