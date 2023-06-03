@@ -4,7 +4,7 @@
 @using KnowledgeShare.Core.Social
 @inject ICreateLikeRelationshipService CreateLikeRelationshipService;
 <div class="actions">
-    <p class="likes"><RadzenIcon disabled="@hasLiked" class="like-button" @onclick="Like" Icon="favorite" /> @likeCount</p>
+    <p class="likes"><span>@likeCount</span> <RadzenIcon disabled="@hasLiked" Style="@LikeColour" class="like-button" @onclick="Like" Icon="favorite" /></p>
 </div>
 
 <style>
@@ -50,6 +50,8 @@
     protected override async Task OnInitializedAsync()
     {
     }
+
+    private string LikeColour => hasLiked ? "color: red" : "color: blue";
     
     private async Task Like()
     {

@@ -8,7 +8,7 @@
 <div class="container border-left border-right">
     <div class="d-flex pt-3 pb-2">
         <form class="reply-form" id="comment-2-reply-form">
-            <InputTextArea type="text" @bind-Value="PostComment" name="text" placeholder="Add a Comment" class="form-control addtxt" />
+            <InputTextArea type="text" @bind-Value="PostComment" name="text" placeholder="Add a Comment" class="addtxt" />
             <RadzenButton class="subtxt" Click="() => HandleSubmit()" Text="Comment"></RadzenButton>
         </form>
     </div>
@@ -53,23 +53,32 @@
 <style>
       .addtxt{
         	padding-top: 10px;
-        	padding-bottom: 10px;
+        	border: 0px;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 0px;
         	font-size: 13px;
         	width: 600px;
         	font-weight: 500;
         	resize: none;
+        }
+        
+        .addtxt:focus{
+            outline: none;
         	border: 0px;
+            border-bottom: 1px solid black;
         }
         
         .subtxt{
             float: right;
-            margin-top: 5px;
+            padding: 3px 5px 2px 5px;
+            text-transform: capitalize;
+            font-size: 14px;
+            margin-top: 0px;
         }
         
         .comment-thread {
             width: 700px;
             max-width: 100%;
-            padding: 0 30px;
             background-color: #fff;
             border: 1px solid transparent; /* Removes margin collapse */
         }
@@ -89,7 +98,6 @@
         
         .comment {
             position: relative;
-            margin: 20px auto;
         }
         .comment-heading {
             display: flex;

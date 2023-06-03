@@ -1,0 +1,97 @@
+﻿@using System.Linq
+@using KnowledgeShare.Core.Posts
+@using KnowledgeShare.Core.Tags
+@using KnowledgeShare.Web.Shared.Posts.Article
+@using KnowledgeShare.Web.Shared.Posts.Book
+@using KnowledgeShare.Web.Shared.Posts.FreeForm
+@inject ISearchPostService SearchPostService;
+@inject IJSRuntime JSRuntime;
+@inject NavigationManager NavigationManager;
+@inject IGetAllTagsService GetAllTagsService;
+
+<div class="card-deck" style="padding-bottom: 200px;">
+    @foreach (var post in Posts)
+    {
+        @switch (post.Type)
+        {
+            case "ArticlePost":
+                <ArticlePostSocialFeedDisplay SearchPostResultDto=@post/>
+                break;
+            case "BookPost":
+                <BookPostSocialFeedDisplay SearchPostResultDto=@post/>
+                break;
+            case "FreeFormPost":
+                <FreeFormSocialFeedDisplayV2 SearchPostResultDto=@post/>
+                break;
+
+        }
+    }
+</div>
+
+<style>
+    /* Hide the browser's default checkbox */
+    .card-deck > .ch-container input {
+      position: absolute;
+      opacity: 0;
+      cursor: pointer;
+      height: 0;
+      width: 0;
+    }
+    
+    /* On mouse-over, add a grey background color */
+    .card-deck > .ch-container:hover input ~ .checkmark {
+      background-color: #ccc;
+    }
+    
+    /* When the checkbox is checked, add a blue background */
+    .card-deck > .ch-container input:checked ~ .checkmark {
+      background-color: #2196F3;
+    }
+    
+    /* Create the checkmark/indicator (hidden when not checked) */
+    .card-deck > .checkmark:after {
+      content: "";
+      position: absolute;
+      display: none;
+    }
+    
+    /* Show the checkmark when checked */
+    .card-deck > .ch-container input:checked ~ .checkmark:after {
+      display: block;
+    }
+    
+    /* Style the checkmark/indicator */
+    .card-deck > .ch-container .checkmark:after {
+      left: 9px;
+      top: 5px;
+      width: 5px;
+      height: 10px;
+      border: solid white;
+      border-width: 0 3px 3px 0;
+      -webkit-transform: rotate(45deg);
+      -ms-transform: rotate(45deg);
+      transform: rotate(45deg);
+    }
+</style>
+
+
+@code {
+    [Parameter]  
+    public IEnumerable<Tag> Tags { get; set; }
+    
+    private List<SearchPostResultDto> Posts = new List<SearchPostResultDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        SearchPostDto searchPostDto = new SearchPostDto()
+        {
+            Tags = new []
+            {
+                Tags.First().Value
+            },
+            Title = string.Empty,
+            Skip = 0
+        };
+        Posts = (await SearchPostService.SearchAsync(searchPostDto)).ToList();
+    }
+}

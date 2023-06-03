@@ -67,8 +67,8 @@ public sealed class RequiredIfAttribute : ValidationAttribute
     /// </summary>
     /// <param name="otherProperty">The other property.</param>
     /// <param name="otherPropertyValue">The other property value.</param>
-    public RequiredIfAttribute(string otherProperty, object otherPropertyValue)
-        : base("'{0}' is required because '{1}' has a value {3}'{2}'.")
+    public RequiredIfAttribute(string otherProperty, object otherPropertyValue, string? message = null)
+        : base(message ?? "'{0}' is required because '{1}' has a value {3}'{2}'.")
     {
         this.OtherProperty = otherProperty;
         this.OtherPropertyValue = otherPropertyValue;

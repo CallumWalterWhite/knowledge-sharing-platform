@@ -1,0 +1,38 @@
+﻿@using KnowledgeShare.Core.People
+
+<div class="info">
+    <RadzenImage Path="@Author.Picture" Style="width: 50px; height: 50px; border-radius: 50%;" />
+    <p class="author">By @Author.Name</p><br/>
+    <p class="date">on @DateTimeCreated.ToShortDateString()</p>
+</div>
+
+<style>
+    .info {
+        display: inline-flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 0 0 10px;
+    }
+
+    .author {
+        font-size: 14px;
+        color: #888;
+        margin-top: 5px;
+        margin-left: 5px;
+    }
+
+    .date {
+        font-size: 14px;
+        color: #888;
+        margin-top: 3px;
+        margin-left: 5px;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public Person Author { get; set; }
+    
+    [Parameter]
+    public DateTime DateTimeCreated { get; set; }
+}

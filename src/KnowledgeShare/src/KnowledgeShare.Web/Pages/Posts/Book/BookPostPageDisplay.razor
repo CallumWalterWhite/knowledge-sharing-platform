@@ -23,12 +23,14 @@
                 <RadzenBadge Text=@tag.Value Style="margin-right: 5px; width: auto;"></RadzenBadge>
             }
         </div>
-        <div class="info">
-            <p class="author">Created by: @BookPost.GetAuthor().Name</p>
-            <p class="date">Created on: @BookPost.GetDateTimeCreated().ToShortDateString()</p>
+        <div class="row" style="margin-top: 50px;">
+            <div class="col-11">
+                <AuthorInfoComponent Author="@BookPost.GetAuthor()" DateTimeCreated="@BookPost.GetDateTimeCreated()" ></AuthorInfoComponent>
+            </div>
+            <div class="col-1">
+                <LikeComponent id="@Id" hasLiked="@hasLiked" likeCount="@likeCount"/>
+            </div>
         </div>
-
-        <LikeComponent id="@Id" hasLiked="@hasLiked" likeCount="@likeCount" />
     </div>
     
     <CommentComponent Id="@Id" />
@@ -51,25 +53,6 @@
         font-size: 18px;
         line-height: 1.5;
         margin: 0 0 20px;
-    }
-
-    .info {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin: 0 0 20px;
-    }
-
-    .author {
-        font-size: 14px;
-        color: #888;
-        margin: 0;
-    }
-
-    .date {
-        font-size: 14px;
-        color: #888;
-        margin: 0;
     }
 </style>
 

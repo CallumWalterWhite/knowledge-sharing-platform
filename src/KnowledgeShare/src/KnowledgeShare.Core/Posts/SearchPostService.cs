@@ -66,17 +66,17 @@ public class SearchPostService : ISearchPostService
         }
         
         IList<SearchPostResultDto> searchPostResultDtos = (await _searchPostQuery.GetPostsAsync(person.Id)).ToList();
-        return await Hydrate(searchPostResultDtos);
+        return await Hydrate(searchPostResultDtos, true);
     }
 
-    private async Task<IList<SearchPostResultDto>> Hydrate(IList<SearchPostResultDto> searchPostResultDtos)
+    private async Task<IList<SearchPostResultDto>> Hydrate(IList<SearchPostResultDto> searchPostResultDtos, bool ignoreForm = false)
     {
         foreach (SearchPostResultDto searchPostResultDto in searchPostResultDtos)
         {
             if (searchPostResultDto.Summary!.Length > MaxCharacterLength)
             {
                 searchPostResultDto.Summary = searchPostResultDto.Type == TypeConstant.FreeFormPost
-                    ? searchPostResultDto.Summary 
+                    ? ignoreForm is false ? searchPostResultDto.Summary : "Can not render HTML"
                     : searchPostResultDto.Summary.Substring(0, MaxCharacterLength) + "...";   
             }
             IEnumerable<Tag> tags = await _tagRepository.GetAllTagsByPostId(searchPostResultDto.Id);

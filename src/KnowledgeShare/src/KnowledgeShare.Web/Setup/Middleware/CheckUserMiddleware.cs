@@ -25,7 +25,7 @@ public class CheckUserMiddleware
         var identity = context.User.Identity;
         if (identity != null && identity.IsAuthenticated)
         {
-            string userName = context.User.Identity!.Name!;
+            string userName = context.User.FindFirst(ClaimTypes.NameIdentifier).Value!;
             Person? person = await personService.GetPersonByUserIdAsync(userName);
             if (person == null)
             {

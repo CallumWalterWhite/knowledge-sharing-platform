@@ -24,81 +24,87 @@
 }
 else
 {
-    <RadzenCard Class="rz-my-12 rz-mx-auto" Style="max-width: 420px">
-        <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" Class="rz-p-4">
-            <RadzenImage Path="@UserPhotoPath" Style="width: 100px; height: 100px; border-radius: 50%;" />
-            <RadzenStack Gap="0">
-                <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Employee</RadzenText>
-                <RadzenText TextStyle="TextStyle.Body1"><b>@(user.DisplayName)</b></RadzenText>
-                <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">Department</RadzenText>
-                <RadzenText TextStyle="TextStyle.Body1"><b>@user.Department</b></RadzenText>
-                <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">Job Title</RadzenText>
-                <RadzenText TextStyle="TextStyle.Body1"><b>@user.JobTitle</b></RadzenText>
-            </RadzenStack>
-        </RadzenStack>
-        <RadzenCard class="rz-background-color-primary-lighter rz-shadow-0 rz-border-radius-0 rz-p-8" style="margin: 1rem;">
-            <RadzenText TextStyle="TextStyle.H6" class="rz-color-primary-light"><strong>Social Stats</strong></RadzenText>
-            <RadzenRow RowGap="0">
-                <RadzenColumn SizeSM="4">
-                    <RadzenText TextStyle="TextStyle.Overline" class="rz-color-primary-light rz-display-flex rz-mt-4 rz-mb-0">Posts</RadzenText>
-                    <RadzenText TextStyle="TextStyle.Body1"><b>@Posts.Count()</b></RadzenText>
-                    <RadzenText TextStyle="TextStyle.Overline" class="rz-color-primary-light rz-display-flex rz-mt-4 rz-mb-0">Likes</RadzenText>
-                    <RadzenText TextStyle="TextStyle.Body1"><b>@totalLikes.ToString()</b></RadzenText>
-                </RadzenColumn>
-                <RadzenColumn SizeSM="8">
-                    <RadzenText TextStyle="TextStyle.Overline" class="rz-color-primary-light rz-display-flex rz-mt-4 rz-mb-0">Comments</RadzenText>
-                    <RadzenText TextStyle="TextStyle.Body1"><b>0</b></RadzenText>
-                </RadzenColumn>
-            </RadzenRow>
-        </RadzenCard>
-    </RadzenCard>
-    <h4>
-        Liked tags
-    </h4>
-    <div class="form-group">
-        <label for="tagSearchInput">Search for a tag:</label>
-        <div class="input-group">
-            <input type="text" class="form-control" id="tagSearchInput" @bind-value="@searchQuery" @bind-value:event="oninput" placeholder="Enter a tag name..." />
-            <div class="input-group-append">
-                <button type="button" class="btn btn-primary" @onclick="AddTag">Add</button>
-            </div>
+    <div class="row">
+        <div class="col-4">
+            
+            <RadzenCard Class="rz-my-12 rz-mx-auto" Style="max-width: 420px; margin-top: 0px !important;">
+                <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.Start" Gap="1rem" Class="rz-p-4">
+                    <RadzenImage Path="@UserPhotoPath" Style="width: 100px; height: 100px; border-radius: 50%;" />
+                    <RadzenStack Gap="0">
+                        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-2 rz-my-0">Employee</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1"><b>@(user.DisplayName)</b></RadzenText>
+                        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">Department</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1"><b>@user.Department</b></RadzenText>
+                        <RadzenText TextStyle="TextStyle.Overline" class="rz-display-flex rz-mt-4 rz-mb-0">Job Title</RadzenText>
+                        <RadzenText TextStyle="TextStyle.Body1"><b>@user.JobTitle</b></RadzenText>
+                    </RadzenStack>
+                </RadzenStack>
+                <RadzenCard class="rz-background-color-primary-lighter rz-shadow-0 rz-border-radius-0 rz-p-8" style="margin: 1rem;">
+                    <RadzenText TextStyle="TextStyle.H6" class="rz-color-primary-light"><strong>Social Stats</strong></RadzenText>
+                    <RadzenRow RowGap="0">
+                        <RadzenColumn SizeSM="4">
+                            <RadzenText TextStyle="TextStyle.Overline" class="rz-color-primary-light rz-display-flex rz-mt-4 rz-mb-0">Posts</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Body1"><b>@Posts.Count()</b></RadzenText>
+                            <RadzenText TextStyle="TextStyle.Overline" class="rz-color-primary-light rz-display-flex rz-mt-4 rz-mb-0">Likes</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Body1"><b>@totalLikes.ToString()</b></RadzenText>
+                        </RadzenColumn>
+                        <RadzenColumn SizeSM="8">
+                            <RadzenText TextStyle="TextStyle.Overline" class="rz-color-primary-light rz-display-flex rz-mt-4 rz-mb-0">Comments</RadzenText>
+                            <RadzenText TextStyle="TextStyle.Body1"><b>0</b></RadzenText>
+                        </RadzenColumn>
+                    </RadzenRow>
+                </RadzenCard>
+            </RadzenCard>
+        </div>
+        <div class="col-8">
+            <h4>
+                    Liked tags
+                </h4>
+                <div class="form-group">
+                    <label for="tagSearchInput">Search for a tag:</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="tagSearchInput" @bind-value="@searchQuery" @bind-value:event="oninput" placeholder="Enter a tag name..." />
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-primary" @onclick="AddTag">Add</button>
+                        </div>
+                    </div>
+                </div>
+                @if (Tags.Any())
+                {
+                    <div class="form-group" style="margin-top: 10px !important;">
+                        <ul class="list-group">
+                            @foreach (var tag in Tags)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center">
+                                    <span>@tag</span>
+                                    <button type="button" class="btn btn-danger btn-sm" @onclick="() => RemoveTag(tag)">
+                                        <RadzenIcon Icon="delete" />
+                                    </button>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <p>No tags liked.</p>
+                }
+                
+                <p style="margin-top: 10px;">Right click on a table cell to open the context menu.</p>
+                <RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="5"
+                                AllowSorting="true" Data="@Posts" TItem="SearchPostResultDto" ColumnWidth="200px"
+                                SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedPosts CellContextMenu="@OnCellContextMenu">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Title" Title="Title" />
+                        <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Summary" Title="Summary" Sortable="false" Filterable="false" />
+                        <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Type" Title="Type" />
+                        <RadzenDataGridColumn TItem="SearchPostResultDto" Property="TagCount" Title="Amount of Tags" Filterable="false" />
+                        <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Likes" Title="Likes" Filterable="false" />
+                        <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Comments" Title="Comments" Filterable="false" />
+                    </Columns>
+                </RadzenDataGrid>
         </div>
     </div>
-    @if (Tags.Any())
-    {
-        <div class="form-group">
-            <label>Selected tags:</label>
-            <ul class="list-group">
-                @foreach (var tag in Tags)
-                {
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>@tag</span>
-                        <button type="button" class="btn btn-danger btn-sm" @onclick="() => RemoveTag(tag)">
-                            <RadzenIcon Icon="delete" />
-                        </button>
-                    </li>
-                }
-            </ul>
-        </div>
-    }
-    else
-    {
-        <p>No tags selected.</p>
-    }
-    
-    <p>Right click on a table cell to open the context menu.</p>
-    <RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
-                    AllowSorting="true" Data="@Posts" TItem="SearchPostResultDto" ColumnWidth="200px"
-                    SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedPosts CellContextMenu="@OnCellContextMenu">
-        <Columns>
-            <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Title" Title="Title" />
-            <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Summary" Title="Summary" Sortable="false" Filterable="false" />
-            <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Type" Title="Type" />
-            <RadzenDataGridColumn TItem="SearchPostResultDto" Property="TagCount" Title="Amount of Tags" Filterable="false" />
-            <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Likes" Title="Likes" Filterable="false" />
-            <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Comments" Title="Comments" Filterable="false" />
-        </Columns>
-    </RadzenDataGrid>
 }
 
 @code {

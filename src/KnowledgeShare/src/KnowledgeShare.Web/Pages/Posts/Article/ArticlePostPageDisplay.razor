@@ -16,22 +16,33 @@
     <div class="container">
         <h1 class="title">@ArticlePost.Title</h1>
         <p class="summary">@ArticlePost.GetSummary()</p>
-        <LinkPreview Link="@ArticlePost.GetLink()" />
+        <div style="float: right;">
+            <LinkPreview Link="@ArticlePost.GetLink()" />
+        </div>
 
-        <div class="row" style="margin-top: 20px;">
+        <div class="row" style="margin-top: 20px; margin-bottom: 20px;">
             @foreach (var tag in ArticlePost.Tags)
             {
                 <RadzenBadge Text=@tag.Value Style="margin-right: 5px; width: auto;"></RadzenBadge>
             }
         </div>
-        <div class="info">
-            <p class="author">Created by: @ArticlePost.GetAuthor().Name</p>
-            <p class="date">Created on: @ArticlePost.GetDateTimeCreated().ToShortDateString()</p>
+        <div class="row" style="margin-top: 50px;">
+            <div class="col-11">
+                <AuthorInfoComponent Author="@ArticlePost.GetAuthor()" DateTimeCreated="@ArticlePost.GetDateTimeCreated()" ></AuthorInfoComponent>
+            </div>
+            <div class="col-1">
+                <LikeComponent id="@Id" hasLiked="@hasLiked" likeCount="@likeCount"/>
+            </div>
         </div>
-
-        <LikeComponent id="@Id" hasLiked="@hasLiked" likeCount="@likeCount" />
+        <div class="row">
+            <div class="col-6">
+                <CommentComponent Id="@Id" />
+            </div>
+            <div class="col-6">
+                @*<RecommendPostsComponent Tags="@ArticlePost.Tags"></RecommendPostsComponent>*@
+            </div>
+        </div>
     </div>
-    <CommentComponent Id="@Id" />
 }
 
 
@@ -51,26 +62,7 @@
         font-size: 18px;
         line-height: 1.5;
         margin: 0 0 20px;
-    }
-
-    .info {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        margin: 0 0 20px;
-    }
-
-    .author {
-        font-size: 14px;
-        color: #888;
-        margin: 0;
-    }
-
-    .date {
-        font-size: 14px;
-        color: #888;
-        margin: 0;
-    }
+    } 
 </style>
 
 @code {
