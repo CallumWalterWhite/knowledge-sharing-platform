@@ -24,7 +24,7 @@ public class SearchPostQuery : ISearchPostQuery
         string query = "MATCH (n) WHERE (n:Post) " +
                        "MATCH (n)-[w:WROTE]-(person) " + 
                        "MATCH (n)-[r:HAS_TAG]->(t) " +
-                       "RETURN distinct n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name " +
+                       "RETURN distinct n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name, person.picture " +
                        "ORDER BY n.createdDateTime DESC " +
                        "SKIP $skip " +
                        "LIMIT 10";
@@ -34,7 +34,7 @@ public class SearchPostQuery : ISearchPostQuery
                     "MATCH (n)-[w:WROTE]-(person) " + 
                     "MATCH (n)-[r:HAS_TAG]->(t)" +
                     "WHERE toLower(t.value) IN $tags " +
-                    "RETURN distinct n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name " +
+                    "RETURN distinct n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name, person.picture " +
                     "ORDER BY n.createdDateTime DESC " +
                     "SKIP $skip " +
                     "LIMIT 10";
@@ -45,7 +45,7 @@ public class SearchPostQuery : ISearchPostQuery
                     "MATCH (n)-[w:WROTE]-(person) " + 
                     "MATCH (n)-[r:HAS_TAG]->(t)" +
                     "WHERE toLower(n.title) CONTAINS toLower($searchTerm) OR toLower(n.summary) CONTAINS toLower($searchTerm) " +
-                    "RETURN distinct n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name " +
+                    "RETURN distinct n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name, person.picture " +
                     "ORDER BY n.createdDateTime DESC " +
                     "SKIP $skip " +
                     "LIMIT 10";
@@ -56,7 +56,7 @@ public class SearchPostQuery : ISearchPostQuery
                     "MATCH (n)-[w:WROTE]-(person) " + 
                     "MATCH (n)-[r:HAS_TAG]->(t)" +
                     "WHERE (toLower(n.title) CONTAINS toLower($searchTerm) OR toLower(n.summary) CONTAINS toLower($searchTerm)) AND toLower(t.value) IN $tags " +
-                    "RETURN distinct n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name " +
+                    "RETURN distinct n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name, person.picture " +
                     "ORDER BY n.createdDateTime DESC " +
                     "SKIP $skip " +
                     "LIMIT 10";
@@ -76,6 +76,7 @@ public class SearchPostQuery : ISearchPostQuery
                             Summary = cursor.Current["n.summary"].ToString(),
                             CreatedDate = cursor.Current["n.createdDateTime"].ToString(),
                             UserCreatedName = cursor.Current["person.name"].ToString(),
+                            UserPhoto = cursor.Current["person.picture"].ToString(),
                             Type = cursor.Current["n.type"].ToString()
                         }
                     );
@@ -96,7 +97,7 @@ public class SearchPostQuery : ISearchPostQuery
         IResultCursor cursor = await _session.RunAsync(
             "MATCH (n) WHERE (n:Post) " +
             "MATCH (n)-[r:WROTE]-(person) " + 
-            "RETURN n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name " +
+            "RETURN n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name, person.picture " +
             "ORDER BY n.createdDateTime DESC", statementParameters);
         while (await cursor.FetchAsync())
         {
@@ -110,6 +111,7 @@ public class SearchPostQuery : ISearchPostQuery
                         Summary = cursor.Current["n.summary"].ToString(),
                         CreatedDate = cursor.Current["n.createdDateTime"].ToString(),
                         UserCreatedName = cursor.Current["person.name"].ToString(),
+                        UserPhoto = cursor.Current["person.picture"].ToString(),
                         Type = cursor.Current["n.type"].ToString()
                     }
                 );

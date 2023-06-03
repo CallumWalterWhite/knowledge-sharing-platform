@@ -4,8 +4,7 @@
 @using KnowledgeShare.Core.Social
 @inject ICreateLikeRelationshipService CreateLikeRelationshipService;
 <div class="actions">
-    <button disabled="@hasLiked" class="like-button" @onclick="Like"><i class="fas fa-heart"></i> Like</button>
-    <p class="likes">Likes: @likeCount</p>
+    <p class="likes"><RadzenIcon disabled="@hasLiked" class="like-button" @onclick="Like" Icon="favorite" /> @likeCount</p>
 </div>
 
 <style>
@@ -54,8 +53,11 @@
     
     private async Task Like()
     {
-        await CreateLikeRelationshipService.CreateLike(id);
-        hasLiked = true;
-        likeCount++;
+        if (hasLiked is false)
+        {
+            await CreateLikeRelationshipService.CreateLike(id);
+            hasLiked = true;
+            likeCount++;   
+        }
     }
 }

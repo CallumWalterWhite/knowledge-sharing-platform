@@ -18,6 +18,9 @@ public class SearchPostResultDto
     }
     
     private string? _createdDate { get; set; }
+    
+
+    public string? UserPhoto { get; set; }
 
     public string? UserCreatedName { get; set; }
     
