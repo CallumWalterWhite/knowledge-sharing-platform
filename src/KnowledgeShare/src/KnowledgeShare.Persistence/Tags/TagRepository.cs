@@ -176,7 +176,7 @@ namespace KnowledgeShare.Persistence.Tags
         public async Task<IEnumerable<Tag>> GetAllTags()
         {
             List<Tag> results = new List<Tag>();
-            IResultCursor cursor = await _session.RunAsync("MATCH (tag:Tag) RETURN tag.value, tag.id");
+            IResultCursor cursor = await _session.RunAsync("MATCH (tag:Tag) RETURN distinct tag.value, tag.id");
             while (await cursor.FetchAsync())
             {
                 object? value = cursor.Current["tag.value"];
