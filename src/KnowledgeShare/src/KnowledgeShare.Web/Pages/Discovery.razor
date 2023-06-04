@@ -255,10 +255,10 @@
                 "eval", "document.getElementsByClassName('scrollable-content')[0].clientHeight");
             if (scrollTop + clientHeight >= scrollHeight)
             {
-                isLoading = true;
                 page++;
-                if (isLoading && initalizing == false)
+                if (isLoading is false && initalizing == false)
                 {
+                    isLoading = true;
                     _searchPostDto.Title = searchTerm;
                     _searchPostDto.Skip = (page - 1) * 10;
                     Posts.AddRange((await SearchPostService.SearchAsync(_searchPostDto)).ToList());
@@ -275,9 +275,9 @@
 
     private async Task LoadPosts()
     {
-        isLoading = true;
-        if (isLoading)
+        if (isLoading is false)
         {
+            isLoading = true;
             _searchPostDto.Title = searchTerm;
             _searchPostDto.Skip = (page - 1) * 10;
             Posts = (await SearchPostService.SearchAsync(_searchPostDto)).ToList();
