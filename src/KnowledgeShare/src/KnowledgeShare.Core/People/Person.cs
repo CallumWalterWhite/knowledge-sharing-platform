@@ -34,6 +34,11 @@ public class Person
     
     public IList<Tag> PersonTags { get; set; }
 
+    public string GetPicture()
+    {
+        return string.IsNullOrWhiteSpace(Picture) ? "/Images/avatardefault.png" : Picture;
+    }
+
     public static Person Create(string userId, string name, string picture)
     {
         return new Person(Guid.NewGuid(), userId, name, picture);

@@ -217,7 +217,7 @@ else
             IList<Tag> tags = (await GetAllTagsService.GetLikedTagsAsync()).ToList();
             Tags = tags.Select(x => x.Value).ToList();
             totalLikes = Posts.Sum(x => x.Likes);
-            UserPhotoPath = person.Picture;
+            UserPhotoPath = string.IsNullOrWhiteSpace(person.Picture) ? "/Images/avatardefault.png" : person.Picture;
         }
         catch (Exception ex)
         {

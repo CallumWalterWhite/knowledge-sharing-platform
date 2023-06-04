@@ -40,4 +40,9 @@ public class SearchPostResultDto
     {
         return Summary;
     }
+
+    public string? GetUserPhoto()
+    {
+        return string.IsNullOrWhiteSpace(UserPhoto) ? "/Images/avatardefault.png" : UserPhoto;
+    }
 }

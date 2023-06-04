@@ -32,18 +32,27 @@ public class CheckUserMiddleware
                 User user = graphServiceClient.Me.Request().GetAsync().ConfigureAwait(true).GetAwaiter().GetResult();
                 if (user is not null)
                 {
-                    Stream photoStream = await graphServiceClient.Me.Photo.Content.Request().GetAsync();
-                    byte[] buffer = new byte[16*1024];
                     string dataImage = string.Empty;
-                    using (MemoryStream ms = new MemoryStream())
+                    try
                     {
-                        int read;
-                        while ((read = await photoStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                        Stream photoStream = await graphServiceClient.Me.Photo.Content.Request().GetAsync();
+                        byte[] buffer = new byte[16 * 1024];
+                        using (MemoryStream ms = new MemoryStream())
                         {
-                            ms.Write(buffer, 0, read);
+                            int read;
+                            while ((read = await photoStream.ReadAsync(buffer, 0, buffer.Length)) > 0)
+                            {
+                                ms.Write(buffer, 0, read);
+                            }
+
+                            byte[] data = ms.ToArray();
+                            dataImage = $"data:image/jpeg;base64,{Convert.ToBase64String(data)}";
                         }
-                        byte[] data = ms.ToArray();
-                        dataImage = $"data:image/jpeg;base64,{Convert.ToBase64String(data)}";
+                    }
+                    catch (Exception exception)
+                    {
+                        //IGNORE exception
+                        dataImage = string.Empty;
                     }
                     await personService.CreatePersonAsync(new CreatePersonDto(userName, user.DisplayName, dataImage));
                 }
