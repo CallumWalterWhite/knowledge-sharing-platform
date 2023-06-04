@@ -6,105 +6,105 @@
 @inject IGetAllTagsService GetAllTagsService;
 @inject NavigationManager NavigationManager;
 
-<h1>Edit Post</h1>
+<PageTitle>MHR Knowledge sharing platform - Edit post</PageTitle>
 <div class="row">
     <div class="col-2"></div>
     <div class="col-8">
-<PageTitle>MHR Knowledge sharing platform - Edit post</PageTitle>
-<EditForm Model="@post" OnValidSubmit="@Create">
-    <ValidationSummary />
-    @if (post.Discriminator == PostTypeDiscriminator.Article)
-    {
-        <div class="form-group">
-            <label for="title">Title</label>
-            <InputText class="form-control" id="title" @bind-Value="@(post.Title)" />
-            <ValidationMessage For="@(() => (post).Title)" />
-        </div>
+        <h1>Edit Post</h1>
+        <EditForm Model="@post" OnValidSubmit="@Create">
+            <ValidationSummary/>
+            @if (post.Discriminator == PostTypeDiscriminator.Article)
+            {
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <InputText class="form-control" id="title" @bind-Value="@(post.Title)"/>
+                    <ValidationMessage For="@(() => (post).Title)"/>
+                </div>
 
-        <div class="form-group">
-            <label for="link">Link</label>
-            <InputText class="form-control" id="link" @bind-Value="@(post.Link)" />
-            <ValidationMessage For="@(() => (post).Link)" />
-        </div>
+                <div class="form-group">
+                    <label for="link">Link</label>
+                    <InputText class="form-control" id="link" @bind-Value="@(post.Link)"/>
+                    <ValidationMessage For="@(() => (post).Link)"/>
+                </div>
 
-        <div class="form-group">
-            <label for="summary">Summary</label>
-            <RadzenTextArea class="form-control" id="summary" @bind-Value="@(post.Summary)" />
-            <ValidationMessage For="@(() => (post).Summary)" />
-        </div>
-    }
+                <div class="form-group">
+                    <label for="summary">Summary</label>
+                    <RadzenTextArea class="form-control" id="summary" @bind-Value="@(post.Summary)"/>
+                    <ValidationMessage For="@(() => (post).Summary)"/>
+                </div>
+            }
 
-    @if (post.Discriminator == PostTypeDiscriminator.Book)
-    {
-        <div class="form-group">
-            <label for="title">Title</label>
-            <InputText class="form-control" id="title" @bind-Value="@(post.Title)" />
-            <ValidationMessage For="@(() => (post).Title)" />
-        </div>
-        
-        <div class="form-group">
-            <label for="author">Author</label>
-            <InputText class="form-control" id="author" @bind-Value="@(post.Author)" />
-            <ValidationMessage For="@(() => (post).Author)" />
-        </div>
-        
-        <div class="form-group">
-            <label for="summary">Summary</label>
-            <RadzenTextArea class="form-control text-body" id="summary" @bind-Value="@(post.Summary)" />
-            <ValidationMessage For="@(() => (post).Summary)" />
-        </div>
-    }
-    
+            @if (post.Discriminator == PostTypeDiscriminator.Book)
+            {
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <InputText class="form-control" id="title" @bind-Value="@(post.Title)"/>
+                    <ValidationMessage For="@(() => (post).Title)"/>
+                </div>
 
-    @if (post.Discriminator == PostTypeDiscriminator.Free)
-    {
-        <div class="form-group">
-            <label for="title">Title</label>
-            <InputText class="form-control" id="title" @bind-Value="@(post.Title)" />
-            <ValidationMessage For="@(() => (post).Title)" />
-        </div>
-        
-        <div class="form-group">
-            <label for="title">Body</label>
-            <RadzenHtmlEditor @bind-Value=@freeFormValue style="height: 500px;" UploadUrl="upload/image">
-            </RadzenHtmlEditor>
-        </div>
-    }
-    
-    <div class="form-group">
-        <label for="tagSearchInput">Search for a tag:</label>
-        <div class="input-group">
-            <input type="text" class="form-control" id="tagSearchInput" @bind-value="@searchQuery" @bind-value:event="oninput" placeholder="Enter a tag name..." />
-            <div class="input-group-append">
-                <button type="button" class="btn btn-primary" @onclick="AddTag">Add</button>
+                <div class="form-group">
+                    <label for="author">Author</label>
+                    <InputText class="form-control" id="author" @bind-Value="@(post.Author)"/>
+                    <ValidationMessage For="@(() => (post).Author)"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="summary">Summary</label>
+                    <RadzenTextArea class="form-control text-body" id="summary" @bind-Value="@(post.Summary)"/>
+                    <ValidationMessage For="@(() => (post).Summary)"/>
+                </div>
+            }
+
+
+            @if (post.Discriminator == PostTypeDiscriminator.Free)
+            {
+                <div class="form-group">
+                    <label for="title">Title</label>
+                    <InputText class="form-control" id="title" @bind-Value="@(post.Title)"/>
+                    <ValidationMessage For="@(() => (post).Title)"/>
+                </div>
+
+                <div class="form-group">
+                    <label for="title">Body</label>
+                    <RadzenHtmlEditor @bind-Value=@freeFormValue style="height: 500px;" UploadUrl="upload/image">
+                    </RadzenHtmlEditor>
+                </div>
+            }
+
+            <div class="form-group">
+                <label for="tagSearchInput">Search for a tag:</label>
+                <div class="input-group">
+                    <input type="text" class="form-control" id="tagSearchInput" @bind-value="@searchQuery" @bind-value:event="oninput" placeholder="Enter a tag name..."/>
+                    <div class="input-group-append">
+                        <button type="button" class="btn btn-primary" @onclick="AddTag">Add</button>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    @if (Tags.Any())
-    {
-        <div class="form-group">
-            <label>Selected tags:</label>
-            <ul class="list-group">
-                @foreach (var tag in Tags)
-                {
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        <span>@tag</span>
-                        <button type="button" class="btn btn-danger btn-sm" @onclick="() => RemoveTag(tag)">
-                            <RadzenIcon Icon="delete" />
-                        </button>
-                    </li>
-                }
-            </ul>
-        </div>
-    }
-    else
-    {
-        <p>No tags selected.</p>
-    }
-    
+            @if (Tags.Any())
+            {
+                <div class="form-group">
+                    <label>Selected tags:</label>
+                    <ul class="list-group">
+                        @foreach (var tag in Tags)
+                        {
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <span>@tag</span>
+                                <button type="button" class="btn btn-danger btn-sm" @onclick="() => RemoveTag(tag)">
+                                    <RadzenIcon Icon="delete"/>
+                                </button>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            }
+            else
+            {
+                <p>No tags selected.</p>
+            }
 
-    <button style="margin-top: 20px; float: right;" type="submit" class="btn btn-primary">Save Post</button>
-</EditForm>
+
+            <button style="margin-top: 20px; float: right;" type="submit" class="btn btn-primary">Save Post</button>
+        </EditForm>
     </div>
     <div class="col-2"></div>
 </div>
