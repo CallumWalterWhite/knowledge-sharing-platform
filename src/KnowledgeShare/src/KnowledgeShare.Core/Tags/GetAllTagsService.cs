@@ -17,7 +17,7 @@ public class GetAllTagsService : IGetAllTagsService
 
     public async Task<IEnumerable<Tag>> GetAllAsync()
     {
-        return await _tagRepository.GetAllTags();
+        return (await _tagRepository.GetAllTags()).DistinctBy(x => x.Value);
     }
 
     public async Task<IEnumerable<Tag>> GetAllAsyncByValue(string value)
