@@ -7,7 +7,9 @@
 @inject NavigationManager NavigationManager;
 
 <h1>Edit Post</h1>
-
+<div class="row">
+    <div class="col-2"></div>
+    <div class="col-8">
 <PageTitle>MHR Knowledge sharing platform - Edit post</PageTitle>
 <EditForm Model="@post" OnValidSubmit="@Create">
     <ValidationSummary />
@@ -101,8 +103,26 @@
     }
     
 
-    <button style="margin-top: 20px;" type="submit" class="btn btn-primary">Save Post</button>
+    <button style="margin-top: 20px; float: right;" type="submit" class="btn btn-primary">Save Post</button>
 </EditForm>
+    </div>
+    <div class="col-2"></div>
+</div>
+
+<style>
+    .form-group{
+        margin-top: 10px;
+    }
+    
+    .validation-errors{
+        border: 1px solid #dc3545;
+        border-radius: 8px;
+        background: #dc3545;
+    }
+    .validation-message {
+        color: white !important;
+    }
+</style>
 
 @code {
     [Parameter]  
