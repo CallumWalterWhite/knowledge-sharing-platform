@@ -31,7 +31,7 @@ public class GraphVisualService : IGraphVisualService
         List<GraphNode> graphNodes = new List<GraphNode>();
         graphNodes.AddRange(tags.Select(x => new GraphNode(x.Id, x.Value, 1)));
         graphNodes.AddRange(posts.Select(x => new GraphNode(x.Id, x.Title, TypeResolver(x))));
-        graphNodes = graphNodes.DistinctBy(x => x.Id).ToList();
+        graphNodes = graphNodes.ToList();
         
         int minX = 0;
         int maxX = 1000;
