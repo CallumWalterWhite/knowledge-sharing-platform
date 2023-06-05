@@ -28,7 +28,10 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Remove="appsettings.json" />
+      <None Remove="appsettingsdev.json" />
+        <EmbeddedResource Include="appsettingsdev.json">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
