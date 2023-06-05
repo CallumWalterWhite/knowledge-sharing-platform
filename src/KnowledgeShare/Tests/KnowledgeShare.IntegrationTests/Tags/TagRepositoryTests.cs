@@ -2,7 +2,7 @@ using KnowledgeShare.Core.People;
 using KnowledgeShare.Core.Tags;
 using KnowledgeShare.Persistence.Tags;
 
-namespace KnowledgeShare.IntegrationTests.TagTest;
+namespace KnowledgeShare.IntegrationTests.Tags;
 
 public class TagRepositoryTests : IntegrationTestsDatabase
 {
