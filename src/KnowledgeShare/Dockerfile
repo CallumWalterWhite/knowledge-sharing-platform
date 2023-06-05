@@ -4,7 +4,10 @@ EXPOSE 80
 EXPOSE 443
 
 # Copy everything
-COPY . ./
+COPY . ./KnowledgeShare.Web
+COPY . ./KnowledgeShare.Core
+COPY . ./KnowledgeShare.Persistence
+COPY . ./KnowledgeShare.Domain
 # Restore as distinct layers
 RUN dotnet restore
 # Build and publish a release

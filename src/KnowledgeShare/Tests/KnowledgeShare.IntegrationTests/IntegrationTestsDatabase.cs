@@ -16,9 +16,7 @@ public class IntegrationTestsDatabase
     protected async Task WithSessionAsync(Func<IAsyncSession, Task> func)
     {
         IAsyncSession asyncSession = _driver.AsyncSession();
-        //await asyncSession.BeginTransactionAsync();
         await func.Invoke(asyncSession);
-        //await asyncSession.CloseAsync();
     }
     
     [TearDown]
