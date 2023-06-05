@@ -7,7 +7,7 @@ public class GlobalSetupFixture
 {
     private static IConfigurationRoot _configurationRoot = new ConfigurationBuilder()
         .SetBasePath(Directory.GetCurrentDirectory())
-        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+        .AddJsonFile("appsettingsdev.json", optional: false, reloadOnChange: true)
         .Build();
 
     public static string? Neo4jConfigUri => _configurationRoot.GetSection("Neo4j:uri").Value;
