@@ -2,9 +2,12 @@
 @using KnowledgeShare.Core.Posts
 @using Microsoft.AspNetCore.Components
 @using KnowledgeShare.Core.Tags
+@using KnowledgeShare.Core.Authentication
+@using KnowledgeShare.Core.People
 @inject IChangePostService ChangePostService;
 @inject IGetAllTagsService GetAllTagsService;
 @inject NavigationManager NavigationManager;
+@inject ICurrentAuthUser CurrentAuthUser;
 
 <PageTitle>MHR Knowledge sharing platform - Edit post</PageTitle>
 <div class="row">
@@ -148,6 +151,7 @@
         post = await ChangePostService.GetChangePostDto(Id, postTypeDiscriminator);
         post.Discriminator = postTypeDiscriminator;
         freeFormValue = post.Body;
+        Person person = (await CurrentAuthUser.GetPersonAsync())!;
         Tags = post.Tags.ToList();
     }
 

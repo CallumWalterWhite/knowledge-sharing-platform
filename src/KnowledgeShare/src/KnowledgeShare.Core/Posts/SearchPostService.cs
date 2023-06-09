@@ -45,16 +45,17 @@ public class SearchPostService : ISearchPostService
         return await Hydrate(searchPostResultDtos);
     }
 
-    public async Task<IEnumerable<SearchPostResultDto>> GetAllAsync()
+    public async Task<AdminSearchPostResultDto> GetAllAsync(AdminSearchPostDto adminSearchPostDto)
     {
-        Person? person = await _currentAuthUser.GetPersonAsync();
-        if (person is null)
+        IList<SearchPostResultDto> searchPostResultDtos = (await _searchPostQuery.AdminSearchAsync(adminSearchPostDto)).ToList();
+        searchPostResultDtos = await Hydrate(searchPostResultDtos);
+        int count = await _searchPostQuery.GetTotalCountAsync();
+        AdminSearchPostResultDto adminSearchPostResultDto = new AdminSearchPostResultDto()
         {
-            return new List<SearchPostResultDto>();
-        }
-
-        IList<SearchPostResultDto> searchPostResultDtos = (await _searchPostQuery.RecommendAsync(person.Id)).ToList();
-        return await Hydrate(searchPostResultDtos);
+            SearchPostResultDtos = searchPostResultDtos,
+            Count = count
+        };
+        return adminSearchPostResultDto;
     }
 
     public async Task<IEnumerable<SearchPostResultDto>> GetPostsByCurrentPersonAsync()

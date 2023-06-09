@@ -16,9 +16,21 @@
 
 <PageTitle>MHR Knowledge sharing platform - Admin</PageTitle>
 <p>Right click on a table cell to open the context menu.</p>
-<RadzenDataGrid AllowFiltering="true" FilterPopupRenderMode="PopupRenderMode.OnDemand" FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" AllowPaging="true" PageSize="10"
-                AllowSorting="true" Data="@AllPosts" TItem="SearchPostResultDto" ColumnWidth="200px"
-                SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedPosts CellContextMenu="@OnCellContextMenu">
+<RadzenDataGrid @ref="grid" 
+                CellContextMenu="@OnCellContextMenu" 
+                IsLoading=@isLoading 
+                Count="@count" 
+                Data="@posts" 
+                LoadData="@LoadData" 
+                FilterPopupRenderMode="PopupRenderMode.OnDemand" 
+                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+                AllowSorting="true" 
+                AllowFiltering="true" 
+                AllowPaging="true" 
+                PageSize="10" 
+                PagerHorizontalAlign="HorizontalAlign.Center" 
+                TItem="SearchPostResultDto" 
+                ColumnWidth="200px">
     <Columns>
         <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Title" Title="Title" />
         <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Summary" Title="Summary" Sortable="false" Filterable="false" />
@@ -30,14 +42,30 @@
 </RadzenDataGrid>
 
 @code {
+    bool isLoading = false;
+    int count;
+    RadzenDataGrid<SearchPostResultDto> grid;
+    IList<SearchPostResultDto> posts;
+    
+    async Task LoadData(LoadDataArgs args)
+    {
+        isLoading = true;
+
+        await Task.Yield();
+        AdminSearchPostResultDto adminSearchPostResultDto = await SearchPostService.GetAllAsync(new AdminSearchPostDto()
+        {
+            Skip = args.Skip ?? 0
+        });
+        count = adminSearchPostResultDto.Count;
+        posts = adminSearchPostResultDto.SearchPostResultDtos.ToList();
+
+        isLoading = false;
+    }
+    
+    
     private IEnumerable<SearchPostResultDto> AllPosts = new List<SearchPostResultDto>();
     IList<SearchPostResultDto> selectedPosts;
 
-    void ClearSelection()
-    {
-        selectedPosts = null;
-    }
-    
     void OnCellContextMenu(DataGridCellMouseEventArgs<SearchPostResultDto> args)
     {
         selectedPosts = new List<SearchPostResultDto>() { args.Data };
@@ -76,7 +104,7 @@
                                {
                                    await DeletePostService.DeletePostAsync(resultDto.Id);
                                    await DialogService.Alert("Post Deleted!", $"{resultDto.Title} has been deleted", new AlertOptions() { OkButtonText = "Ok" });
-                                   AllPosts = await SearchPostService.GetAllAsync();
+                                   //AllPosts = await SearchPostService.GetAllAsync();
                                    await base.OnInitializedAsync();
                                    selectedPosts = AllPosts.Take(1).ToList();
                                    await InvokeAsync(StateHasChanged);
@@ -85,11 +113,5 @@
                        }
             }
             );
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        AllPosts = await SearchPostService.GetAllAsync();
-        selectedPosts = AllPosts.Take(1).ToList();
     }
 }

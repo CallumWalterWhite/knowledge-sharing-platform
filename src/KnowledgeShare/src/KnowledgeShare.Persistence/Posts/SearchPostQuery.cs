@@ -87,6 +87,67 @@ public class SearchPostQuery : ISearchPostQuery
         return results;
     }
 
+    public async Task<IEnumerable<SearchPostResultDto>> AdminSearchAsync(AdminSearchPostDto adminSearchPostDto)
+    {
+        List<SearchPostResultDto> results = new List<SearchPostResultDto>();
+        Dictionary<string, object> statementParameters = new Dictionary<string, object>
+        {
+            {"searchTerm", adminSearchPostDto.Title },
+            {"skip", adminSearchPostDto.Skip },
+        };
+        string query = "MATCH (n) WHERE (n:Post) " +
+                       "MATCH (n)-[w:WROTE]-(person) " + 
+                       "MATCH (n)-[r:HAS_TAG]->(t) " +
+                       "RETURN distinct n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name, person.picture " +
+                       "ORDER BY n.createdDateTime DESC " +
+                       "SKIP $skip " +
+                       "LIMIT 10";
+        await _session.ExecuteReadAsync(async tx =>
+        {
+            IResultCursor cursor = await tx.RunAsync(query, statementParameters);
+            while (await cursor.FetchAsync())
+            {
+                if (cursor.Current is not null)
+                {
+                    results.Add(
+                        new SearchPostResultDto()
+                        {
+                            Id = Guid.Parse(cursor.Current["n.id"].ToString()),
+                            Title = cursor.Current["n.title"].ToString(),
+                            Summary = cursor.Current["n.summary"].ToString(),
+                            CreatedDate = cursor.Current["n.createdDateTime"].ToString(),
+                            UserCreatedName = cursor.Current["person.name"].ToString(),
+                            UserPhoto = cursor.Current["person.picture"].ToString(),
+                            Type = cursor.Current["n.type"].ToString()
+                        }
+                    );
+                }
+            } 
+        });
+
+        return results;
+    }
+
+    public async Task<int> GetTotalCountAsync()
+    {
+        int count = 0;
+        string query = "MATCH (n:Post) " +
+                       "RETURN count(n) as count ";
+        await _session.ExecuteReadAsync(async tx =>
+        {
+            IResultCursor cursor = await tx.RunAsync(query);
+            while (await cursor.FetchAsync())
+            {
+                if (cursor.Current is not null)
+                {
+                    count = int.Parse(cursor.Current["count"].ToString()!);
+                }
+            } 
+        });
+
+        return count;
+    }
+
     public async Task<IEnumerable<SearchPostResultDto>> RecommendAsync(Guid personId)
     {
         List<SearchPostResultDto> results = new List<SearchPostResultDto>();
