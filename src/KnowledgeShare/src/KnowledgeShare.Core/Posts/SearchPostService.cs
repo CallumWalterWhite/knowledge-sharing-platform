@@ -48,7 +48,7 @@ public class SearchPostService : ISearchPostService
     public async Task<AdminSearchPostResultDto> GetAllAsync(AdminSearchPostDto adminSearchPostDto)
     {
         IList<SearchPostResultDto> searchPostResultDtos = (await _searchPostQuery.AdminSearchAsync(adminSearchPostDto)).ToList();
-        searchPostResultDtos = await Hydrate(searchPostResultDtos);
+        searchPostResultDtos = await Hydrate(searchPostResultDtos, true);
         int count = await _searchPostQuery.GetTotalCountAsync();
         AdminSearchPostResultDto adminSearchPostResultDto = new AdminSearchPostResultDto()
         {
