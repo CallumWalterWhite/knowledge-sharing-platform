@@ -239,7 +239,6 @@ public class SearchPostQuery : ISearchPostQuery
                 );
             }
         }
-
         return results;
     }
 }

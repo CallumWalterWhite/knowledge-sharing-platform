@@ -1,5 +1,6 @@
 ﻿using KnowledgeShare.Core.Authentication;
 using KnowledgeShare.Core.People;
+using KnowledgeShare.Core.Posts;
 
 namespace KnowledgeShare.Core.Tags;
 
@@ -7,12 +8,18 @@ public class GetAllTagsService : IGetAllTagsService
 {
     private readonly ITagRepository _tagRepository;
 
+    private readonly ISearchPostQuery _searchPostQuery;
+
     private readonly ICurrentAuthUser _currentAuthUser;
 
-    public GetAllTagsService(ITagRepository tagRepository, ICurrentAuthUser currentAuthUser)
+    public GetAllTagsService(
+        ITagRepository tagRepository, 
+        ICurrentAuthUser currentAuthUser, 
+        ISearchPostQuery searchPostQuery)
     {
         _tagRepository = tagRepository;
         _currentAuthUser = currentAuthUser;
+        _searchPostQuery = searchPostQuery;
     }
 
     public async Task<IEnumerable<Tag>> GetAllAsync()
@@ -20,9 +27,9 @@ public class GetAllTagsService : IGetAllTagsService
         return (await _tagRepository.GetAllTags()).DistinctBy(x => x.Value.ToLower());
     }
 
-    public async Task<IEnumerable<Tag>> GetAllAsyncByValue(string value)
+    public async Task<IEnumerable<TagPostCountDto>> GetAllWithPostCountAsync()
     {
-        return await _tagRepository.GetAllTagsByValue(value);
+        return (await _tagRepository.GetAllTagsWithPostCount()).ToList();
     }
 
     public async Task<IEnumerable<Tag>> GetLikedTagsAsync()

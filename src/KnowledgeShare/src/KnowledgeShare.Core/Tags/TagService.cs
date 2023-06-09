@@ -39,4 +39,15 @@ public class TagService : ITagService
         Person? person = await _currentAuthUser.GetPersonAsync();
         await _tagRepository.DeletePersonLikeTagRelationship(person!.Id, tag);
     }
+
+    public async Task DeleteTag(Guid id)
+    {
+        Tag? tag = await _tagRepository.GetTagByIdAsync(id);
+        if (tag is null)
+        {
+            return;
+        }
+        
+        await _tagRepository.DeleteAsync(tag);
+    }
 }

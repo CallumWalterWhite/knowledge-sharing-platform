@@ -1,12 +1,15 @@
 ﻿@page "/admin-posts"
 @using KnowledgeShare.Core.Posts
 @using KnowledgeShare.Core.Authentication
+@using KnowledgeShare.Core.Tags
 @inject ISearchPostService SearchPostService;
 @inject NavigationManager NavigationManager;
 @inject ContextMenuService ContextMenuService
 @inject DialogService DialogService
 @inject IDeletePostService DeletePostService;
 @inject ICurrentAuthUser CurrentAuthUser;
+@inject IGetAllTagsService GetAllTagsService;
+@inject ITagService TagService;
 @{
     if (!CurrentAuthUser.GetPersonAsync().GetAwaiter().GetResult()!.IsAdmin)
     {
@@ -15,7 +18,7 @@
 }
 
 <PageTitle>MHR Knowledge sharing platform - Admin</PageTitle>
-<p>Right click on a table cell to open the context menu.</p>
+<p>Posts</p>
 <RadzenDataGrid @ref="grid" 
                 CellContextMenu="@OnCellContextMenu" 
                 IsLoading=@isLoading 
@@ -41,11 +44,31 @@
     </Columns>
 </RadzenDataGrid>
 
+<p>Tags</p>
+<RadzenDataGrid 
+    AllowFiltering="true" 
+    FilterPopupRenderMode="PopupRenderMode.OnDemand" 
+    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+    AllowPaging="true" 
+    PageSize="10"
+    AllowSorting="true" 
+    Data="@tags" TItem="TagPostCountDto" 
+    ColumnWidth="200px"
+    SelectionMode="DataGridSelectionMode.Single" 
+    CellContextMenu="@OnTagCellContextMenu">
+    <Columns>
+        <RadzenDataGridColumn TItem="TagPostCountDto" Property="Tag" Title="Tag" />
+        <RadzenDataGridColumn TItem="TagPostCountDto" Property="Count" Title="Post count" />
+    </Columns>
+</RadzenDataGrid>
+
 @code {
     bool isLoading = false;
     int count;
     RadzenDataGrid<SearchPostResultDto> grid;
     IList<SearchPostResultDto> posts;
+
+    IList<TagPostCountDto> tags;
     
     async Task LoadData(LoadDataArgs args)
     {
@@ -61,15 +84,10 @@
 
         isLoading = false;
     }
-    
-    
-    private IEnumerable<SearchPostResultDto> AllPosts = new List<SearchPostResultDto>();
-    IList<SearchPostResultDto> selectedPosts;
 
     void OnCellContextMenu(DataGridCellMouseEventArgs<SearchPostResultDto> args)
     {
-        selectedPosts = new List<SearchPostResultDto>() { args.Data };
-        SearchPostResultDto resultDto = selectedPosts.First();
+        SearchPostResultDto resultDto = args.Data;
 
         ContextMenuService.Open(args,
             new List<ContextMenuItem> {
@@ -104,14 +122,45 @@
                                {
                                    await DeletePostService.DeletePostAsync(resultDto.Id);
                                    await DialogService.Alert("Post Deleted!", $"{resultDto.Title} has been deleted", new AlertOptions() { OkButtonText = "Ok" });
-                                   //AllPosts = await SearchPostService.GetAllAsync();
                                    await base.OnInitializedAsync();
-                                   selectedPosts = AllPosts.Take(1).ToList();
                                    await InvokeAsync(StateHasChanged);
                                }
                            }
                        }
             }
             );
+    }
+    
+
+    void OnTagCellContextMenu(DataGridCellMouseEventArgs<TagPostCountDto> args)
+    {
+        TagPostCountDto resultDto = args.Data;
+
+        ContextMenuService.Open(args,
+            new List<ContextMenuItem> {
+                new ContextMenuItem(){ Text = "Delete", Value = 1, }
+            }, 
+            async (e) => {
+                       if (int.Parse(e.Value.ToString() ?? string.Empty) == 1)
+                       {
+                           bool? result = await DialogService.Confirm($"Are you sure you want to delete {resultDto.Tag}?", "Delete tag", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+                           if (result is not null)
+                           {
+                               if (result.Value)
+                               {
+                                   await TagService.DeleteTag(resultDto.Id);
+                                   await DialogService.Alert("Tag Deleted!", $"{resultDto.Tag} has been deleted", new AlertOptions() { OkButtonText = "Ok" });
+                                   await base.OnInitializedAsync();
+                                   await InvokeAsync(StateHasChanged);
+                               }
+                           }
+                       }
+            }
+            );
+    }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        tags = (await GetAllTagsService.GetAllWithPostCountAsync()).ToList();
     }
 }

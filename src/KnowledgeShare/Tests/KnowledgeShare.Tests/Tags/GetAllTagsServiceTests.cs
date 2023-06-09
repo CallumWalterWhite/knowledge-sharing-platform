@@ -1,5 +1,6 @@
 ﻿using KnowledgeShare.Core.Authentication;
 using KnowledgeShare.Core.People;
+using KnowledgeShare.Core.Posts;
 using KnowledgeShare.Core.Tags;
 using Moq;
 
@@ -11,13 +12,15 @@ public class GetAllTagsServiceTests
     private GetAllTagsService _getAllTagsService;
     private Mock<ITagRepository> _tagRepositoryMock;
     private Mock<ICurrentAuthUser> _currentAuthUserMock;
+    private Mock<ISearchPostQuery> _searchPostQuery;
 
     [SetUp]
     public void SetUp()
     {
         _tagRepositoryMock = new Mock<ITagRepository>();
         _currentAuthUserMock = new Mock<ICurrentAuthUser>();
-        _getAllTagsService = new GetAllTagsService(_tagRepositoryMock.Object, _currentAuthUserMock.Object);
+        _searchPostQuery = new Mock<ISearchPostQuery>();
+        _getAllTagsService = new GetAllTagsService(_tagRepositoryMock.Object, _currentAuthUserMock.Object, _searchPostQuery.Object);
     }
 
     [Test]
@@ -39,27 +42,6 @@ public class GetAllTagsServiceTests
         // Assert
         Assert.AreEqual(3, result.Count());
         Assert.IsTrue(result.All(x => x.Value == "Tag1" || x.Value == "Tag2" || x.Value == "Tag3"));
-    }
-
-    [Test]
-    public async Task GetAllAsyncByValue_ShouldReturnMatchingTags()
-    {
-        // Arrange
-        IEnumerable<Tag> tags = new List<Tag>
-        {
-            new Tag(Guid.NewGuid(), "Tag1"),
-            new Tag(Guid.NewGuid(), "Tag1"),
-            new Tag(Guid.NewGuid(), "Tag3"),
-            new Tag(Guid.NewGuid(), "Tag4")
-        };
-        _tagRepositoryMock.Setup(r => r.GetAllTagsByValue("Tag1")).ReturnsAsync(tags.Where(t => t.Value == "Tag1"));
-
-        // Act
-        IEnumerable<Tag> result = await _getAllTagsService.GetAllAsyncByValue("Tag1");
-
-        // Assert
-        Assert.AreEqual(2, result.Count());
-        Assert.IsTrue(result.All(x => x.Value == "Tag1"));
     }
 
     [Test]

@@ -25,7 +25,42 @@ namespace KnowledgeShare.Persistence.Tags
                     statementParameters);
             });
         }
-        
+
+        public async Task DeleteAsync(Tag tag)
+        {
+            Dictionary<string, object> statementParameters = new Dictionary<string, object>
+            {
+                {"id", tag.Id.ToString() }
+            };
+            await _session.ExecuteWriteAsync(async tx =>
+            {
+                await tx.RunAsync("MATCH (tag:Tag WHERE tag.id = $id) DETACH DELETE tag ",
+                    statementParameters);
+            });
+        }
+
+        public async Task<IEnumerable<TagPostCountDto>> GetAllTagsWithPostCount()
+        {
+            List<TagPostCountDto> results = new List<TagPostCountDto>();
+            IResultCursor cursor = await _session.RunAsync("MATCH (n) WHERE (n:Post) MATCH (n)-[r:HAS_TAG]->(t) RETURN t.id, t.value, count(n) as count");
+            while (await cursor.FetchAsync())
+            {
+                object? value = cursor.Current["t.value"];
+                object? id = cursor.Current["t.id"];
+                object? count = cursor.Current["count"];
+                if (value is not null)
+                {
+                    results.Add(new TagPostCountDto(
+                        Guid.Parse(id.ToString()),
+                        value.ToString() ?? string.Empty,
+                        int.Parse(count.ToString())
+                    ));   
+                }
+            }
+
+            return results;
+        }
+
         public async Task<bool> MatchAsync(string value)
         {
             bool matched = false;
@@ -58,6 +93,27 @@ namespace KnowledgeShare.Persistence.Tags
                 if (value is not null)
                 {
                     tag = new Tag(Guid.Parse(id.ToString()), value.ToString());
+                }
+            }
+
+            return tag;
+        }
+
+        public async Task<Tag?> GetTagByIdAsync(Guid id)
+        {
+            Dictionary<string, object> statementParameters = new Dictionary<string, object>
+            {
+                {"id", id.ToString() }
+            };
+            Tag? tag = null;
+            IResultCursor cursor = await _session.RunAsync("MATCH (tag:Tag WHERE toLower(tag.id) = $id) RETURN tag.id, tag.value", statementParameters);
+            while (await cursor.FetchAsync())
+            {
+                object? value = cursor.Current["tag.value"];
+                object? tagId = cursor.Current["tag.id"];
+                if (value is not null)
+                {
+                    tag = new Tag(Guid.Parse(tagId.ToString()), value.ToString());
                 }
             }
 
