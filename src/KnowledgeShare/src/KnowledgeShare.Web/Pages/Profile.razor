@@ -50,7 +50,7 @@ else
                         </RadzenColumn>
                         <RadzenColumn SizeSM="8">
                             <RadzenText TextStyle="TextStyle.Overline" class="rz-color-primary-light rz-display-flex rz-mt-4 rz-mb-0">Comments</RadzenText>
-                            <RadzenText TextStyle="TextStyle.Body1"><b>0</b></RadzenText>
+                            <RadzenText TextStyle="TextStyle.Body1"><b>@totalComments.ToString()</b></RadzenText>
                         </RadzenColumn>
                     </RadzenRow>
                 </RadzenCard>
@@ -114,6 +114,7 @@ else
     User user;
 
     int totalLikes = 0;
+    int totalComments = 0;
     
     private IEnumerable<SearchPostResultDto> Posts = new List<SearchPostResultDto>();
     IList<SearchPostResultDto> selectedPosts;
@@ -217,6 +218,7 @@ else
             IList<Tag> tags = (await GetAllTagsService.GetLikedTagsAsync()).ToList();
             Tags = tags.Select(x => x.Value).ToList();
             totalLikes = Posts.Sum(x => x.Likes);
+            totalComments = Posts.Sum(x => x.Comments);
             UserPhotoPath = string.IsNullOrWhiteSpace(person.Picture) ? "/Images/avatardefault.png" : person.Picture;
         }
         catch (Exception ex)

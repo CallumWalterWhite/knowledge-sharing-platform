@@ -16,14 +16,17 @@ public class SearchPostService : ISearchPostService
     private readonly ITagRepository _tagRepository;
 
     private readonly ILikeRepository _likeRepository;
+
+    private readonly IPostCommentRepository _commentRepository;
     
     public SearchPostService(
-        ISearchPostQuery searchPostQuery, ICurrentAuthUser currentAuthUser, ITagRepository tagRepository, ILikeRepository likeRepository)
+        ISearchPostQuery searchPostQuery, ICurrentAuthUser currentAuthUser, ITagRepository tagRepository, ILikeRepository likeRepository, IPostCommentRepository commentRepository)
     {
         _searchPostQuery = searchPostQuery;
         _currentAuthUser = currentAuthUser;
         _tagRepository = tagRepository;
         _likeRepository = likeRepository;
+        _commentRepository = commentRepository;
     }
 
     public async Task<IEnumerable<SearchPostResultDto>> SearchAsync(SearchPostDto searchPostDto)
@@ -83,6 +86,7 @@ public class SearchPostService : ISearchPostService
             IEnumerable<Tag> tags = await _tagRepository.GetAllTagsByPostId(searchPostResultDto.Id);
             searchPostResultDto.Tags = tags.Select(x => x.Value).ToList();
             searchPostResultDto.Likes = (await _likeRepository.GetPeopleIdsByPostIdAsync(searchPostResultDto.Id)).Count();
+            searchPostResultDto.Comments = (await _commentRepository.GetPostCommentsAsync(searchPostResultDto.Id)).Count();
         }
 
         return searchPostResultDtos;
