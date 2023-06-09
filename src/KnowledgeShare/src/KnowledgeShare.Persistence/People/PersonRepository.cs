@@ -59,7 +59,29 @@ public class PersonRepository : IPersonRepository
 
         return person;
     }
-    
+
+    public async Task SetAdminAsync(Guid id, bool admin)
+    {
+        Dictionary<string, object> statementParameters = new Dictionary<string, object>
+        {
+            {"id", id.ToString() },
+            {"isadmin", admin }
+        };
+        await _session.RunAsync("MATCH (p:Person WHERE p.id = $id) SET p.isadmin = $isadmin", statementParameters);
+    }
+
+    public async Task<IEnumerable<Person>> GetAllAsync()
+    {
+        List<Person> people = new List<Person>();
+        IResultCursor cursor = await _session.RunAsync("MATCH (p:Person) RETURN p{ id: p.id, userId: p.userId, name: p.name, picture: p.picture, isadmin: p.isadmin}");
+        while (await cursor.FetchAsync())
+        {
+            people.Add(CreatePersonFromResult(cursor.Current));
+        }
+
+        return people;
+    }
+
     private Person CreatePersonFromResult(IRecord record)
     {
         return new Person(

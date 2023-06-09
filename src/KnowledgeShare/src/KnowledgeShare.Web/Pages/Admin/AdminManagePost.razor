@@ -1,6 +1,7 @@
 ﻿@page "/admin-posts"
 @using KnowledgeShare.Core.Posts
 @using KnowledgeShare.Core.Authentication
+@using KnowledgeShare.Core.People
 @using KnowledgeShare.Core.Tags
 @inject ISearchPostService SearchPostService;
 @inject NavigationManager NavigationManager;
@@ -10,6 +11,7 @@
 @inject ICurrentAuthUser CurrentAuthUser;
 @inject IGetAllTagsService GetAllTagsService;
 @inject ITagService TagService;
+@inject IPersonService PersonService;
 @{
     if (!CurrentAuthUser.GetPersonAsync().GetAwaiter().GetResult()!.IsAdmin)
     {
@@ -43,24 +45,47 @@
         <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Comments" Title="Comments" Filterable="false" />
     </Columns>
 </RadzenDataGrid>
-
-<p>Tags</p>
-<RadzenDataGrid 
-    AllowFiltering="true" 
-    FilterPopupRenderMode="PopupRenderMode.OnDemand" 
-    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
-    AllowPaging="true" 
-    PageSize="10"
-    AllowSorting="true" 
-    Data="@tags" TItem="TagPostCountDto" 
-    ColumnWidth="200px"
-    SelectionMode="DataGridSelectionMode.Single" 
-    CellContextMenu="@OnTagCellContextMenu">
-    <Columns>
-        <RadzenDataGridColumn TItem="TagPostCountDto" Property="Tag" Title="Tag" />
-        <RadzenDataGridColumn TItem="TagPostCountDto" Property="Count" Title="Post count" />
-    </Columns>
-</RadzenDataGrid>
+<div class="row mt-5">
+    <div class="col-6">
+        <p>Tags</p>
+        <RadzenDataGrid 
+            AllowFiltering="true" 
+            FilterPopupRenderMode="PopupRenderMode.OnDemand" 
+            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+            AllowPaging="true" 
+            PageSize="10"
+            AllowSorting="true" 
+            Data="@tags" TItem="TagPostCountDto" 
+            ColumnWidth="200px"
+            SelectionMode="DataGridSelectionMode.Single" 
+            CellContextMenu="@OnTagCellContextMenu">
+            <Columns>
+                <RadzenDataGridColumn TItem="TagPostCountDto" Property="Tag" Title="Tag" />
+                <RadzenDataGridColumn TItem="TagPostCountDto" Property="Count" Title="Post count" />
+            </Columns>
+        </RadzenDataGrid>
+    </div>
+    <div class="col-6">
+        <p>People</p>
+        <RadzenDataGrid 
+            AllowFiltering="true" 
+            FilterPopupRenderMode="PopupRenderMode.OnDemand" 
+            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+            AllowPaging="true" 
+            PageSize="10"
+            AllowSorting="true" 
+            Data="@people" TItem="Person" 
+            ColumnWidth="200px"
+            SelectionMode="DataGridSelectionMode.Single" 
+            CellContextMenu="@OnPersonCellContextMenu">
+            <Columns>
+                <RadzenDataGridColumn TItem="Person" Property="UserId" Title="User Id" />
+                <RadzenDataGridColumn TItem="Person" Property="Name" Title="Name" />
+                <RadzenDataGridColumn TItem="Person" Property="IsAdmin" Title="Is a admin?" />
+            </Columns>
+        </RadzenDataGrid>
+    </div>
+</div>
 
 @code {
     bool isLoading = false;
@@ -69,6 +94,7 @@
     IList<SearchPostResultDto> posts;
 
     IList<TagPostCountDto> tags;
+    IList<Person> people;
     
     async Task LoadData(LoadDataArgs args)
     {
@@ -123,6 +149,7 @@
                                    await DeletePostService.DeletePostAsync(resultDto.Id);
                                    await DialogService.Alert("Post Deleted!", $"{resultDto.Title} has been deleted", new AlertOptions() { OkButtonText = "Ok" });
                                    await base.OnInitializedAsync();
+                                   await grid.GoToPage(1, true);
                                    await InvokeAsync(StateHasChanged);
                                }
                            }
@@ -150,6 +177,7 @@
                                {
                                    await TagService.DeleteTag(resultDto.Id);
                                    await DialogService.Alert("Tag Deleted!", $"{resultDto.Tag} has been deleted", new AlertOptions() { OkButtonText = "Ok" });
+                                   tags = (await GetAllTagsService.GetAllWithPostCountAsync()).ToList();
                                    await base.OnInitializedAsync();
                                    await InvokeAsync(StateHasChanged);
                                }
@@ -159,8 +187,58 @@
             );
     }
     
+    void OnPersonCellContextMenu(DataGridCellMouseEventArgs<Person> args)
+    {
+        Person resultDto = args.Data;
+        string contextMenuText = 
+            resultDto.IsAdmin ?
+            "Revoke admin":
+                "Grant admin";
+        ContextMenuService.Open(args,
+            new List<ContextMenuItem> {
+                new ContextMenuItem(){ Text = contextMenuText, Value = 1, }
+            }, 
+            async (e) => {
+                 if (int.Parse(e.Value.ToString() ?? string.Empty) == 1)
+                 {
+                     if (resultDto.IsAdmin)
+                     {
+                         bool? result = await DialogService.Confirm($"Are you sure you want to remove {resultDto.Name} as admin?", "Revoke admin", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+                         if (result is not null)
+                         {
+                             if (result.Value)
+                             {
+                                 await PersonService.SetIsAdminAsync(resultDto.Id, false);
+                                 await DialogService.Alert("Admin Revoked!", $"{resultDto.Name} has been revoke admin privileges", new AlertOptions() { OkButtonText = "Ok" });
+                                 people = (await PersonService.GetAllPeopleAsync()).ToList();
+                                 await base.OnInitializedAsync();
+                                 await InvokeAsync(StateHasChanged);
+                             }
+                         }
+                     }
+                     else
+                     {
+                         bool? result = await DialogService.Confirm($"Are you sure you want to grant {resultDto.Name} as admin?", "Grant admin", new ConfirmOptions() { OkButtonText = "Yes", CancelButtonText = "No" });
+                         if (result is not null)
+                         {
+                             if (result.Value)
+                             {
+                                 await PersonService.SetIsAdminAsync(resultDto.Id, true);
+                                 await DialogService.Alert("Admin Granted!", $"{resultDto.Name} has been granted admin privileges", new AlertOptions() { OkButtonText = "Ok" });
+                                 people = (await PersonService.GetAllPeopleAsync()).ToList();
+                                 await base.OnInitializedAsync();
+                                 await InvokeAsync(StateHasChanged);
+                             }
+                         }
+                     }
+                 }
+            }
+            );
+    }
+    
     protected override async Task OnInitializedAsync()
     {
         tags = (await GetAllTagsService.GetAllWithPostCountAsync()).ToList();
+        people = (await PersonService.GetAllPeopleAsync()).ToList();
     }
 }

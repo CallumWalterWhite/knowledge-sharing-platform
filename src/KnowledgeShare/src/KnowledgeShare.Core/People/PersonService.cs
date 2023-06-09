@@ -20,4 +20,14 @@ public class PersonService : IPersonService
         Person person = Person.Create(createPersonDto.UserId, createPersonDto.Name, createPersonDto.DataImage);
         await _personRepository.AddAsync(person);
     }
+
+    public async Task<IEnumerable<Person>> GetAllPeopleAsync()
+    {
+        return await _personRepository.GetAllAsync();
+    }
+
+    public async Task SetIsAdminAsync(Guid personId, bool isAdmin)
+    {
+        await _personRepository.SetAdminAsync(personId, isAdmin);
+    }
 }
