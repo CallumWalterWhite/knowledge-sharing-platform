@@ -10,18 +10,17 @@ This is a knowledge sharing platform built using .NET and Neo4j graph database. 
 
 ## Technologies
 * Blazor web app for web application development
-* .NET framework for server-side programming
 * Neo4j graph database for efficient and scalable data management
 * HTML, CSS, and JavaScript for front-end development
 * Bootstrap for responsive web design
 * C# for server-side programming
-* Visual Studio for development environment
+* Visual Studio/Rider for development environment
 
 ## Installation
-To use this platform, you need to have .NET and Neo4j installed on your system.
+To use this platform, you need to set up an App registration on your Azure portal tenant and obtain the Tenant ID, Client ID, and Client Secret. Additionally, make sure you have .NET and Neo4j installed on your system.
 * Clone the repository to your local machine
 * Open the project in Visual Studio
-* Set up the database connection in the appsettings.json file
+* Set up the database connection and Azure AD configuration in the appsettings.json file, using the obtained credentials
 * Build and run the application
 
 ## License
