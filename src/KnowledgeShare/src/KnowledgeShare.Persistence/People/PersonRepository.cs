@@ -44,22 +44,6 @@ public class PersonRepository : IPersonRepository
         });
     }
     
-    public async Task<Person?> GetAsync(Guid id)
-    {
-        Person? person = null;
-        Dictionary<string, object> statementParameters = new Dictionary<string, object>
-        {
-            {"id", id.ToString() }
-        };
-        IResultCursor cursor = await _session.RunAsync("MATCH (p:Person WHERE p.id = $id) RETURN p{ id: p.id, userId: p.userId, name: p.name, picture: p.picture, isadmin: p.isadmin}", statementParameters);
-        while (await cursor.FetchAsync())
-        {
-            person = CreatePersonFromResult(cursor.Current);
-        }
-
-        return person;
-    }
-
     public async Task SetAdminAsync(Guid id, bool admin)
     {
         Dictionary<string, object> statementParameters = new Dictionary<string, object>
