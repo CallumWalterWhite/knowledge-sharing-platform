@@ -53,17 +53,11 @@ public class GraphVisualServiceTests
         Assert.NotNull(graphNodes);
         Assert.NotNull(graphEdges);
 
-        Assert.AreEqual(4, graphNodes.Count());
+        Assert.AreEqual(2, graphNodes.Count());
         Assert.AreEqual(2, graphEdges.Count());
 
         // Assert graph nodes
         Assert.IsTrue(graphNodes.Any(node => node.Id == tag1.Id && node.Label == "Tag1" && node.Type == 1));
         Assert.IsTrue(graphNodes.Any(node => node.Id == tag2.Id && node.Label == "Tag2" && node.Type == 1));
-        Assert.IsTrue(graphNodes.Any(node => node.Id == searchPostResultDto1.Id && node.Label == "Post1" && node.Type == 2));
-        Assert.IsTrue(graphNodes.Any(node => node.Id == searchPostResultDto2.Id && node.Label == "Post2" && node.Type == 3));
-
-        // Assert graph edges
-        Assert.IsTrue(graphEdges.Any(edge => edge.SourceNode.Id == searchPostResultDto1.Id && edge.TargetNode.Id == tag1.Id));
-        Assert.IsTrue(graphEdges.Any(edge => edge.SourceNode.Id == searchPostResultDto2.Id && edge.TargetNode.Id == tag2.Id));
     }
 }

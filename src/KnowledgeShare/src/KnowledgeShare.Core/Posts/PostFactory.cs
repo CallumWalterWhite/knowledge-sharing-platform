@@ -19,7 +19,6 @@ public class PostFactory : IPostFactory
         Person? person = await _currentAuthUser.GetPersonAsync();
         if (person is null)
         {
-            //TODO: Raise exception
             throw new ArgumentException();
         }
         CreatePostDtoValidator.Validate(createPostDto);
