@@ -41,8 +41,9 @@ namespace KnowledgeShare.Persistence.Tags
 
         public async Task<IEnumerable<TagPostCountDto>> GetAllTagsWithPostCount()
         {
+            await using var transaction = await _session.BeginTransactionAsync();
             List<TagPostCountDto> results = new List<TagPostCountDto>();
-            IResultCursor cursor = await _session.RunAsync("MATCH (n) WHERE (n:Post) MATCH (n)-[r:HAS_TAG]->(t) RETURN t.id, t.value, count(n) as count");
+            IResultCursor cursor = await transaction.RunAsync("MATCH (n) WHERE (n:Post) MATCH (n)-[r:HAS_TAG]->(t) RETURN t.id, t.value, count(n) as count");
             while (await cursor.FetchAsync())
             {
                 object? value = cursor.Current["t.value"];
@@ -58,34 +59,39 @@ namespace KnowledgeShare.Persistence.Tags
                 }
             }
 
+            await transaction.CommitAsync();
+
             return results;
         }
 
         public async Task<bool> MatchAsync(string value)
         {
+            await using var transaction = await _session.BeginTransactionAsync();
             bool matched = false;
             Dictionary<string, object> statementParameters = new Dictionary<string, object>
             {
                 {"value", value.ToLower() }
             };
-            IResultCursor cursor = await _session.RunAsync("MATCH (tag:Tag WHERE tag.value = $value) RETURN tag.value", statementParameters);
+            IResultCursor cursor = await transaction.RunAsync("MATCH (tag:Tag WHERE tag.value = $value) RETURN tag.value", statementParameters);
             while (await cursor.FetchAsync())
             {
                 object? tag = cursor.Current["tag.value"];
                 matched = tag is not null;
             }
+            await transaction.CommitAsync();
 
             return matched;
         }
 
         public async Task<Tag?> GetAsync(string tagValue)
         {
+            await using var transaction = await _session.BeginTransactionAsync();
             Dictionary<string, object> statementParameters = new Dictionary<string, object>
             {
                 {"value", tagValue.ToLower() }
             };
             Tag? tag = null;
-            IResultCursor cursor = await _session.RunAsync("MATCH (tag:Tag WHERE toLower(tag.value) = toLower($value)) RETURN tag.id, tag.value", statementParameters);
+            IResultCursor cursor = await transaction.RunAsync("MATCH (tag:Tag WHERE toLower(tag.value) = toLower($value)) RETURN tag.id, tag.value", statementParameters);
             while (await cursor.FetchAsync())
             {
                 object? value = cursor.Current["tag.value"];
@@ -95,6 +101,7 @@ namespace KnowledgeShare.Persistence.Tags
                     tag = new Tag(Guid.Parse(id.ToString()), value.ToString());
                 }
             }
+            await transaction.CommitAsync();
 
             return tag;
         }
@@ -122,12 +129,13 @@ namespace KnowledgeShare.Persistence.Tags
 
         public async Task<IEnumerable<Tag>> GetAllTagsByValue(string value)
         {
+            await using var transaction = await _session.BeginTransactionAsync();
             List<Tag> results = new List<Tag>();
             Dictionary<string, object> statementParameters = new Dictionary<string, object>
             {
                 {"searchQuery", value },
             };
-            IResultCursor cursor = await _session.RunAsync(
+            IResultCursor cursor = await transaction.RunAsync(
                 "MATCH (t:Tag)\nWHERE toLower(t.value) CONTAINS toLower($searchQuery)\nRETURN t.id, t.value, apoc.text.distance(t.value, $searchQuery, 2) AS distance\nORDER BY distance", statementParameters);
             while (await cursor.FetchAsync())
             {
@@ -141,6 +149,8 @@ namespace KnowledgeShare.Persistence.Tags
                     ));   
                 }
             }
+
+            await transaction.CommitAsync();
 
             return results;
         }
@@ -231,8 +241,9 @@ namespace KnowledgeShare.Persistence.Tags
 
         public async Task<IEnumerable<Tag>> GetAllTags()
         {
+            await using var transaction = await _session.BeginTransactionAsync();
             List<Tag> results = new List<Tag>();
-            IResultCursor cursor = await _session.RunAsync("MATCH (tag:Tag) RETURN distinct tag.value, tag.id");
+            IResultCursor cursor = await transaction.RunAsync("MATCH (tag:Tag) RETURN distinct tag.value, tag.id");
             while (await cursor.FetchAsync())
             {
                 object? value = cursor.Current["tag.value"];
@@ -245,6 +256,8 @@ namespace KnowledgeShare.Persistence.Tags
                     ));   
                 }
             }
+
+            await transaction.CommitAsync();
 
             return results;
         }

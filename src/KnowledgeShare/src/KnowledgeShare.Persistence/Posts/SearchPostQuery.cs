@@ -61,28 +61,28 @@ public class SearchPostQuery : ISearchPostQuery
                     "SKIP $skip " +
                     "LIMIT 10";
         }
-        await _session.ExecuteReadAsync(async tx =>
+
+        await using var transaction = await _session.BeginTransactionAsync();
+        IResultCursor cursor = await transaction.RunAsync(query, statementParameters);
+        while (await cursor.FetchAsync())
         {
-            IResultCursor cursor = await tx.RunAsync(query, statementParameters);
-            while (await cursor.FetchAsync())
+            if (cursor.Current is not null)
             {
-                if (cursor.Current is not null)
-                {
-                    results.Add(
-                        new SearchPostResultDto()
-                        {
-                            Id = Guid.Parse(cursor.Current["n.id"].ToString()),
-                            Title = cursor.Current["n.title"].ToString(),
-                            Summary = cursor.Current["n.summary"].ToString(),
-                            CreatedDate = cursor.Current["n.createdDateTime"].ToString(),
-                            UserCreatedName = cursor.Current["person.name"].ToString(),
-                            UserPhoto = cursor.Current["person.picture"].ToString(),
-                            Type = cursor.Current["n.type"].ToString()
-                        }
-                    );
-                }
-            } 
-        });
+                results.Add(
+                    new SearchPostResultDto()
+                    {
+                        Id = Guid.Parse(cursor.Current["n.id"].ToString()),
+                        Title = cursor.Current["n.title"].ToString(),
+                        Summary = cursor.Current["n.summary"].ToString(),
+                        CreatedDate = cursor.Current["n.createdDateTime"].ToString(),
+                        UserCreatedName = cursor.Current["person.name"].ToString(),
+                        UserPhoto = cursor.Current["person.picture"].ToString(),
+                        Type = cursor.Current["n.type"].ToString()
+                    }
+                );
+            }
+        } 
+        await transaction.CommitAsync();
 
         return results;
     }
@@ -102,28 +102,27 @@ public class SearchPostQuery : ISearchPostQuery
                        "ORDER BY n.createdDateTime DESC " +
                        "SKIP $skip " +
                        "LIMIT 10";
-        await _session.ExecuteReadAsync(async tx =>
+        await using var transaction = await _session.BeginTransactionAsync();
+        IResultCursor cursor = await transaction.RunAsync(query, statementParameters);
+        while (await cursor.FetchAsync())
         {
-            IResultCursor cursor = await tx.RunAsync(query, statementParameters);
-            while (await cursor.FetchAsync())
+            if (cursor.Current is not null)
             {
-                if (cursor.Current is not null)
-                {
-                    results.Add(
-                        new SearchPostResultDto()
-                        {
-                            Id = Guid.Parse(cursor.Current["n.id"].ToString()),
-                            Title = cursor.Current["n.title"].ToString(),
-                            Summary = cursor.Current["n.summary"].ToString(),
-                            CreatedDate = cursor.Current["n.createdDateTime"].ToString(),
-                            UserCreatedName = cursor.Current["person.name"].ToString(),
-                            UserPhoto = cursor.Current["person.picture"].ToString(),
-                            Type = cursor.Current["n.type"].ToString()
-                        }
-                    );
-                }
-            } 
-        });
+                results.Add(
+                    new SearchPostResultDto()
+                    {
+                        Id = Guid.Parse(cursor.Current["n.id"].ToString()),
+                        Title = cursor.Current["n.title"].ToString(),
+                        Summary = cursor.Current["n.summary"].ToString(),
+                        CreatedDate = cursor.Current["n.createdDateTime"].ToString(),
+                        UserCreatedName = cursor.Current["person.name"].ToString(),
+                        UserPhoto = cursor.Current["person.picture"].ToString(),
+                        Type = cursor.Current["n.type"].ToString()
+                    }
+                );
+            }
+        }  
+        await transaction.CommitAsync();
 
         return results;
     }
@@ -133,17 +132,16 @@ public class SearchPostQuery : ISearchPostQuery
         int count = 0;
         string query = "MATCH (n:Post) " +
                        "RETURN count(n) as count ";
-        await _session.ExecuteReadAsync(async tx =>
+        await using var transaction = await _session.BeginTransactionAsync();
+        IResultCursor cursor = await transaction.RunAsync(query);
+        while (await cursor.FetchAsync())
         {
-            IResultCursor cursor = await tx.RunAsync(query);
-            while (await cursor.FetchAsync())
+            if (cursor.Current is not null)
             {
-                if (cursor.Current is not null)
-                {
-                    count = int.Parse(cursor.Current["count"].ToString()!);
-                }
-            } 
-        });
+                count = int.Parse(cursor.Current["count"].ToString()!);
+            }
+        } 
+        await transaction.CommitAsync();
 
         return count;
     }
@@ -155,7 +153,8 @@ public class SearchPostQuery : ISearchPostQuery
         {
             {"searchTerm", personId.ToString() },
         };
-        IResultCursor cursor = await _session.RunAsync(
+        await using var transaction = await _session.BeginTransactionAsync();
+        IResultCursor cursor = await transaction.RunAsync(
             "MATCH (n) WHERE (n:Post) " +
             "MATCH (n)-[r:WROTE]-(person) " + 
             "RETURN n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name, person.picture " +
@@ -178,6 +177,7 @@ public class SearchPostQuery : ISearchPostQuery
                 );
             }
         }
+        await transaction.CommitAsync();
 
         return results;
     }
@@ -189,7 +189,8 @@ public class SearchPostQuery : ISearchPostQuery
         {
             {"person_id", personId.ToString() },
         };
-        IResultCursor cursor = await _session.RunAsync(
+        await using var transaction = await _session.BeginTransactionAsync();
+        IResultCursor cursor = await transaction.RunAsync(
             "MATCH (p:Person)-[:WROTE]->(post:Post) " +
             "WHERE p.id = $person_id "  +
             "RETURN post.id, post.summary, post.title, post.type", statementParameters);
@@ -208,6 +209,7 @@ public class SearchPostQuery : ISearchPostQuery
                 );
             }
         }
+        await transaction.CommitAsync();
 
         return results;
     }
@@ -219,7 +221,8 @@ public class SearchPostQuery : ISearchPostQuery
         {
             {"tagId", tagId.ToString() },
         };
-        IResultCursor cursor = await _session.RunAsync(
+        await using var transaction = await _session.BeginTransactionAsync();
+        IResultCursor cursor = await transaction.RunAsync(
             "MATCH (n) WHERE (n:Post) " +
             "MATCH (n)-[r:HAS_TAG]->(t) " +
             "WHERE t.id = $tagId " +
@@ -239,6 +242,7 @@ public class SearchPostQuery : ISearchPostQuery
                 );
             }
         }
+        await transaction.CommitAsync();
         return results;
     }
 }

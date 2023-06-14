@@ -8,12 +8,12 @@ public class PostBaseRepository
 {
     private readonly IAsyncSession _session;
 
-    public PostBaseRepository(IAsyncSession session)
+    protected PostBaseRepository(IAsyncSession session)
     {
         _session = session;
     }
-    
-    public async Task AddAuthorAsync(Post post)
+
+    protected async Task AddAuthorAsync(Post post)
     {
         Dictionary<string, object?> statementParameters = new Dictionary<string, object?>
         {
@@ -21,18 +21,36 @@ public class PostBaseRepository
             {"personId", post.GetAuthor().Id.ToString() }
         };
 
-        await _session.ExecuteWriteAsync(async tx =>
+        await using var transaction = await _session.BeginTransactionAsync();
+        string query = "MATCH (a:Person), (b:Post) " +
+                       "WHERE a.id = $personId AND b.id = $postId " +
+                       "CREATE (a)-[:WROTE]->(b)";
+        await transaction.RunAsync(query,
+            statementParameters);
+        await transaction.CommitAsync();
+    }
+
+    protected async Task AddTagsAsync(Post post)
+    {
+        await using var transaction = await _session.BeginTransactionAsync();
+        foreach(Tag tag in post.Tags)
         {
-            string query = "MATCH (a:Person), (b:Post) " +
-                           "WHERE a.id = $personId AND b.id = $postId " +
-                           "CREATE (a)-[:WROTE]->(b)";
-            await tx.RunAsync(query,
+            Dictionary<string, object?> statementParameters = new Dictionary<string, object?>
+            {
+                {"postId", post.Id.ToString() },
+                {"tagId", tag.Id.ToString() }
+            };
+            string query = "MATCH (a:Post { id: $postId }), (t:Tag { id: $tagId }) " +
+                           "MERGE (a)-[:HAS_TAG]->(t)";
+            await transaction.RunAsync(query,
                 statementParameters);
-        });
+        }
+        await transaction.CommitAsync();
     }
-    
-    public async Task AddTagsAsync(Post post)
+
+    protected async Task RemoveTagsAsync(Post post)
     {
+        await using var transaction = await _session.BeginTransactionAsync();
         foreach(Tag tag in post.Tags)
         {
             Dictionary<string, object?> statementParameters = new Dictionary<string, object?>
@@ -41,46 +59,23 @@ public class PostBaseRepository
                 {"tagId", tag.Id.ToString() }
             };
 
-            await _session.ExecuteWriteAsync(async tx =>
-            {
-                string query = "MATCH (a:Post { id: $postId }), (t:Tag { id: $tagId }) " +
-                               "MERGE (a)-[:HAS_TAG]->(t)";
-                await tx.RunAsync(query,
-                    statementParameters);
-            });
+            string query = "MATCH (a:Post { id: $postId })-[t:HAS_TAG]->()" +
+                           "DELETE t";
+            await transaction.RunAsync(query,
+                statementParameters);
         }
+        await transaction.CommitAsync();
     }
-    
-    public async Task RemoveTagsAsync(Post post)
-    {
-        foreach(Tag tag in post.Tags)
-        {
-            Dictionary<string, object?> statementParameters = new Dictionary<string, object?>
-            {
-                {"postId", post.Id.ToString() },
-                {"tagId", tag.Id.ToString() }
-            };
 
-            await _session.ExecuteWriteAsync(async tx =>
-            {
-                string query = "MATCH (a:Post { id: $postId })-[t:HAS_TAG]->()" +
-                               "DELETE t";
-                await tx.RunAsync(query,
-                    statementParameters);
-            });
-        }
-    }
-    
-    public async Task DeleteAsync(Guid postId)
+    protected async Task DeleteAsync(Guid postId)
     {
+        await using var transaction = await _session.BeginTransactionAsync();
         Dictionary<string, object> statementParameters = new Dictionary<string, object>
         {
             {"id", postId.ToString() }
         };
-        await _session.ExecuteWriteAsync(async tx =>
-        {
-            await tx.RunAsync("MATCH (n:Post) WHERE n.id = $id DETACH DELETE n",
-                statementParameters);
-        });
+        await transaction.RunAsync("MATCH (n:Post) WHERE n.id = $id DETACH DELETE n",
+            statementParameters);
+        await transaction.CommitAsync();
     }
 }
