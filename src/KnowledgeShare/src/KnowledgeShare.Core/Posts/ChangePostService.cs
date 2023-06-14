@@ -95,6 +95,7 @@ public class ChangePostService : IChangePostService
 
     private async Task<IEnumerable<Tag>> CreateTags(IEnumerable<string> tags)
     {
+        tags = tags.Select(x => x.ToLower()).ToList();
         List<Tag> tagEntities = new List<Tag>();
         foreach (string value in tags)
         {

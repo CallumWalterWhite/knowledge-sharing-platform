@@ -17,6 +17,7 @@ public class TagService : ITagService
 
     public async Task CreateTagForPersonAsync(string tagValue)
     {
+        tagValue = tagValue.ToLower();
         Tag? tag = await _tagRepository.GetAsync(tagValue);
         if (tag is null)
         {
