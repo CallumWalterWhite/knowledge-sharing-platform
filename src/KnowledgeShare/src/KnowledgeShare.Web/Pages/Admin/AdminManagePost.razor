@@ -21,21 +21,18 @@
 
 <PageTitle>MHR Knowledge sharing platform - Admin</PageTitle>
 <p>Posts</p>
-<RadzenDataGrid @ref="grid" 
-                CellContextMenu="@OnCellContextMenu" 
-                IsLoading=@isLoading 
-                Count="@count" 
-                Data="@posts" 
-                LoadData="@LoadData" 
-                FilterPopupRenderMode="PopupRenderMode.OnDemand" 
-                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
-                AllowSorting="true" 
-                AllowFiltering="true" 
-                AllowPaging="true" 
-                PageSize="10" 
-                PagerHorizontalAlign="HorizontalAlign.Center" 
-                TItem="SearchPostResultDto" 
-                ColumnWidth="200px">
+<RadzenDataGrid 
+    AllowFiltering="true" 
+    FilterPopupRenderMode="PopupRenderMode.OnDemand" 
+    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive" 
+    AllowPaging="true" 
+    PageSize="10"
+    AllowSorting="true" 
+    Data="@posts" 
+    TItem="SearchPostResultDto" 
+    ColumnWidth="200px"
+    SelectionMode="DataGridSelectionMode.Single" 
+    CellContextMenu="@OnCellContextMenu">
     <Columns>
         <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Title" Title="Title" />
         <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Summary" Title="Summary" Sortable="false" Filterable="false" />
@@ -45,6 +42,7 @@
         <RadzenDataGridColumn TItem="SearchPostResultDto" Property="Comments" Title="Comments" Filterable="false" />
     </Columns>
 </RadzenDataGrid>
+
 <div class="row mt-5">
     <div class="col-6">
         <p>Tags</p>
@@ -149,7 +147,11 @@
                                    await DeletePostService.DeletePostAsync(resultDto.Id);
                                    await DialogService.Alert("Post Deleted!", $"{resultDto.Title} has been deleted", new AlertOptions() { OkButtonText = "Ok" });
                                    await base.OnInitializedAsync();
-                                   await grid.GoToPage(1, true);
+                                   AdminSearchPostResultDto adminSearchPostResultDto = await SearchPostService.GetAllAsync(new AdminSearchPostDto()
+                                   {
+                                       Skip = 0
+                                   });
+                                   posts = adminSearchPostResultDto.SearchPostResultDtos.ToList();
                                    await InvokeAsync(StateHasChanged);
                                }
                            }
@@ -238,6 +240,11 @@
     
     protected override async Task OnInitializedAsync()
     {
+        AdminSearchPostResultDto adminSearchPostResultDto = await SearchPostService.GetAllAsync(new AdminSearchPostDto()
+        {
+            Skip = 0
+        });
+        posts = adminSearchPostResultDto.SearchPostResultDtos.ToList();
         tags = (await GetAllTagsService.GetAllWithPostCountAsync()).ToList();
         people = (await PersonService.GetAllPeopleAsync()).ToList();
     }

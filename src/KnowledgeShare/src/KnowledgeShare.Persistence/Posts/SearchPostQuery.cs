@@ -101,7 +101,7 @@ public class SearchPostQuery : ISearchPostQuery
                        "RETURN distinct n.id, n.summary, n.title, n.type, n.createdDateTime, person.id, person.userid, person.name, person.picture " +
                        "ORDER BY n.createdDateTime DESC " +
                        "SKIP $skip " +
-                       "LIMIT 10";
+                       "LIMIT 100";
         await using var transaction = await _session.BeginTransactionAsync();
         IResultCursor cursor = await transaction.RunAsync(query, statementParameters);
         while (await cursor.FetchAsync())
