@@ -11,9 +11,8 @@ This is a knowledge sharing platform built using .NET and Neo4j graph database. 
 ## Technologies
 * Blazor web app for web application development
 * Neo4j graph database for efficient and scalable data management
-* HTML, CSS, and JavaScript for front-end development
 * Bootstrap for responsive web design
-* C# for server-side programming
+* C# .NET for server-side programming
 * Visual Studio/Rider for development environment
 
 ## Installation
